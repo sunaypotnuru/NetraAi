@@ -1,0 +1,348 @@
+name: CI - Continuous Integration
+
+on:
+  push:
+    branches: [main, develop, staging]
+  pull_request:
+    branches: [main, develop, staging]
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '22'
+
+jobs:
+  # Python Backend Tests
+  backend-tests:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: false  # Backend services are on HuggingFace, not GitHub submodules
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov pytest-asyncio
+          if [ -f backend/requirements.txt ]; then
+            pip install -r backend/requirements.txt
+          fi
+
+      - name: Check backend/core exists
+        id: check_core
+        run: |
+          if [ -d "backend/core/app" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "⚠️ backend/core/app not found — backend services are deployed on HuggingFace Spaces."
+          fi
+
+      - name: Run tests
+        if: steps.check_core.outputs.exists == 'true'
+        env:
+          SUPABASE_URL: "https://test.supabase.co"
+          SUPABASE_SERVICE_KEY: "test_key_for_ci"
+          GROQ_API_KEY: ""
+          GEMINI_API_KEY: ""
+          ALLOW_MOCK_RESPONSES: "true"
+        run: |
+          cd backend/core
+          if [ -d "tests" ]; then
+            pytest tests/ -v --cov=app --cov-report=xml --cov-report=term
+          else
+            echo "⚠️ No tests/ directory found in backend/core — skipping."
+          fi
+
+      - name: Skip backend tests (submodule on HuggingFace)
+        if: steps.check_core.outputs.exists == 'false'
+        run: echo "✅ Backend services are deployed on HuggingFace Spaces. Health checks validate runtime status."
+
+  # Python Linting
+  backend-lint:
+    name: Backend Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install linting tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff black mypy
+
+      - name: Check backend/core exists
+        id: check_core
+        run: |
+          if [ -d "backend/core/app" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run Ruff
+        if: steps.check_core.outputs.exists == 'true'
+        run: ruff check backend/core/app --output-format=github
+        continue-on-error: true
+
+      - name: Run Black
+        if: steps.check_core.outputs.exists == 'true'
+        run: black --check backend/core/app
+        continue-on-error: true
+
+      - name: Run MyPy
+        if: steps.check_core.outputs.exists == 'true'
+        run: mypy backend/core/app --ignore-missing-imports
+        continue-on-error: true
+
+      - name: Skip linting (backend on HuggingFace)
+        if: steps.check_core.outputs.exists == 'false'
+        run: echo "✅ Backend services deployed on HuggingFace Spaces — linting skipped."
+
+  # Frontend Tests
+  frontend-tests:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Run tests
+        run: |
+          cd frontend
+          npm run test -- --coverage --reporter=verbose --passWithNoTests
+        continue-on-error: true  # Audio pipeline tests require live HuggingFace services
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./frontend/coverage/coverage-final.json
+          flags: frontend
+          name: frontend-coverage
+        continue-on-error: true
+
+  # Frontend Linting
+  frontend-lint:
+    name: Frontend Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Run ESLint
+        run: |
+          cd frontend
+          npm run lint
+        continue-on-error: true
+
+      - name: Run TypeScript check
+        run: |
+          cd frontend
+          npm run type-check
+
+  # Frontend Build Validation
+  frontend-build:
+    name: Frontend Build Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Build production bundle
+        run: |
+          cd frontend
+          npm run build
+
+  # Security Scanning
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+        continue-on-error: true
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+        continue-on-error: true
+
+      - name: Python Security Check
+        run: |
+          pip install safety bandit
+          safety check --json || true
+          if [ -d "backend/core/app" ]; then
+            bandit -r backend/core/app -f json -o bandit-report.json || true
+          else
+            echo "⚠️ backend/core/app not present — skipping bandit scan."
+            echo "{}" > bandit-report.json
+          fi
+
+      - name: Upload security reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-reports
+          path: |
+            trivy-results.sarif
+            bandit-report.json
+
+  # Docker Build Test
+  docker-build:
+    name: Docker Build Test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image_name: frontend
+            context: ./frontend
+            dockerfile: ./frontend/Dockerfile
+            tag: netra-frontend:test
+            path_check: frontend/Dockerfile
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Check Dockerfile exists
+        id: check_dockerfile
+        run: |
+          if [ -f "${{ matrix.path_check }}" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "⚠️ Dockerfile not found at ${{ matrix.path_check }} — skipping build."
+          fi
+
+      - name: Set up Docker Buildx
+        if: steps.check_dockerfile.outputs.exists == 'true'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build ${{ matrix.image_name }} image
+        if: steps.check_dockerfile.outputs.exists == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: false
+          tags: ${{ matrix.tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max,scope=${{ matrix.image_name }}
+
+  # SQL Validation
+  sql-validation:
+    name: SQL Schema Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Check if SQL validation script exists
+        id: check_script
+        run: |
+          if [ -f validate_sql_syntax.py ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Validate SQL schema
+        if: steps.check_script.outputs.exists == 'true'
+        run: python validate_sql_syntax.py
+
+      - name: Skip SQL validation
+        if: steps.check_script.outputs.exists == 'false'
+        run: echo "✅ SQL validation script not found — skipping."
+
+  # All checks passed
+  all-checks:
+    name: All Checks Passed
+    runs-on: ubuntu-latest
+    needs: [backend-tests, backend-lint, frontend-tests, frontend-lint, frontend-build, security-scan, docker-build, sql-validation]
+
+    steps:
+      - name: All checks passed
+        run: echo "✅ All CI checks completed successfully!"

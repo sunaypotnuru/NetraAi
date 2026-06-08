@@ -1,0 +1,119 @@
+/* src/styles/design.css */
+:root {
+  /* Color palette */
+  --color-primary: hsl(171deg 70% 45%); /* teal */
+  --color-secondary: hsl(220deg 80% 55%); /* blue */
+  --color-accent: hsl(340deg 80% 55%); /* pink */
+  --color-bg-dark: hsl(220deg 30% 10%);
+  --color-bg-gradient-start: #f0fdfa;
+  --color-bg-gradient-end: #faf5ff;
+  --color-card-bg: hsl(0deg 0% 100% / 80%);
+  --color-card-border: hsl(0deg 0% 0% / 8%);
+  --color-text-primary: #0F172A;
+  --color-text-secondary: rgb(15 23 42 / 60%);
+}
+
+/* System preference dark mode */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --color-bg-dark: hsl(220deg 30% 12%);
+    --color-bg-gradient-start: hsl(220deg 30% 12%);
+    --color-bg-gradient-end: hsl(220deg 30% 6%);
+    --color-card-bg: hsl(0deg 0% 100% / 8%);
+    --color-card-border: hsl(0deg 0% 100% / 12%);
+    --color-text-primary: #fff;
+    --color-text-secondary: rgb(255 255 255 / 80%);
+  }
+}
+
+/* Explicit class-based dark mode */
+.dark, [data-theme="dark"] {
+  --color-bg-dark: hsl(220deg 30% 12%);
+  --color-bg-gradient-start: hsl(220deg 30% 12%);
+  --color-bg-gradient-end: hsl(220deg 30% 6%);
+  --color-card-bg: hsl(0deg 0% 100% / 8%);
+  --color-card-border: hsl(0deg 0% 100% / 12%);
+  --color-text-primary: #fff;
+  --color-text-secondary: rgb(255 255 255 / 80%);
+}
+
+body {
+  font-family: Inter, system-ui, -apple-system, Helvetica, Arial, sans-serif;
+  background: linear-gradient(135deg, var(--color-bg-gradient-start), var(--color-bg-gradient-end));
+  color: var(--color-text-primary);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Glassmorphism card */
+.glass-card {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  padding: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgb(0 0 0 / 40%);
+}
+
+/* Buttons */
+.btn-primary {
+  display: inline-block;
+  background: var(--color-primary);
+  color: var(--color-text-primary);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.btn-primary:hover {
+  background: hsl(171deg 70% 50%);
+  transform: scale(1.02);
+}
+
+.btn-secondary {
+  background: var(--color-secondary);
+  color: var(--color-text-primary);
+}
+
+.btn-secondary:hover {
+  background: hsl(220deg 80% 60%);
+}
+
+/* Heading styles */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-text-primary);
+  margin-top: 0;
+}
+
+/* Link styles */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: hsl(171deg 70% 55%);
+  text-decoration: none;
+}
+
+/* Utility classes */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.grid-gap {
+  display: grid;
+  gap: 1.5rem;
+}
+
