@@ -37,17 +37,14 @@ def test_get_pending_doctors(mock_dependencies):
     mock_table = mock_dependencies
     
     # Configure mock chain for get_pending_doctors
-    # supabase.table("profiles_doctor").select("*").eq("verification_status", "pending").neq("is_admin", True).execute()
-    mock_select = MagicMock()
-    mock_eq = MagicMock()
-    mock_neq = MagicMock()
-    mock_execute = MagicMock()
+    # supabase.table("profiles_doctor").select("*").eq("verification_status", "pending").neq("is_admin", True).neq("email", "sunaypotnuru@gmail.com").execute()
+    mock_query = MagicMock()
+    mock_query.select.return_value = mock_query
+    mock_query.eq.return_value = mock_query
+    mock_query.neq.return_value = mock_query
     
-    mock_table.return_value = mock_select
-    mock_select.select.return_value = mock_eq
-    mock_eq.eq.return_value = mock_neq
-    mock_neq.neq.return_value = mock_execute
-    mock_execute.execute.return_value.data = [
+    mock_table.return_value = mock_query
+    mock_query.execute.return_value.data = [
         {"id": "doc1", "email": "doc1@example.com", "verification_status": "pending", "is_admin": False}
     ]
     
@@ -60,9 +57,10 @@ def test_get_pending_doctors(mock_dependencies):
     
     # Verify exact call chains
     mock_table.assert_any_call("profiles_doctor")
-    mock_select.select.assert_called_with("*")
-    mock_eq.eq.assert_called_with("verification_status", "pending")
-    mock_neq.neq.assert_called_with("is_admin", True)
+    mock_query.select.assert_called_with("*")
+    mock_query.eq.assert_any_call("verification_status", "pending")
+    mock_query.neq.assert_any_call("is_admin", True)
+    mock_query.neq.assert_any_call("email", "sunaypotnuru@gmail.com")
 
 def test_verify_doctor_approve(mock_dependencies):
     """Test approving a doctor updates is_verified and verification_status to approved."""
@@ -134,37 +132,22 @@ def test_get_all_doctors_excludes_admins(mock_dependencies):
     mock_profiles_query = MagicMock()
     mock_table.return_value = mock_profiles_query
     
-    # Chain 1: Count
-    mock_count_select = MagicMock()
-    mock_count_neq = MagicMock()
-    mock_count_execute = MagicMock()
-    mock_count_execute.execute.return_value.count = 5
-    
-    # Chain 2: Fetch
-    mock_fetch_select = MagicMock()
-    mock_fetch_neq = MagicMock()
-    mock_fetch_order = MagicMock()
-    mock_fetch_range = MagicMock()
-    mock_fetch_execute = MagicMock()
-    mock_fetch_execute.execute.return_value.data = [
-        {"id": "doc1", "email": "doc1@example.com", "verification_status": "approved", "is_admin": False}
-    ]
-    
     # Hook it all up: since the mock_table returns the same mock query builder,
     # we can use side_effects or structured mocks depending on call pattern.
-    # To keep it simple, we can set up mock_profiles_query to return appropriate chains.
-    # Note that in python we can inspect the call arguments to differentiate count select vs select("*").
     def select_side_effect(columns=None, count=None):
+        res = MagicMock()
+        res.select.return_value = res
+        res.eq.return_value = res
+        res.neq.return_value = res
+        res.order.return_value = res
+        res.range.return_value = res
         if count == "exact":
-            res = MagicMock()
-            res.neq.return_value.execute.return_value.count = 5
-            return res
+            res.execute.return_value.count = 5
         else:
-            res = MagicMock()
-            res.neq.return_value.order.return_value.range.return_value.execute.return_value.data = [
+            res.execute.return_value.data = [
                 {"id": "doc1", "email": "doc1@example.com", "verification_status": "approved", "is_admin": False}
             ]
-            return res
+        return res
             
     mock_profiles_query.select.side_effect = select_side_effect
     
