@@ -645,6 +645,89 @@ async def create_prescription(
         # Don't fail the prescription creation if auto-add fails
         logger.error(f"Failed to auto-add medications to reminders: {auto_add_err}")
 
+    # Auto-dispatch prescription email to patient via SendGrid
+    try:
+        patient_id = rx.patient_id
+        patient_res = (
+            supabase.table("profiles_patient")
+            .select("full_name, email")
+            .eq("id", patient_id)
+            .single()
+            .execute()
+        )
+        if patient_res.data:
+            patient_name = patient_res.data.get("full_name") or "Patient"
+            patient_email = patient_res.data.get("email")
+            
+            if patient_email:
+                # Retrieve doctor name for the email signature
+                doctor_res = (
+                    supabase.table("profiles_doctor")
+                    .select("full_name")
+                    .eq("id", current_user.sub)
+                    .single()
+                    .execute()
+                )
+                doctor_name = (
+                    doctor_res.data.get("full_name") 
+                    if doctor_res.data 
+                    else "Your Physician"
+                )
+                
+                # Build HTML table for medications list
+                med_lines = []
+                for idx, med in enumerate(rx.medications, 1):
+                    med_dict = med.model_dump()
+                    med_lines.append(
+                        f"<tr>"
+                        f"<td style='padding: 8px; border-bottom: 1px solid #e2e8f0;'><strong>{idx}. {med_dict.get('name') or med_dict.get('drug_name')}</strong></td>"
+                        f"<td style='padding: 8px; border-bottom: 1px solid #e2e8f0;'>{med_dict.get('dosage')}</td>"
+                        f"<td style='padding: 8px; border-bottom: 1px solid #e2e8f0;'>{med_dict.get('duration')}</td>"
+                        f"<td style='padding: 8px; border-bottom: 1px solid #e2e8f0;'>{med_dict.get('instructions')}</td>"
+                        f"</tr>"
+                    )
+                medications_table = (
+                    f"<table style='width:100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;'>"
+                    f"<thead>"
+                    f"<tr style='background-color: #f1f5f9; text-align: left;'>"
+                    f"<th style='padding: 8px; border-bottom: 2px solid #cbd5e1;'>Medication</th>"
+                    f"<th style='padding: 8px; border-bottom: 2px solid #cbd5e1;'>Dosage</th>"
+                    f"<th style='padding: 8px; border-bottom: 2px solid #cbd5e1;'>Duration</th>"
+                    f"<th style='padding: 8px; border-bottom: 2px solid #cbd5e1;'>Instructions</th>"
+                    f"</tr>"
+                    f"</thead>"
+                    f"<tbody>"
+                    f"{''.join(med_lines)}"
+                    f"</tbody>"
+                    f"</table>"
+                )
+                
+                email_subject = "Your New Prescription - Netra AI"
+                email_body = (
+                    f"Dear {patient_name},<br><br>"
+                    f"A new prescription has been generated for you by <strong>{doctor_name}</strong>.<br><br>"
+                    f"<strong>Diagnosis:</strong> {rx.diagnosis}<br><br>"
+                    f"<strong>Prescribed Medications:</strong><br>"
+                    f"{medications_table}<br>"
+                )
+                
+                if rx.additional_notes:
+                    email_body += f"<br><strong>Doctor's Notes:</strong> {rx.additional_notes}<br>"
+                    
+                email_body += (
+                    f"<br>These medications have also been automatically added to your medication reminders list in the Netra AI portal.<br><br>"
+                    f"Take care of your health!<br><br>"
+                    f"Sincerely,<br>"
+                    f"The Netra AI Platform Support Team"
+                )
+                
+                # Import and dispatch the SendGrid email in a background task
+                from app.utils.reminders import _send_email
+                asyncio.create_task(_send_email(patient_email, email_subject, email_body))
+                logger.info(f"Triggered prescription email dispatch task for patient: {patient_email}")
+    except Exception as email_err:
+        logger.error(f"Failed to trigger prescription email auto-dispatch: {email_err}")
+
     # Gamification (with error monitoring)
     try:
         asyncio.create_task(record_achievement_progress(current_user.sub, "HEALER", 1))

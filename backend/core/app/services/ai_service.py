@@ -3,7 +3,7 @@ AI Service with Groq Integration (Production-Ready)
 
 Triple-Fallback Strategy:
 1. Groq (Primary) - Fast, free, generous limits (llama-3.3-70b-versatile)
-2. Gemini (Secondary) - Reliable Google fallback (gemini-1.5-flash)
+2. Gemini (Secondary) - Reliable Google fallback (gemini-2.5-flash)
 
 Replaces Ollama (9GB DeepSeek R1) with cloud-based Groq API.
 No model download needed - works immediately on Render.
@@ -70,7 +70,7 @@ class AIService:
         if GENAI_AVAILABLE and gemini_api_key:
             try:
                 genai.configure(api_key=gemini_api_key)
-                self.gemini_model = genai.GenerativeModel("gemini-1.5-flash")
+                self.gemini_model = genai.GenerativeModel("gemini-2.5-flash")
                 logger.info("✅ Gemini AI initialized (Secondary Fallback)")
                 logger.info("   Free Tier: 1,500 requests/day")
             except Exception as e:
@@ -183,7 +183,7 @@ class AIService:
     async def _chat_gemini(
         self, prompt: str, system_prompt: str, history: List[Dict], format: str
     ) -> Dict[str, Any]:
-        """Chat using Google Gemini API (gemini-1.5-flash)."""
+        """Chat using Google Gemini API (gemini-2.5-flash)."""
         logger.info("☁️ Using Google Gemini AI (Fallback)...")
 
         # Combine system prompt and history into Gemini format
@@ -212,7 +212,7 @@ class AIService:
 
         return {
             "content": content,
-            "model": "gemini-1.5-flash",
+            "model": "gemini-2.5-flash",
             "provider": "Google Gemini (Cloud)",
             "success": True,
         }
