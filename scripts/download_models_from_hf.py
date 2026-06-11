@@ -34,7 +34,7 @@ MODELS = {
         "files": ["*.pt", "*.h5", "*.pkl", "model.pt", "cataract_model.pt"]
     },
     "netra-mental": {
-        "repo_id": f"{HF_USERNAME}/netra-mental",
+        "repo_id": "rohith-panduru/netra-mental",
         "local_dir": "backend/mental-health/models",
         "files": ["*.pt", "*.h5", "*.pkl", "model.pt", "mental_health_model.pt"]
     }

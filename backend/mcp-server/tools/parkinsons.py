@@ -44,7 +44,7 @@ async def screen_parkinsons(
 
     service_url = os.getenv(
         "PARKINSONS_SERVICE_URL",
-        "https://sunay-potnuru-netra-parkinsons-screening.hf.space",
+        "https://rohith-panduru-netra-parkinsons.hf.space",
     )
 
     try:

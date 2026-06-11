@@ -89,12 +89,12 @@ class MLServiceConfig:
         MLModelType.PARKINSONS: getattr(
             settings,
             "PARKINSONS_API_URL",
-            "https://sunay-potnuru-netra-parkinsons.hf.space",
+            "https://rohith-panduru-netra-parkinsons.hf.space",
         ),
         MLModelType.MENTAL_HEALTH: getattr(
             settings,
             "MENTAL_HEALTH_API_URL",
-            "https://sunay-potnuru-netra-mental.hf.space",
+            "https://rohith-panduru-netra-mental.hf.space",
         ),
     }
 

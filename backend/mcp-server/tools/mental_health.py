@@ -43,7 +43,7 @@ async def analyze_mental_health(
 
     service_url = os.getenv(
         "MENTAL_HEALTH_SERVICE_URL",
-        "https://sunay-potnuru-netra-mental.hf.space",
+        "https://rohith-panduru-netra-mental.hf.space",
     )
 
     try:
