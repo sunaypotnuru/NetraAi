@@ -37,8 +37,8 @@ def _get_a2a_health_url() -> str:
         return f"{a2a_url.rstrip('/')}/health"
     
     # Fallback to MCP server URL as they are often hosted together
-    mcp_url = "https://sunay-potnuru-netra-mcp-server.hf.space"
-    return f"{mcp_url}/health"
+    mcp_url = getattr(settings, "MCP_SERVER_URL", "https://rohith-panduru-netra-mcp-server.hf.space")
+    return f"{mcp_url.rstrip('/')}/health"
 
 
 # Microservice endpoints with ports
@@ -100,7 +100,7 @@ MICROSERVICES = [
     # MCP Server Infrastructure
     {
         "name": "NetraAI MCP Server (HuggingFace)",
-        "url": "https://sunay-potnuru-netra-mcp-server.hf.space/health",
+        "url": f"{getattr(settings, 'MCP_SERVER_URL', 'https://rohith-panduru-netra-mcp-server.hf.space').rstrip('/')}/health",
         "port": 8080,
         "id": "mcp-server",
     },
