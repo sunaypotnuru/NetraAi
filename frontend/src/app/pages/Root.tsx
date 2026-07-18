@@ -71,10 +71,7 @@ export default function Root() {
   const isAdminPage = location.pathname.startsWith("/admin");
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
+    <div
       className="min-h-screen flex flex-col relative"
     >
       {/* Dynamic global background */}
@@ -91,13 +88,13 @@ export default function Root() {
       {!isAdminPage && <NavbarMain />}
 
       <main className="flex-1 overflow-x-hidden">
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={location.pathname}
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.25, ease: "easeInOut" }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18, ease: "easeInOut" }}
             className="h-full w-full"
           >
             <Outlet />
@@ -116,6 +113,6 @@ export default function Root() {
       {(user?.role === "patient" || !user) && !isAdminPage && <ChatbotWidget />}
 
       {/* only a single toaster should exist in the app; the instance in App.tsx handles notifications */}
-    </motion.div>
+    </div>
   );
 }

@@ -17,7 +17,7 @@ import "../../components/layout/hero-animations.css";
 const Counter = ({ from = 0, to, duration = 2 }: { from?: number, to: number, duration?: number }) => {
   const [count, setCount] = useState(from);
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
+  const isInView = useInView(ref, { once: false });
 
   useEffect(() => {
     if (!isInView) return;

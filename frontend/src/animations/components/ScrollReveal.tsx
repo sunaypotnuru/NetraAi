@@ -43,8 +43,8 @@ interface ScrollRevealProps {
    */
   rootMargin?: string;
   /**
-   * Only animate once
-   * @default true
+   * Only animate once — set to false so back-navigation re-triggers animations
+   * @default false
    */
   once?: boolean;
   /**
@@ -61,7 +61,7 @@ export function ScrollReveal({
   delay = 0,
   threshold = 0.05,
   rootMargin = '0px',
-  once = true,
+  once = false,
   className,
 }: ScrollRevealProps) {
   const { getTransition } = useAnimationConfig();

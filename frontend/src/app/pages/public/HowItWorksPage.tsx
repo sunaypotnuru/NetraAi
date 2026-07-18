@@ -70,7 +70,7 @@ export default function HowItWorksPage() {
                             key={idx}
                             initial={{ opacity: 0, x: idx % 2 === 0 ? -30 : 30 }}
                             whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
+                            viewport={{ once: false }}
                             whileHover={{ y: -4 }}
                             className="rounded-2xl p-8 border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 transition-all flex flex-col md:flex-row gap-6 items-start md:items-center bg-slate-50/50 dark:bg-white/5 backdrop-blur-md"
                         >

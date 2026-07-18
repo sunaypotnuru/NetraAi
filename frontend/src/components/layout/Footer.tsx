@@ -67,7 +67,7 @@ export default function Footer() {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                viewport={{ once: false }}
                 className="flex items-center gap-2.5 mb-4"
               >
                 <div className="w-10 h-10 bg-gradient-to-br from-[#0D9488] to-[#0F766E] rounded-xl flex items-center justify-center">
@@ -97,7 +97,7 @@ export default function Footer() {
                 key={title}
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                viewport={{ once: false }}
               >
                 <h3 className="font-semibold text-foreground/90 mb-4">{getTranslatedTitle(title)}</h3>
                 <ul className="space-y-2.5">

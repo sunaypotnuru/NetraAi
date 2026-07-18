@@ -69,7 +69,7 @@ export function HowItWorks() {
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
+          viewport={{ once: false, amount: 0.2 }}
         >
           {/* Connection line */}
           <div className="hidden lg:block absolute top-20 left-[12%] right-[12%] h-[2px] bg-gradient-to-r from-[#0D9488]/30 via-[#0EA5E9]/30 to-[#8B5CF6]/30 dark:from-teal-400/30 dark:via-blue-400/30 dark:to-purple-400/30" />
