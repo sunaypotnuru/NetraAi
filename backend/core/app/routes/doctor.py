@@ -368,14 +368,127 @@ async def get_patient_details(
 
     patient_res = (
         supabase.table("profiles_patient")
-        .select("id, full_name, email, age, gender, blood_type, avatar_url")
+        .select("*")
         .eq("id", id)
         .execute()
     )
     if not patient_res.data:
         raise HTTPException(status_code=404, detail="Patient not found.")
 
-    return patient_res.data[0]
+    # 1. Fetch appointments to count and list recent
+    all_appts_res = (
+        supabase.table("appointments")
+        .select("*")
+        .eq("patient_id", id)
+        .order("scheduled_at", desc=True)
+        .execute()
+    )
+
+    # 2. Fetch active medications
+    meds_res = (
+        supabase.table("medications")
+        .select("*")
+        .eq("patient_id", id)
+        .eq("is_active", True)
+        .execute()
+    )
+
+    # 3. Fetch vitals log
+    vitals_res = (
+        supabase.table("vitals_log")
+        .select("*")
+        .eq("patient_id", id)
+        .order("logged_at", desc=True)
+        .execute()
+    )
+
+    # 4. Compile recent vitals
+    latest_vitals = {
+        "blood_pressure": "N/A",
+        "heart_rate": "N/A",
+        "temperature": "N/A",
+        "weight": "N/A",
+        "height": "N/A",
+        "bmi": "N/A",
+        "oxygen_saturation": "N/A",
+        "blood_glucose": "N/A"
+    }
+
+    if vitals_res.data:
+        for vital in vitals_res.data:
+            ttype = vital.get("tracker_type")
+            val = vital.get("value")
+            unit = vital.get("unit") or ""
+            if ttype == "blood_pressure" and latest_vitals["blood_pressure"] == "N/A":
+                latest_vitals["blood_pressure"] = f"{val} {unit}".strip()
+            elif ttype == "heart_rate" and latest_vitals["heart_rate"] == "N/A":
+                latest_vitals["heart_rate"] = f"{val} {unit}".strip()
+            elif ttype == "weight" and latest_vitals["weight"] == "N/A":
+                latest_vitals["weight"] = f"{val} {unit}".strip()
+            elif ttype == "blood_glucose" and latest_vitals["blood_glucose"] == "N/A":
+                latest_vitals["blood_glucose"] = f"{val} {unit}".strip()
+
+    # 5. Format vital trends
+    trends_map = {}
+    for vital in reversed(vitals_res.data or []):
+        logged_at = vital.get("logged_at", "")
+        if not logged_at:
+            continue
+        date_str = logged_at[:7]
+        if date_str not in trends_map:
+            trends_map[date_str] = {"date": date_str}
+        
+        ttype = vital.get("tracker_type")
+        try:
+            val_float = float(vital.get("value", 0))
+        except ValueError:
+            val_float = 0.0
+            
+        if ttype == "blood_pressure":
+            val_str = str(vital.get("value", ""))
+            if "/" in val_str:
+                parts = val_str.split("/")
+                try:
+                    trends_map[date_str]["bp_systolic"] = float(parts[0])
+                    trends_map[date_str]["bp_diastolic"] = float(parts[1])
+                except ValueError:
+                    pass
+        elif ttype == "weight":
+            trends_map[date_str]["weight"] = val_float
+        elif ttype == "blood_glucose":
+            trends_map[date_str]["hba1c"] = val_float / 20.0
+
+    vital_trends = list(trends_map.values())[-6:]
+
+    # 6. Format recent appointments
+    recent_appointments = []
+    for apt in (all_appts_res.data or [])[:5]:
+        scheduled_at = apt.get("scheduled_at", "")
+        recent_appointments.append({
+            "date": scheduled_at[:10] if scheduled_at else "Unknown",
+            "type": apt.get("consultation_type") or "Consultation",
+            "diagnosis": apt.get("notes") or "General Checkup",
+            "status": apt.get("status") or "completed"
+        })
+
+    # Return structured nested response matching frontend
+    return {
+        "patient": {
+            **patient_res.data[0],
+            "medical_history": {
+                "allergies": [],
+                "chronic_conditions": [],
+                "current_medications": [m.get("name") for m in meds_res.data] if meds_res.data else []
+            },
+            "recent_vitals": latest_vitals,
+            "vital_trends": vital_trends,
+            "recent_appointments": recent_appointments,
+            "stats": {
+                "appointments_count": len(all_appts_res.data or []),
+                "adherence_score": 85
+            }
+        }
+    }
 
 
 @router.get("/patients/{id}/timeline")

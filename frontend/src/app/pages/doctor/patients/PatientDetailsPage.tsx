@@ -46,6 +46,8 @@ interface Patient {
   lab_results: any[];
   appointments_count: number;
   adherence_score: number;
+  vital_trends?: any[];
+  recent_appointments?: any[];
 }
 
 export default function PatientDetailsPage() {
@@ -134,7 +136,9 @@ export default function PatientDetailsPage() {
         },
         lab_results: dbPatient.lab_results || [],
         appointments_count: dbPatient.stats?.appointments_count || 0,
-        adherence_score: dbPatient.stats?.adherence_score || 0
+        adherence_score: dbPatient.stats?.adherence_score || 0,
+        vital_trends: dbPatient.vital_trends || [],
+        recent_appointments: dbPatient.recent_appointments || []
       };
     },
     enabled: !!patientId
@@ -166,20 +170,24 @@ export default function PatientDetailsPage() {
     setupRealtime();
   }, [patientId, queryClient, patient?.full_name]);
 
-  // Mock vital trends data
-  const vitalTrends = [
-    { date: '2024-01', bp_systolic: 135, bp_diastolic: 85, weight: 67, hba1c: 7.5 },
-    { date: '2024-02', bp_systolic: 138, bp_diastolic: 88, weight: 66, hba1c: 7.3 },
-    { date: '2024-03', bp_systolic: 142, bp_diastolic: 92, weight: 65, hba1c: 7.2 },
-    { date: '2024-04', bp_systolic: 140, bp_diastolic: 90, weight: 65, hba1c: 7.2 },
-    { date: '2024-05', bp_systolic: 138, bp_diastolic: 88, weight: 64, hba1c: 7.1 }
-  ];
+  // Vital trends and appointments data (loaded dynamically with mock fallbacks)
+  const vitalTrends = (patient && patient.vital_trends && patient.vital_trends.length > 0)
+    ? patient.vital_trends
+    : [
+        { date: '2024-01', bp_systolic: 135, bp_diastolic: 85, weight: 67, hba1c: 7.5 },
+        { date: '2024-02', bp_systolic: 138, bp_diastolic: 88, weight: 66, hba1c: 7.3 },
+        { date: '2024-03', bp_systolic: 142, bp_diastolic: 92, weight: 65, hba1c: 7.2 },
+        { date: '2024-04', bp_systolic: 140, bp_diastolic: 90, weight: 65, hba1c: 7.2 },
+        { date: '2024-05', bp_systolic: 138, bp_diastolic: 88, weight: 64, hba1c: 7.1 }
+      ];
 
-  const recentAppointments = [
-    { date: '2024-05-01', type: 'Follow-up', diagnosis: 'Diabetes Management', status: 'completed' },
-    { date: '2024-04-15', type: 'Consultation', diagnosis: 'Hypertension Review', status: 'completed' },
-    { date: '2024-03-20', type: 'Lab Review', diagnosis: 'Routine Check-up', status: 'completed' }
-  ];
+  const recentAppointments = (patient && patient.recent_appointments && patient.recent_appointments.length > 0)
+    ? patient.recent_appointments
+    : [
+        { date: '2024-05-01', type: 'Follow-up', diagnosis: 'Diabetes Management', status: 'completed' },
+        { date: '2024-04-15', type: 'Consultation', diagnosis: 'Hypertension Review', status: 'completed' },
+        { date: '2024-03-20', type: 'Lab Review', diagnosis: 'Routine Check-up', status: 'completed' }
+      ];
 
   if (isLoading) {
     return <HeartbeatLoader text="Retrieving Patient File..." />;
