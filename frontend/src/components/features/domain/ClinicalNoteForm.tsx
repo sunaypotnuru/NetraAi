@@ -8,7 +8,7 @@ import SOAPEditor from "./SOAPEditor";
 import { useState } from "react";
 import { aiAPI } from "@/lib/api";
 import { toast } from "sonner";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 interface ClinicalNoteFormProps {
   patientId: string;

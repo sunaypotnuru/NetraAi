@@ -8,7 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Search, Filter, Calendar as CalendarIcon, X } from 'lucide-react';
 import { format } from 'date-fns';
 import api from "@/lib/api";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 interface SearchResult {
   id: string;

@@ -3,7 +3,7 @@ import { Send, Paperclip, Smile, X, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import EmojiPicker from "@/components/features/messaging/EmojiPicker";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 interface MessageInputProps {
   value: string;

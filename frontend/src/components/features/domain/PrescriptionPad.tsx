@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Stethoscope } from 'lucide-react';
 import { useAuth } from "@/app/contexts/AuthContext";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 interface PrescriptionPadProps {
     patient: {

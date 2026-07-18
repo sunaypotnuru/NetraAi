@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Users, User, ChevronDown } from "lucide-react";
 import { patientAPI } from "@/lib/api";
 import { useAuthStore } from "@/lib/store";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 interface FamilyMember {
   id: string;

@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import { Upload, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ImageWithFallback } from "@/components/features/figma/ImageWithFallback";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 export function HeroRealistic() {
   const { t } = useTranslation();

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, AreaChart, Area } from "recharts";
 import { doctorAPI } from "@/lib/api";
 import { TrendingUp, Calendar, BarChart3, ArrowLeft, Download, Loader2, Activity, CheckCircle2, AlertCircle } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 interface PROSubmission {
   submitted_at: string;

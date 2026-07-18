@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Download, FileText, FileSpreadsheet } from 'lucide-react';
 import api from "@/lib/api";
 import { toast } from 'sonner';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 interface ExportDialogProps {
   open: boolean;

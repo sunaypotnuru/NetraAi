@@ -4,7 +4,7 @@ import { MessageCircle, X, Send, Minimize2, Maximize2, ShieldCheck } from "lucid
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/lib/store";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 import { useNavigate } from "react-router";
 import api from "@/lib/api";
 import { toast } from "sonner";

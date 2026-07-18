@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { Card } from "@/components/ui/card";
 import { Lock, Star } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 interface Badge {
   id: string;

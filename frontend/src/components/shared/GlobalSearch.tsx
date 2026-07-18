@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { searchAPI } from "@/lib/api";
 import { useNavigate } from "react-router";
 import { useDebounce } from "use-debounce";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 interface Doctor {
   id: string;

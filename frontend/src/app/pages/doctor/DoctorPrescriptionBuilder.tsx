@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import DrugAutocomplete from "@/components/features/domain/DrugAutocomplete";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 import { useAuthStore } from "@/lib/store";
 import { doctorAPI } from "@/lib/api";
 import { supabase } from "@/lib/supabase";

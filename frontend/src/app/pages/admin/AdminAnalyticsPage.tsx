@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import api, { adminAPI } from '@/lib/api';
 import { toast } from 'sonner';
 import { Skeleton } from '@mui/material';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "@/lib/i18n";
 
 const COLORS = ['#8B5CF6', '#0D9488', '#F59E0B', '#EC4899', '#3B82F6'];
 

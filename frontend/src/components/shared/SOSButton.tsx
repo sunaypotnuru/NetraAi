@@ -3,7 +3,7 @@ import { AlertTriangle, X, Phone } from "lucide-react";
 import { patientAPI } from "@/lib/api";
 import { toast } from "sonner";
 import { useLocation } from "react-router";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 /**
  * Floating SOS Emergency Button

@@ -4,7 +4,7 @@ import { MessageSquare, X, Send, Sparkles } from 'lucide-react';
 import { useAuth } from "@/app/contexts/AuthContext";
 import api from "@/lib/api";
 import { toast } from 'sonner';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 export function AIAssistantWidget() {
   const { t } = useTranslation();

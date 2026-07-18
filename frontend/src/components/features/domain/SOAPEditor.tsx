@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ChevronDown, ChevronRight, FileText, Lightbulb } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 interface SOAPNotes {
   subjective: string;

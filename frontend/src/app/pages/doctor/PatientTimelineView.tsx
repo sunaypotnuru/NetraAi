@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 import ClinicalNoteForm from "@/components/features/domain/ClinicalNoteForm";
 import type { ClinicalNoteValues } from "@/lib/schemas";
 

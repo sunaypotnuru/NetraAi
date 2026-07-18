@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Search, Clock } from "lucide-react";
 import { motion } from "motion/react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 interface EmojiPickerProps {
   onSelect: (emoji: string) => void;

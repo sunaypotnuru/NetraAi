@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Check, CheckCheck, Reply, Download, Image as ImageIcon } from "lucide-react";
 import { motion } from "motion/react";
 import { format } from "date-fns";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 interface Message {
   id: string;

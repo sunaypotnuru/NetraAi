@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import api from '@/lib/api';
 import { toast } from 'sonner';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "@/lib/i18n";
 import { Badge } from "@/components/ui/badge";
 
 interface AuditLog {

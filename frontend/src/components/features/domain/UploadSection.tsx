@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import { Upload, Camera, FileImage } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 export function UploadSection() {
   const { t } = useTranslation();

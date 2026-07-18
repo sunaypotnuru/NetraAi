@@ -4,7 +4,7 @@ import { Mic, Square, CheckCircle, Trash2, Loader2, Volume2 } from "lucide-react
 import { Button } from "@/components/ui/button";
 import api from "@/lib/api";
 import { toast } from "sonner";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 interface VoiceNoteProps {
     appointmentId: string;

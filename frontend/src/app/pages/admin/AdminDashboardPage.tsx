@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "@/lib/i18n";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card } from "@/components/ui/card";
 import { Users, UserRoundPlus, Calendar, Scan, TrendingUp, AlertCircle, ArrowUpRight, Zap, ShieldCheck, FileText, Activity, UserCheck, AlertTriangle, Brain } from 'lucide-react';

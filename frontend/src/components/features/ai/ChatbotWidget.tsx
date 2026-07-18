@@ -11,7 +11,7 @@ import { useAuthStore } from "@/lib/store";
 import { useNavigate } from "react-router";
 import api from "@/lib/api";
 import { toast } from "sonner";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 interface Message {
     id: string;

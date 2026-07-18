@@ -3,7 +3,7 @@ import { Command } from 'cmdk';
 import { Search, Users, Calendar, Settings, Activity, Heart, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { useAuth } from "@/app/contexts/AuthContext";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 export function CommandPalette() {
   const { t } = useTranslation();

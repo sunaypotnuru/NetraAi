@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Mail, Phone, MapPin, Calendar, Activity, FileText, AlertCircle } from 'lucide-react';
 import { adminAPI } from '@/lib/api';
 import { Skeleton } from "@mui/material";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "@/lib/i18n";
 
 interface PatientDetailResponse {
     profile: {

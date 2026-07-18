@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, Download, FileText } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 interface VideoPlayerProps {
     recordingId: string;

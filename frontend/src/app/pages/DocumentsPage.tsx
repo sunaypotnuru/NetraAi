@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { toast } from "sonner";
 import { documentsAPI } from "../../lib/api";
 import { useTranslation } from "../../lib/i18n";
-import { useTranslation as useI18Next } from "react-i18next";
+import { useTranslation as useI18Next } from "@/lib/i18n";
 import { useLocation } from "react-router";
 import DocumentShareModal from "@/components/shared/DocumentShareModal";
 

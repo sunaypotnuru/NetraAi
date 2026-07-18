@@ -12,7 +12,7 @@ import { Card } from "@/components/ui/card";
 import api from "@/lib/api";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 // -- Types --
 interface HotspotFeature {

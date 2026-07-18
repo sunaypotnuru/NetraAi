@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import { Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 export function Navbar() {
   const { t } = useTranslation();

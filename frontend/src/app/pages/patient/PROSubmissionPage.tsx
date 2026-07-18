@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { patientAPI } from "@/lib/api";
 import { ClipboardList, Send, CheckCircle, Clock, Calendar, ArrowLeft, Loader2, TrendingUp } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 
 export default function PROSubmissionPage() {
   const { t } = useTranslation();

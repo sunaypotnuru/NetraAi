@@ -1,7 +1,7 @@
 import { Heart, Users, Award, Zap, Star, Eye, Mic, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 import { Link } from "react-router-dom";
 
 export function AboutSection() {

@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import { Activity, Dumbbell, PlayCircle, Target, Clock, Bone } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 import api from "@/lib/api";
 
 interface PatientExercise {
