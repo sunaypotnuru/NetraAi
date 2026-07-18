@@ -1,3 +1,12 @@
+---
+title: Netra Core Api
+emoji: 🚀
+colorFrom: red
+colorTo: red
+sdk: docker
+pinned: false
+---
+
 # 🏥 Netra AI - Healthcare Platform
 
 **AI-Powered Telemedicine Platform with 5 ML Models for Medical Diagnostics**
