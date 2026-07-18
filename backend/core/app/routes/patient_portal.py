@@ -1138,8 +1138,8 @@ async def update_settings_preferences(
 async def get_appointments_alias(current_user: TokenPayload = Depends(get_current_user)):
     """Get all appointments (frontend client api match)"""
     from app.routes.patient import get_appointments
-    from app.models.schemas import TokenPayload
-    user_payload = TokenPayload(sub=current_user.sub, role="patient")
+    from app.models.schemas import TokenPayload, UserRole
+    user_payload = TokenPayload(sub=current_user.sub, role=UserRole.PATIENT)
     return await get_appointments(current_user=user_payload)
 
 

@@ -1,5 +1,7 @@
 from contextlib import asynccontextmanager  # type: ignore
-from fastapi import FastAPI, HTTPException  # type: ignore
+from fastapi import FastAPI, HTTPException, Request  # type: ignore
+from fastapi.responses import JSONResponse  # type: ignore
+from fastapi.exceptions import RequestValidationError  # type: ignore
 from fastapi.middleware.cors import CORSMiddleware  # type: ignore
 from starlette.middleware.trustedhost import TrustedHostMiddleware  # type: ignore
 import logging
@@ -517,3 +519,48 @@ async def confirm_email(payload: dict):
     except Exception as e:
         logger.error(f"Failed to confirm email for user {user_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ─── Global Exception Handlers ───────────────────────────────────────
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    """Custom handler for HTTPExceptions with consistent JSON structure."""
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "status": "error",
+            "status_code": exc.status_code,
+            "detail": exc.detail,
+        },
+        headers=getattr(exc, "headers", None),
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """Custom handler for Request Validation Errors (422 Unprocessable Entity)."""
+    logger.warning(f"Validation error on {request.method} {request.url.path}: {exc.errors()}")
+    return JSONResponse(
+        status_code=422,
+        content={
+            "status": "error",
+            "status_code": 422,
+            "detail": "Request validation failed",
+            "errors": exc.errors(),
+        },
+    )
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    """Global catch-all for 500 Unhandled Exceptions to prevent sensitive leakages."""
+    logger.error(f"Unhandled exception on {request.method} {request.url.path}: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={
+            "status": "error",
+            "status_code": 500,
+            "detail": "An internal server error occurred.",
+        },
+    )
+
