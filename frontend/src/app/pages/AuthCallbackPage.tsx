@@ -1,34 +1,97 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
-import { Loader2, ShieldCheck, UserCheck } from "lucide-react";
-import { useAuthStore } from "../../lib/store";
+import { Loader2, ShieldCheck, UserCheck, AlertTriangle } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { supabase } from "@/lib/supabase";
+
+type AuthStatus = "loading" | "error";
 
 /**
  * AuthCallbackPage
  * Handles the redirect from Supabase/Google OAuth.
- * Displays a beautiful loading state while waiting for the session to initialize,
- * then redirects the user to their appropriate dashboard based on their role.
+ *
+ * Supports two OAuth flows:
+ *  1. PKCE flow  — URL contains `?code=…` → we exchange it via exchangeCodeForSession()
+ *  2. Implicit   — URL contains `#access_token=…` → Supabase detects it automatically
+ *
+ * After a valid session is established, reads the user role from user_metadata
+ * and redirects to the correct portal dashboard.
  */
 export default function AuthCallbackPage() {
     const navigate = useNavigate();
-    const { user, loadUser, loading } = useAuthStore();
+    const [status, setStatus] = useState<AuthStatus>("loading");
+    const [errorMsg, setErrorMsg] = useState<string>("");
 
     useEffect(() => {
-        // Initialize the user session from the URL hash/cookie
-        const initSession = async () => {
-            await loadUser();
+        let cancelled = false;
+
+        const handleCallback = async () => {
+            try {
+                const url = new URL(window.location.href);
+                const code = url.searchParams.get("code");
+                const errorParam = url.searchParams.get("error");
+                const errorDescription = url.searchParams.get("error_description");
+
+                // If Supabase returned an error in the redirect URL
+                if (errorParam) {
+                    console.error("[AuthCallback] OAuth error from provider:", errorParam, errorDescription);
+                    if (!cancelled) {
+                        setErrorMsg(errorDescription || errorParam);
+                        setStatus("error");
+                    }
+                    return;
+                }
+
+                // PKCE flow: exchange the one-time code for a session
+                if (code) {
+                    console.log("[AuthCallback] PKCE flow detected — exchanging code for session...");
+                    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+                    if (error || !data.session) {
+                        console.error("[AuthCallback] Code exchange failed:", error);
+                        if (!cancelled) {
+                            setErrorMsg(error?.message || "Failed to exchange authorization code.");
+                            setStatus("error");
+                        }
+                        return;
+                    }
+
+                    if (!cancelled) redirectByRole(data.session.user);
+                    return;
+                }
+
+                // Implicit flow: Supabase detects #access_token automatically via detectSessionInUrl.
+                // We still call getSession() to confirm the session was stored.
+                console.log("[AuthCallback] Implicit flow — waiting for Supabase to detect session from URL hash...");
+                // Small delay to let Supabase process the fragment before querying
+                await new Promise((r) => setTimeout(r, 300));
+
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+                if (sessionError || !session) {
+                    console.error("[AuthCallback] No session found after callback:", sessionError);
+                    if (!cancelled) {
+                        setErrorMsg("Authentication could not be completed. Please try again.");
+                        setStatus("error");
+                    }
+                    return;
+                }
+
+                if (!cancelled) redirectByRole(session.user);
+            } catch (err: unknown) {
+                console.error("[AuthCallback] Unexpected error:", err);
+                if (!cancelled) {
+                    setErrorMsg("An unexpected error occurred. Redirecting to login...");
+                    setStatus("error");
+                }
+            }
         };
-        initSession();
-    }, [loadUser]);
 
-    useEffect(() => {
-        // Once the user is loaded and not loading anymore, redirect
-        if (!loading && user) {
-            const role = user.role;
-            console.log(`[AuthCallback] User loaded with role: ${role}. Redirecting...`);
-            
+        const redirectByRole = (user: { user_metadata?: Record<string, unknown> }) => {
+            const role = (user.user_metadata?.role as string) || "patient";
+            console.log(`[AuthCallback] Session established. Role: ${role}. Redirecting...`);
+
             if (role === "admin") {
                 navigate("/admin/dashboard", { replace: true });
             } else if (role === "doctor") {
@@ -36,12 +99,23 @@ export default function AuthCallbackPage() {
             } else {
                 navigate("/patient/dashboard", { replace: true });
             }
-        } else if (!loading && !user) {
-            // If after loading there's still no user, something went wrong
-            console.error("[AuthCallback] No user found after session initialization.");
+        };
+
+        handleCallback();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [navigate]);
+
+    // Auto-redirect to /login after a short delay when in error state
+    useEffect(() => {
+        if (status !== "error") return;
+        const timer = setTimeout(() => {
             navigate("/login", { replace: true });
-        }
-    }, [user, loading, navigate]);
+        }, 4000);
+        return () => clearTimeout(timer);
+    }, [status, navigate]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F8FAFC] via-[#F1F5F9] to-[#E2E8F0] px-6">
@@ -51,43 +125,68 @@ export default function AuthCallbackPage() {
                 className="w-full max-w-md"
             >
                 <Card className="p-8 shadow-2xl border-white/50 bg-white/80 backdrop-blur-xl text-center">
-                    <motion.div
-                        className="w-20 h-20 bg-gradient-to-br from-[#0D9488] to-[#0F766E] rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg shadow-[#0D9488]/20"
-                        animate={{ 
-                            rotate: [0, 10, -10, 0],
-                            scale: [1, 1.05, 0.95, 1]
-                        }}
-                        transition={{ 
-                            duration: 4, 
-                            repeat: Infinity,
-                            ease: "easeInOut"
-                        }}
-                    >
-                        <ShieldCheck className="w-10 h-10 text-white" />
-                    </motion.div>
-
-                    <h1 className="text-3xl font-bold text-[#0F172A] mb-3">
-                        Authenticating
-                    </h1>
-                    <p className="text-[#64748B] mb-8 leading-relaxed">
-                        Completing your secure login to Netra AI. One moment while we prepare your workspace...
-                    </p>
-
-                    <div className="flex flex-col items-center gap-4">
-                        <div className="relative">
+                    {status === "loading" ? (
+                        <>
                             <motion.div
-                                animate={{ rotate: 360 }}
-                                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                                className="w-20 h-20 bg-gradient-to-br from-[#0D9488] to-[#0F766E] rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg shadow-[#0D9488]/20"
+                                animate={{
+                                    rotate: [0, 10, -10, 0],
+                                    scale: [1, 1.05, 0.95, 1]
+                                }}
+                                transition={{
+                                    duration: 4,
+                                    repeat: Infinity,
+                                    ease: "easeInOut"
+                                }}
                             >
-                                <Loader2 className="w-10 h-10 text-[#0D9488]" />
+                                <ShieldCheck className="w-10 h-10 text-white" />
                             </motion.div>
-                        </div>
-                        
-                        <div className="flex items-center gap-2 text-sm font-medium text-[#94A3B8]">
-                            <UserCheck className="w-4 h-4" />
-                            <span>Verifying Identity</span>
-                        </div>
-                    </div>
+
+                            <h1 className="text-3xl font-bold text-[#0F172A] mb-3">
+                                Authenticating
+                            </h1>
+                            <p className="text-[#64748B] mb-8 leading-relaxed">
+                                Completing your secure login to Netra AI. One moment while we prepare your workspace...
+                            </p>
+
+                            <div className="flex flex-col items-center gap-4">
+                                <div className="relative">
+                                    <motion.div
+                                        animate={{ rotate: 360 }}
+                                        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                                    >
+                                        <Loader2 className="w-10 h-10 text-[#0D9488]" />
+                                    </motion.div>
+                                </div>
+
+                                <div className="flex items-center gap-2 text-sm font-medium text-[#94A3B8]">
+                                    <UserCheck className="w-4 h-4" />
+                                    <span>Verifying Identity</span>
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <motion.div
+                                className="w-20 h-20 bg-gradient-to-br from-[#EF4444] to-[#DC2626] rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg shadow-red-500/20"
+                                initial={{ scale: 0.8 }}
+                                animate={{ scale: 1 }}
+                                transition={{ type: "spring", stiffness: 200 }}
+                            >
+                                <AlertTriangle className="w-10 h-10 text-white" />
+                            </motion.div>
+
+                            <h1 className="text-3xl font-bold text-[#0F172A] mb-3">
+                                Authentication Failed
+                            </h1>
+                            <p className="text-[#64748B] mb-4 leading-relaxed">
+                                {errorMsg || "Something went wrong during authentication."}
+                            </p>
+                            <p className="text-sm text-[#94A3B8]">
+                                Redirecting you to the login page in a moment...
+                            </p>
+                        </>
+                    )}
 
                     <div className="mt-10 pt-8 border-t border-slate-100 flex items-center justify-center gap-6">
                         <div className="flex items-center gap-2">

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Activity, Target, Shield, HeartPulse } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 import PageWrapper from "@/components/ui/PageWrapper";
 import AutoSlider from "@/components/ui/AutoSlider";
 

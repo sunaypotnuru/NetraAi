@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Linkedin, User } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
 import PageWrapper from "@/components/ui/PageWrapper";

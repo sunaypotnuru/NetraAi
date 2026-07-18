@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Upload, Brain, CheckCircle, Video, ArrowRight } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 import PageWrapper from "@/components/ui/PageWrapper";
 
 export default function HowItWorksPage() {

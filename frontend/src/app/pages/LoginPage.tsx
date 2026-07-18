@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n";
 import { motion } from "motion/react";
 import { ArrowRight, Eye, Shield, Heart, Activity, Scan, Stethoscope } from "lucide-react";
 import { Card } from "@/components/ui/card";
