@@ -2,12 +2,15 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Globe, MapPin, Users } from 'lucide-react';
 import PageWrapper from "@/components/ui/PageWrapper";
+import { useTranslation } from '@/lib/i18n';
 
 export default function GlobalReachPage() {
+  const { t } = useTranslation();
+
   const stats = [
-    { icon: Users, stat: "50,000+", label: "Patients Reached", color: "from-teal-500 to-cyan-600" },
-    { icon: MapPin, stat: "15+", label: "Countries Active", color: "from-blue-500 to-indigo-600" },
-    { icon: Globe, stat: "30+", label: "Rural Clinics Equipped", color: "from-emerald-500 to-green-600" },
+    { icon: Users, stat: "50,000+", label: t('public.global_reach.stat1', 'Patients Reached'), color: "from-teal-500 to-cyan-600" },
+    { icon: MapPin, stat: "15+", label: t('public.global_reach.stat2', 'Countries Active'), color: "from-blue-500 to-indigo-600" },
+    { icon: Globe, stat: "30+", label: t('public.global_reach.stat3', 'Rural Clinics Equipped'), color: "from-emerald-500 to-green-600" },
   ];
 
   return (
@@ -23,14 +26,14 @@ export default function GlobalReachPage() {
             className="inline-block px-4 py-1 rounded-full text-xs font-semibold tracking-widest uppercase mb-4"
             style={{ background: "rgba(13,148,136,0.18)", color: "#5eead4" }}
           >
-            Worldwide
+            {t('public.global_reach.badge', 'Worldwide')}
           </span>
           <Globe className="w-14 h-14 text-teal-400 mx-auto mb-5" />
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Our Global Reach
+            {t('public.global_reach.title', 'Our Global Reach')}
           </h1>
           <p className="text-lg text-slate-300 max-w-3xl mx-auto">
-            Breaking down geographical barriers to deliver AI-powered diagnostics to the most remote areas of the world.
+            {t('public.global_reach.description', 'Breaking down geographical barriers to deliver AI-powered diagnostics to the most remote areas of the world.')}
           </p>
         </motion.div>
 

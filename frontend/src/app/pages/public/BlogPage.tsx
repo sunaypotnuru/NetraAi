@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { FileText, Calendar, User } from 'lucide-react';
 import PageWrapper from "@/components/ui/PageWrapper";
+import { useTranslation } from '@/lib/i18n';
 
 interface Blog {
   id: string;
@@ -14,6 +15,7 @@ interface Blog {
 }
 
 export default function BlogPage() {
+  const { t } = useTranslation();
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -51,13 +53,13 @@ export default function BlogPage() {
             className="inline-block px-4 py-1 rounded-full text-xs font-semibold tracking-widest uppercase mb-4"
             style={{ background: "rgba(13,148,136,0.18)", color: "#5eead4" }}
           >
-            Netra AI Blog
+            {t('public.blog.badge', 'Netra AI Blog')}
           </span>
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Latest Insights &amp; Research
+            {t('public.blog.title', 'Latest Insights & Research')}
           </h1>
           <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-            Stay updated with the latest advancements in AI-driven healthcare, telemedicine, and our platform updates.
+            {t('public.blog.description', 'Stay updated with the latest advancements in AI-driven healthcare, telemedicine, and our platform updates.')}
           </p>
         </motion.div>
 
@@ -121,8 +123,8 @@ export default function BlogPage() {
             className="mt-16 rounded-2xl p-16 border border-white/10 text-center"
             style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(12px)" }}
           >
-            <h2 className="text-2xl font-bold text-white mb-4">No Articles Yet</h2>
-            <p className="text-slate-400 text-lg">Check back soon for our first publication!</p>
+            <h2 className="text-2xl font-bold text-white mb-4">{t('public.blog.empty_title', 'No Articles Yet')}</h2>
+            <p className="text-slate-400 text-lg">{t('public.blog.empty_desc', 'Check back soon for our first publication!')}</p>
           </motion.div>
         )}
       </div>
