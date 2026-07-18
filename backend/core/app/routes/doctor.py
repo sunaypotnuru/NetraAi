@@ -94,7 +94,10 @@ async def get_doctor_availability(doctor_id: str, date: Optional[str] = None):
     try:
         # Parse date or use today
         if date:
-            target_date = datetime.fromisoformat(date.replace("Z", "+00:00"))
+            try:
+                target_date = datetime.fromisoformat(date.replace("Z", "+00:00"))
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid date format. Expected ISO 8601.")
         else:
             target_date = datetime.now()
 
@@ -110,6 +113,8 @@ async def get_doctor_availability(doctor_id: str, date: Optional[str] = None):
             "available_slots": slots,
             "total_slots": len(slots),
         }
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error getting availability: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -715,10 +720,10 @@ async def create_prescription(
                     email_body += f"<br><strong>Doctor's Notes:</strong> {rx.additional_notes}<br>"
                     
                 email_body += (
-                    f"<br>These medications have also been automatically added to your medication reminders list in the Netra AI portal.<br><br>"
-                    f"Take care of your health!<br><br>"
-                    f"Sincerely,<br>"
-                    f"The Netra AI Platform Support Team"
+                    "<br>These medications have also been automatically added to your medication reminders list in the Netra AI portal.<br><br>"
+                    "Take care of your health!<br><br>"
+                    "Sincerely,<br>"
+                    "The Netra AI Platform Support Team"
                 )
                 
                 # Import and dispatch the SendGrid email in a background task

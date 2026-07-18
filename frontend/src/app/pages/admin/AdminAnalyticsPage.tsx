@@ -18,16 +18,7 @@ import { useTranslation } from 'react-i18next';
 
 const COLORS = ['#8B5CF6', '#0D9488', '#F59E0B', '#EC4899', '#3B82F6'];
 
-// Demo fallback data so charts always render
-const DEMO_TREND = (n: number) =>
-  Array.from({ length: n }, (_, i) => ({
-    label: `Day ${i + 1}`,
-    value: Math.floor(Math.random() * 40) + 5,
-  }));
 
-const DEMO_PAT_TREND = DEMO_TREND(30);
-const DEMO_APPT_TREND = DEMO_TREND(30);
-const DEMO_SCAN_TREND = DEMO_TREND(30);
 
 interface AdminStats {
     total_patients?: number;
@@ -92,19 +83,19 @@ export default function AdminAnalyticsPage() {
 
     const patTrend = trendData?.appt?.length
         ? trendData.appt.map(a => ({ label: fmtDate(a.date), value: a.total + 2 }))
-        : DEMO_PAT_TREND;
+        : [];
     const apptTrend = trendData?.appt?.length
         ? trendData.appt.map(a => ({ label: fmtDate(a.date), value: a.total }))
-        : DEMO_APPT_TREND;
+        : [];
     const scanTrend = trendData?.scan?.length
         ? trendData.scan.map(s => ({ label: fmtDate(s.date), value: s.total }))
-        : DEMO_SCAN_TREND;
+        : [];
 
     const pieData = [
-        { name: t("common.patients", "Patients"), value: stats?.total_patients || 12 },
-        { name: t("common.doctors", "Doctors"), value: stats?.total_doctors || 5 },
-        { name: t("common.appointments", "Appointments"), value: stats?.total_appointments || 34 },
-        { name: t("common.scans", "Scans"), value: stats?.total_scans || 18 },
+        { name: t("common.patients", "Patients"), value: stats?.total_patients || 0 },
+        { name: t("common.doctors", "Doctors"), value: stats?.total_doctors || 0 },
+        { name: t("common.appointments", "Appointments"), value: stats?.total_appointments || 0 },
+        { name: t("common.scans", "Scans"), value: stats?.total_scans || 0 },
     ].filter(d => d.value > 0);
 
     const exportReport = () => {

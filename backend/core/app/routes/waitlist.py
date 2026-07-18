@@ -88,7 +88,7 @@ async def get_patient_waitlist(
         return {"data": res.data or []}
     except Exception as e:
         logger.error(f"Waitlist get patient error: {e}")
-        return {"data": []}
+        raise HTTPException(status_code=500, detail=f"Failed to fetch waitlist: {str(e)}")
 
 
 @router.get("/doctor")
@@ -106,7 +106,7 @@ async def get_doctor_waitlist(current_user: TokenPayload = Depends(get_current_d
         return {"data": res.data or []}
     except Exception as e:
         logger.error(f"Waitlist get doctor error: {e}")
-        return {"data": []}
+        raise HTTPException(status_code=500, detail=f"Failed to fetch waitlist: {str(e)}")
 
 
 @router.put("/{waitlist_id}/status")

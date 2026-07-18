@@ -1,4 +1,3 @@
-import os
 from typing import Dict, Any
 
 
@@ -12,7 +11,7 @@ def get_agent_card() -> Dict[str, Any]:
     - SHARP-on-MCP for FHIR context propagation
     """
     # Force public URL for hackathon validator reliability
-    base_url = "https://sunay-potnuru-netra-mcp-server.hf.space"
+    base_url = "https://rohith-panduru-netra-mcp-server.hf.space"
 
     return {
         "id": "netra-ai",
@@ -176,10 +175,10 @@ def get_agent_card() -> Dict[str, Any]:
         },
         "supportedInterfaces": [
             {
-                "type": "mcp-sse-v1",
-                "protocolBinding": "mcp-sse-v1",
-                "url": f"{base_url}/mcp/sse/",
-                "endpointUrl": f"{base_url}/mcp/sse/",
+                "type": "mcp-streamable-http-v1",
+                "protocolBinding": "mcp-streamable-http-v1",
+                "url": f"{base_url}/mcp/",
+                "endpointUrl": f"{base_url}/mcp/",
                 "protocolVersion": "1.0.0",
             },
             {

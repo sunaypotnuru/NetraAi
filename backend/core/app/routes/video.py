@@ -60,9 +60,10 @@ async def livekit_webhook(request: Request, authorization: str = Header(None)):
         # Update appointment status to completed and log duration
         room_name = room.name
         duration = room.empty_timeout  # Approx metric, or compute from timestamps
+        duration_minutes = (duration // 60) if duration is not None else 0
 
         supabase.table("appointments").update(
-            {"status": "completed", "duration_minutes": duration // 60}
+            {"status": "completed", "duration_minutes": duration_minutes}
         ).eq("video_room_id", room_name).execute()
 
     return {"message": "Webhook processed successfully"}

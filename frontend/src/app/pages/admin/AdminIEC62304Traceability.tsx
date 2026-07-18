@@ -26,7 +26,19 @@ export default function AdminIEC62304Traceability() {
     queryFn: () => complianceAPI.getIECRequirements().then(res => res.data),
   });
 
-  if (statsLoading || reqsLoading) {
+  const { data: phasesData, isLoading: phasesLoading } = useQuery({
+    queryKey: ["iecPhases"],
+    queryFn: async () => {
+      // Assuming a standard REST pattern for missing endpoint
+      const res = await fetch("/api/v1/admin/compliance/iec-phases", {
+        headers: { "Authorization": `Bearer ${localStorage.getItem('token')}` }
+      });
+      if (!res.ok) throw new Error("Failed to fetch phases");
+      return res.json();
+    },
+  });
+
+  if (statsLoading || reqsLoading || phasesLoading) {
     return (
       <div className="min-h-screen pt-24 pb-12 px-6 bg-white dark:bg-[#0B0F1A]">
         <div className="max-w-7xl mx-auto space-y-8">
@@ -40,14 +52,7 @@ export default function AdminIEC62304Traceability() {
     );
   }
 
-  const phases = [
-    { phase: "1 - Concept", status: "Complete", items: 12, done: 12, color: "text-emerald-400" },
-    { phase: "2 - Design", status: "Complete", items: 18, done: 18, color: "text-emerald-400" },
-    { phase: "3 - Implementation", status: "Complete", items: 45, done: 45, color: "text-emerald-400" },
-    { phase: "4 - Verification", status: "In Progress", items: 30, done: 24, color: "text-[#0EA5E9]" },
-    { phase: "5 - Release", status: "Pending", items: 10, done: 0, color: "text-gray-500" },
-    { phase: "6 - Post-Production", status: "Pending", items: 9, done: 0, color: "text-gray-500" },
-  ];
+  const phases = phasesData?.phases || [];
 
   return (
     <div className="min-h-screen pt-24 pb-12 px-6 bg-white dark:bg-[#0B0F1A]">
@@ -100,7 +105,7 @@ export default function AdminIEC62304Traceability() {
             </div>
             <div className="p-6 space-y-4">
               <AnimatePresence>
-                {phases.map((p, i) => (
+                {phases.map((p: any, i: number) => (
                   <motion.div 
                     key={p.phase} 
                     initial={{ opacity: 0, x: -20 }} 
@@ -109,21 +114,21 @@ export default function AdminIEC62304Traceability() {
                     className="flex items-center justify-between p-4 bg-gray-50 dark:bg-[#0B0F1A] border-gray-100 dark:border-white/5 hover:border-gray-200 dark:hover:border-white/10 border rounded-2xl group transition-all"
                   >
                     <div className="flex items-center gap-4">
-                      <div className={`w-2 h-2 rounded-full shadow-[0_0_8px_currentColor] ${p.color}`} />
+                      <div className={`w-2 h-2 rounded-full shadow-[0_0_8px_currentColor] ${p.color || 'text-gray-500'}`} />
                       <div>
                         <span className="text-gray-900 dark:text-white font-bold text-sm">{p.phase}</span>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className={`text-[10px] font-bold uppercase tracking-widest ${p.color}`}>{p.status}</span>
+                          <span className={`text-[10px] font-bold uppercase tracking-widest ${p.color || 'text-gray-500'}`}>{p.status}</span>
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-8">
                       <div className="hidden md:block">
-                        <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold text-right">{p.done}/{p.items} Verified</p>
+                        <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold text-right">{p.done || 0}/{p.items || 0} Verified</p>
                         <div className="w-32 bg-white/5 rounded-full h-1.5 mt-1.5 overflow-hidden">
                           <motion.div 
                             initial={{ width: 0 }} 
-                            animate={{ width: `${(p.done / p.items) * 100}%` }} 
+                            animate={{ width: `${((p.done || 0) / (p.items || 1)) * 100}%` }} 
                             className={`h-full rounded-full ${p.status === "Complete" ? "bg-emerald-500" : "bg-[#0EA5E9]"}`} 
                           />
                         </div>

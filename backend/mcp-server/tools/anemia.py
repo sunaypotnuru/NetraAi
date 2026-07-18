@@ -57,7 +57,7 @@ async def diagnose_anemia(
     )
 
     try:
-        async with httpx.AsyncClient(timeout=120.0) as client:
+        async with httpx.AsyncClient(timeout=120.0, follow_redirects=True) as client:
             img_response = await client.get(image_url)
             img_response.raise_for_status()
 

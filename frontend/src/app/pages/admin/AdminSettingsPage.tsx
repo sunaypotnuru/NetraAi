@@ -8,6 +8,7 @@ import { useSettingsStore, PlatformSettings } from '@/lib/settingsStore';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/lib/supabase';
+import api from '@/lib/api';
 
 // Settings state types
 type SecuritySettings = { twoFA: boolean; sessionTimeout: number; };
@@ -153,11 +154,20 @@ export default function AdminSettingsPage() {
 
     const handleSave = async (section: string) => {
         setSaving(true);
-        // Simulate API call — replace with real endpoint when backend settings table exists
-        await new Promise(r => setTimeout(r, 800));
-        setSaving(false);
-        toast.success(t("admin.settings.section_saved", "{{section}} settings saved successfully", { section }));
-        setActivePanel(null);
+        try {
+            // Assume an endpoint exists to save individual section settings
+            await api.put(`/api/v1/admin/settings/${section}`, {
+                security,
+                notif,
+                system
+            });
+            toast.success(t("admin.settings.section_saved", "{{section}} settings saved successfully", { section }));
+            setActivePanel(null);
+        } catch (error) {
+            toast.error(t("admin.settings.section_failed", "Failed to save {{section}} settings", { section }));
+        } finally {
+            setSaving(false);
+        }
     };
 
     const cards = [

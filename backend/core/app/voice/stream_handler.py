@@ -24,7 +24,33 @@ from app.utils.twilio_client import current_client, TWILIO_NUMBER
 logger = logging.getLogger(__name__)
 
 audio_buffers: Dict[str, bytearray] = {}
+background_tasks = set()
 
+def _run_transcription_sync(ulaw_path: str, wav_path: str) -> str:
+    """Synchronous CPU/IO intensive task to be run in a thread"""
+    subprocess.run(
+        [
+            "ffmpeg",
+            "-y",
+            "-f",
+            "mulaw",
+            "-ar",
+            "8000",
+            "-i",
+            ulaw_path,
+            "-ar",
+            "16000",
+            wav_path,
+        ],
+        check=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
+    # Load faster-whisper and transcribe natively
+    model = WhisperModel("tiny", device="cpu", compute_type="int8")
+    segments, info = model.transcribe(wav_path, beam_size=5)
+    return " ".join([segment.text for segment in segments])
 
 async def finalize_transcription(call_sid: str):
     """Offline background task to convert uLAW to WAV via ffmpeg and transcribe with Whisper."""
@@ -50,30 +76,9 @@ async def finalize_transcription(call_sid: str):
             ulaw_path = f.name
 
         wav_path = ulaw_path.replace(".ulaw", ".wav")
-        # Format explicitly via FFMPEG
-        subprocess.run(
-            [
-                "ffmpeg",
-                "-y",
-                "-f",
-                "mulaw",
-                "-ar",
-                "8000",
-                "-i",
-                ulaw_path,
-                "-ar",
-                "16000",
-                wav_path,
-            ],
-            check=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
-
-        # Load faster-whisper and transcribe natively
-        model = WhisperModel("tiny", device="cpu", compute_type="int8")
-        segments, info = model.transcribe(wav_path, beam_size=5)
-        transcript = " ".join([segment.text for segment in segments])
+        
+        # Run blocking FFMPEG and WhisperModel transcription in a separate thread
+        transcript = await asyncio.to_thread(_run_transcription_sync, ulaw_path, wav_path)
 
         if transcript:
             supabase.table("voice_call_logs").update({"transcript": transcript}).eq(
@@ -515,7 +520,17 @@ async def websocket_endpoint(websocket: WebSocket):
                 process_openai_events(websocket, openai_ws, state)
             )
 
-            await asyncio.gather(task_tw, task_oai)
+            done, pending = await asyncio.wait(
+                [task_tw, task_oai],
+                return_when=asyncio.FIRST_COMPLETED
+            )
+            
+            for task in pending:
+                task.cancel()
+                try:
+                    await task
+                except asyncio.CancelledError:
+                    pass
 
     except websockets.exceptions.ConnectionClosed as e:
         logger.error(f"OpenAI connection closed: {e}")
@@ -534,6 +549,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 ).eq("call_sid", call_sid).execute()
 
                 # Offload transcription generation to background task
-                asyncio.create_task(finalize_transcription(call_sid))
+                task = asyncio.create_task(finalize_transcription(call_sid))
+                background_tasks.add(task)
+                task.add_done_callback(background_tasks.discard)
             except Exception as e:
                 logger.error(f"Failed to close voice call log: {e}")

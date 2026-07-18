@@ -5,7 +5,7 @@ Uses Supabase free tier for HIPAA-compliant audit trails.
 
 from supabase import create_client, Client
 import os
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Dict, Optional, Any
 import re
 import logging

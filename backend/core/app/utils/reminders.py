@@ -426,6 +426,7 @@ async def process_medication_reminders() -> None:
                     time_diff = abs(
                         (slot_hour * 60 + slot_min) - (now.hour * 60 + now.minute)
                     )
+                    time_diff = min(time_diff, 1440 - time_diff)
 
                     if time_diff <= 5:
                         today_start = now.replace(
@@ -449,7 +450,7 @@ async def process_medication_reminders() -> None:
                     logger.error("Error processing time slot %s: %s", slot, slot_err)
 
     except Exception as e:
-        logger.error("Medication reminder processing error: %s", e)
+        logger.warning("Medication reminder processing error: %s", e)
 
 
 async def send_medication_reminder(medication: Dict[str, Any], time_slot: str) -> None:
@@ -574,6 +575,7 @@ async def check_medication_calls() -> None:
                 p_hr, p_min = map(int, pref_time.split(":"))
                 n_hr, n_min = map(int, current_time.split(":"))
                 diff = abs((p_hr * 60 + p_min) - (n_hr * 60 + n_min))
+                diff = min(diff, 1440 - diff)
             except Exception:
                 continue
 
@@ -672,7 +674,7 @@ async def check_medication_calls() -> None:
                 res = supabase.table("voice_call_logs").insert(data).execute()
 
     except Exception as e:
-        logger.error(f"Error checking ambient medication calls: {e}")
+        logger.warning(f"Error checking ambient medication calls: {e}")
 
 
 # ============================================================

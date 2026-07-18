@@ -516,4 +516,4 @@ async def confirm_email(payload: dict):
         return {"confirmed": True}
     except Exception as e:
         logger.error(f"Failed to confirm email for user {user_id}: {str(e)}")
-        return {"confirmed": False, "error": str(e)}
+        raise HTTPException(status_code=500, detail=str(e))

@@ -116,9 +116,9 @@ async def analyze_mental_health_tool(
 
 @mcp.tool()
 async def screen_parkinsons_tool(
-    ctx: Context, image_url: str, patient_id: Optional[str] = None
+    ctx: Context, audio_url: str, patient_id: Optional[str] = None
 ) -> dict:
-    return await screen_parkinsons(ctx=ctx, image_url=image_url, patient_id=patient_id)
+    return await screen_parkinsons(ctx=ctx, audio_url=audio_url, patient_id=patient_id)
 
 
 @mcp.tool()
@@ -210,18 +210,51 @@ def create_app():
     #   POST /mcp/messages → receives JSON-RPC messages
     # The newer 'streamable-http' transport requires a session handshake (session ID)
     # which causes the "Missing session ID" 400 error from external validators.
-    mcp_asgi = mcp.http_app(path="/sse", transport="sse")
+    mcp_asgi = mcp.http_app(path="/", transport="streamable-http")
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         # Initialise Sentry safely
         _init_sentry_safe()
-        # SSE transport does not require explicit lifespan integration
-        yield
+        # Run FastMCP's lifespan context to initialize task groups
+        async with mcp_asgi.router.lifespan_context(app):
+            yield
 
     fastapi_app = FastAPI(
         title="NetraAI MCP Bridge", version="2.0.0", lifespan=lifespan
     )
+
+    # Global request logs for debugging connection issues
+    if not hasattr(fastapi_app.state, "request_logs"):
+        fastapi_app.state.request_logs = []
+
+    @fastapi_app.middleware("http")
+    async def log_requests(request: Request, call_next):
+        from datetime import datetime
+        method = request.method
+        path = request.url.path
+        headers = {}
+        for k, v in request.headers.items():
+            if k.lower() in ["authorization", "x-api-key", "cookie", "proxy-authorization"]:
+                headers[k] = "[REDACTED]"
+            else:
+                headers[k] = v
+        
+        if "/health" not in path and "/debug/logs" not in path:
+            fastapi_app.state.request_logs.append({
+                "method": method,
+                "path": path,
+                "headers": headers,
+                "timestamp": datetime.now().isoformat()
+            })
+            if len(fastapi_app.state.request_logs) > 50:
+                fastapi_app.state.request_logs.pop(0)
+        
+        return await call_next(request)
+
+    @fastapi_app.get("/debug/logs")
+    async def get_debug_logs():
+        return fastapi_app.state.request_logs
 
     # ── FHIR Context Extension Support ──
     # Register support for PromptOpinion's FHIR context extension.
@@ -476,7 +509,7 @@ def create_app():
             
             path = scope.get("path", "")
             # 1. CRITICAL BYPASS: Skip all processing for MCP SSE to avoid crashes
-            if path.startswith("/mcp/sse"):
+            if path.startswith("/mcp"):
                 return await self.app(scope, receive, send)
 
             # 2. Rate Limiting (Skip for health and HF)

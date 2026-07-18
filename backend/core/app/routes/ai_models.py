@@ -248,7 +248,7 @@ async def update_model(
     if version:
         updates["version"] = version
     if accuracy is not None:
-        updates["accuracy"] = str(accuracy)  # Convert float to string for consistency
+        updates["accuracy"] = accuracy  # Keep as float for calculations
     if status:
         updates["status"] = status
 
@@ -291,6 +291,13 @@ async def get_public_model_info():
 
     Returns basic information for display on homepage/marketing pages
     """
+    models_with_accuracy = [m for m in AI_MODELS if m.get("accuracy")]
+    avg_accuracy = (
+        sum(m["accuracy"] for m in models_with_accuracy) / len(models_with_accuracy)
+        if models_with_accuracy
+        else 0.0
+    )
+
     return {
         "models": [
             {
@@ -305,7 +312,6 @@ async def get_public_model_info():
         "summary": {
             "total_models": len(AI_MODELS),
             "deployed": sum(1 for m in AI_MODELS if m["status"] == "deployed"),
-            "average_accuracy": sum(m["accuracy"] for m in AI_MODELS if m["accuracy"])
-            / sum(1 for m in AI_MODELS if m["accuracy"]),
+            "average_accuracy": avg_accuracy,
         },
     }

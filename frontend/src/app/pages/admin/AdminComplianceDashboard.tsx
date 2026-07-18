@@ -54,12 +54,12 @@ export default function AdminComplianceDashboard() {
   const complaintScore = Math.max(0, 100 - (openComplaints * 5));
 
   const complianceAreas = [
-    { name: "FDA APM (21 CFR 820)", score: alerts?.length > 0 ? 85 : 99, icon: Shield, color: "text-blue-400", bg: "bg-blue-400/10" },
-    { name: "IEC 62304 Lifecycle", score: parseInt(iecStats?.full_traceability || "87"), icon: GitBranch, color: "text-purple-400", bg: "bg-purple-400/10" },
-    { name: "SOC 2 Type II", score: soc2Stats?.overall_compliance_percentage || 91, icon: Lock, color: "text-emerald-400", bg: "bg-emerald-400/10" },
-    { name: "HIPAA Security Rule", score: 96, icon: Activity, color: "text-teal-400", bg: "bg-teal-400/10" },
-    { name: "FHIR R4 Interop", score: 98, icon: CheckCircle, color: "text-indigo-400", bg: "bg-indigo-400/10" },
-    { name: "Complaint Mgmt", score: complaintScore, icon: AlertCircle, color: "text-amber-400", bg: "bg-amber-400/10" },
+    { name: "FDA APM (21 CFR 820)", score: alerts?.length > 0 ? 85 : 100, icon: Shield, color: "text-blue-400", bg: "bg-blue-400/10" },
+    { name: "IEC 62304 Lifecycle", score: parseInt(iecStats?.full_traceability || "0"), icon: GitBranch, color: "text-purple-400", bg: "bg-purple-400/10" },
+    { name: "SOC 2 Type II", score: soc2Stats?.overall_compliance_percentage || 0, icon: Lock, color: "text-emerald-400", bg: "bg-emerald-400/10" },
+    { name: "HIPAA Security Rule", score: soc2Stats?.hipaa_score || 0, icon: Activity, color: "text-teal-400", bg: "bg-teal-400/10" },
+    { name: "FHIR R4 Interop", score: soc2Stats?.fhir_score || 0, icon: CheckCircle, color: "text-indigo-400", bg: "bg-indigo-400/10" },
+    { name: "Complaint Mgmt", score: complaintScore || 0, icon: AlertCircle, color: "text-amber-400", bg: "bg-amber-400/10" },
   ];
 
   const overallScore = Math.round(complianceAreas.reduce((s, c) => s + c.score, 0) / complianceAreas.length);

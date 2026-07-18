@@ -10,6 +10,7 @@ from app.main import app
 
 from app.core.security import get_current_user
 from app.routes.patient import get_current_patient
+from app.services.supabase import supabase
 
 client = TestClient(app, base_url="http://localhost")
 
@@ -21,9 +22,6 @@ mock_current_user.email = "patient@example.com"
 mock_current_user.role = "patient"
 
 mock_token_payload = mock_current_user
-
-
-from app.services.supabase import supabase
 
 @pytest.fixture(autouse=True)
 def mock_dependencies():

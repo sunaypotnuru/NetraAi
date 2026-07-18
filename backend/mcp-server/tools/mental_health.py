@@ -47,7 +47,7 @@ async def analyze_mental_health(
     )
 
     try:
-        async with httpx.AsyncClient(timeout=120.0) as client:
+        async with httpx.AsyncClient(timeout=120.0, follow_redirects=True) as client:
             audio_response = await client.get(audio_url)
             audio_response.raise_for_status()
 
@@ -102,8 +102,8 @@ async def analyze_mental_health(
     severity = risk if risk != "None" else "Normal"
     
     depression = ml_result.get("depression_score") or 0.0
-    anxiety = ml_result.get("anxiety_score") or 0.0
-    stress = ml_result.get("stress_score") or 0.0
+    _anxiety = ml_result.get("anxiety_score") or 0.0
+    _stress = ml_result.get("stress_score") or 0.0
     phq9 = int(depression * 27) # Map to PHQ-9 scale for report transparency
 
     # 💎 SURPLUS VALUE: Crisis Detection

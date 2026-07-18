@@ -45,85 +45,7 @@ interface SecurityStats {
   last_audit_date: string;
 }
 
-const MOCK_SESSIONS: ActiveSession[] = [
-  {
-    id: "sess_01",
-    userId: "usr_admin_01",
-    userName: "Dr. Ananya Rao (Chief Admin)",
-    userRole: "admin",
-    ipAddress: "157.45.189.22",
-    deviceInfo: "Chrome on macOS (M3 Pro)",
-    loginTime: new Date(Date.now() - 4 * 3600 * 1000).toISOString(),
-    lastActivity: new Date(Date.now() - 2 * 60 * 1000).toISOString(),
-  },
-  {
-    id: "sess_02",
-    userId: "usr_doc_02",
-    userName: "Dr. Rajesh Kumar (Oncology)",
-    userRole: "doctor",
-    ipAddress: "182.72.90.114",
-    deviceInfo: "Safari on iPad Pro (iOS 17)",
-    loginTime: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
-    lastActivity: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-  },
-  {
-    id: "sess_03",
-    userId: "usr_doc_03",
-    userName: "Dr. Sunita Sharma (Cardiology)",
-    userRole: "doctor",
-    ipAddress: "103.241.12.56",
-    deviceInfo: "Firefox on Windows 11 Enterprise",
-    loginTime: new Date(Date.now() - 1 * 3600 * 1000).toISOString(),
-    lastActivity: new Date(Date.now() - 45 * 1000).toISOString(),
-  }
-];
 
-const MOCK_FAILED_LOGINS: FailedLogin[] = [
-  {
-    id: "fail_01",
-    email: "rohan.guptha@netra.ai",
-    ipAddress: "49.36.120.89",
-    timestamp: new Date(Date.now() - 12 * 3600 * 1000).toISOString(),
-    reason: "MFA Timeout Check Failed (3 consecutive attempts)",
-  },
-  {
-    id: "fail_02",
-    email: "unknown-staff@netra.ai",
-    ipAddress: "198.51.100.12",
-    timestamp: new Date(Date.now() - 18 * 3600 * 1000).toISOString(),
-    reason: "Suspicious API access token payload mismatch",
-  },
-  {
-    id: "fail_03",
-    email: "malicious_actor@attacker.io",
-    ipAddress: "203.0.113.111",
-    timestamp: new Date(Date.now() - 22 * 3600 * 1000).toISOString(),
-    reason: "Brute-force password credential stuffing attempt",
-  }
-];
-
-const MOCK_ALERTS: SecurityAlert[] = [
-  {
-    id: "alert_01",
-    type: "critical",
-    message: "Multiple failed login attempts from blocked blacklisted CIDR block in Bangalore region.",
-    timestamp: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-  },
-  {
-    id: "alert_02",
-    type: "warning",
-    message: "Admin configuration modified: Global session expiry duration updated by Chief Admin.",
-    timestamp: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
-  }
-];
-
-const MOCK_STATS: SecurityStats = {
-  failed_logins_24h: 3,
-  active_sessions: 3,
-  open_alerts: 2,
-  security_score: 97,
-  last_audit_date: new Date().toISOString(),
-};
 
 export default function SecurityPage() {
   const { t } = useTranslation();
@@ -166,18 +88,16 @@ export default function SecurityPage() {
         const statsRes = await adminAPI.getSecurityStats();
         if (statsRes.data) {
           setStats({
-            ...MOCK_STATS,
+            failed_logins_24h: 0,
+            active_sessions: 0,
+            open_alerts: 0,
+            security_score: 100,
+            last_audit_date: new Date().toISOString(),
             ...statsRes.data,
-            active_sessions: statsRes.data.active_sessions || MOCK_STATS.active_sessions,
-            failed_logins_24h: statsRes.data.failed_logins_24h || MOCK_STATS.failed_logins_24h,
-            open_alerts: statsRes.data.open_alerts || MOCK_STATS.open_alerts,
           });
-        } else {
-          setStats(MOCK_STATS);
         }
       } catch (err) {
         console.debug("Security stats endpoints returned fallback:", err);
-        setStats(MOCK_STATS);
       }
 
       // 3. Fetch Active Sessions
@@ -196,12 +116,11 @@ export default function SecurityPage() {
           }));
           setActiveSessions(mapped);
         } else {
-          // Graceful fallback with mock data if empty or unseeded
-          setActiveSessions(MOCK_SESSIONS);
+          setActiveSessions([]);
         }
       } catch (err) {
         console.debug("Active sessions fallback:", err);
-        setActiveSessions(MOCK_SESSIONS);
+        setActiveSessions([]);
       }
 
       // 4. Fetch Security Logs (Audit Trail)
@@ -223,8 +142,7 @@ export default function SecurityPage() {
         if (failures.length > 0) {
           setFailedLogins(failures);
         } else {
-          // Standard compliance mock fallback
-          setFailedLogins(MOCK_FAILED_LOGINS);
+          setFailedLogins([]);
         }
 
         // Map security alerts from audit logs or open incidents
@@ -242,12 +160,12 @@ export default function SecurityPage() {
         if (alerts.length > 0) {
           setSecurityAlerts(alerts);
         } else {
-          setSecurityAlerts(MOCK_ALERTS);
+          setSecurityAlerts([]);
         }
       } catch (err) {
         console.debug("Security logs / audit trail fallback:", err);
-        setFailedLogins(MOCK_FAILED_LOGINS);
-        setSecurityAlerts(MOCK_ALERTS);
+        setFailedLogins([]);
+        setSecurityAlerts([]);
       }
 
     } catch (error) {

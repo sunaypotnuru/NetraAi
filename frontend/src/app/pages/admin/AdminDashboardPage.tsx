@@ -122,10 +122,10 @@ export default function AdminDashboardPage() {
     const statsData = dashboardData || {};
 
     const dynamicStats = [
-        { title: t("admin.dashboard.stats.total_patients", "Total Patients"), value: statsData.total_patients || 0, change: '+12%', icon: Users, color: '#0D9488', bg: 'bg-[#0D9488]/10' },
-        { title: t("admin.dashboard.stats.total_doctors", "Total Doctors"), value: statsData.total_doctors || 0, change: '+5%', icon: UserRoundPlus, color: '#0EA5E9', bg: 'bg-[#0EA5E9]/10' },
-        { title: t("admin.dashboard.stats.total_appointments", "Total Appointments"), value: statsData.total_appointments || 0, change: '+18%', icon: Calendar, color: '#F43F5E', bg: 'bg-[#F43F5E]/10' },
-        { title: t("admin.dashboard.stats.total_scans", "AI Scans Processed"), value: statsData.total_scans || 0, change: '+24%', icon: Scan, color: '#8B5CF6', bg: 'bg-[#8B5CF6]/10' },
+        { title: t("admin.dashboard.stats.total_patients", "Total Patients"), value: statsData.total_patients || 0, change: (statsData as any).patient_growth || '+0%', icon: Users, color: '#0D9488', bg: 'bg-[#0D9488]/10' },
+        { title: t("admin.dashboard.stats.total_doctors", "Total Doctors"), value: statsData.total_doctors || 0, change: (statsData as any).doctor_growth || '+0%', icon: UserRoundPlus, color: '#0EA5E9', bg: 'bg-[#0EA5E9]/10' },
+        { title: t("admin.dashboard.stats.total_appointments", "Total Appointments"), value: statsData.total_appointments || 0, change: (statsData as any).appointment_growth || '+0%', icon: Calendar, color: '#F43F5E', bg: 'bg-[#F43F5E]/10' },
+        { title: t("admin.dashboard.stats.total_scans", "AI Scans Processed"), value: statsData.total_scans || 0, change: (statsData as any).scan_growth || '+0%', icon: Scan, color: '#8B5CF6', bg: 'bg-[#8B5CF6]/10' },
     ];
 
     const growthData = statsData.growth_data || [];

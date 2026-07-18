@@ -537,9 +537,12 @@ async def schedule_appointment(
     try:
         # Parse scheduled_at to datetime
         if isinstance(appt.scheduled_at, str):
-            scheduled_at = datetime.fromisoformat(
-                appt.scheduled_at.replace("Z", "+00:00")
-            )
+            try:
+                scheduled_at = datetime.fromisoformat(
+                    appt.scheduled_at.replace("Z", "+00:00")
+                )
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid date format for scheduled_at")
         elif hasattr(appt.scheduled_at, "isoformat"):
             scheduled_at = appt.scheduled_at
         else:
@@ -673,12 +676,18 @@ async def reschedule_appointment(
 
         # Parse new date
         if isinstance(new_date, str):
-            new_scheduled_at = datetime.fromisoformat(new_date.replace("Z", "+00:00"))
+            try:
+                new_scheduled_at = datetime.fromisoformat(new_date.replace("Z", "+00:00"))
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid date format for scheduled_at")
         else:
             new_scheduled_at = new_date
 
         # Validate date is not in the past
         now = datetime.now(timezone.utc)
+        if new_scheduled_at.tzinfo is None:
+            new_scheduled_at = new_scheduled_at.replace(tzinfo=timezone.utc)
+        
         if new_scheduled_at < now:
             raise HTTPException(
                 status_code=400, 

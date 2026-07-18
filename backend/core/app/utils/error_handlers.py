@@ -136,14 +136,27 @@ def safe_database_operation(operation_name: str):
             return supabase.table("users").insert(data).execute()
     """
 
+    import asyncio
+    import functools
+
     def decorator(func):
-        def wrapper(*args, **kwargs):
+        @functools.wraps(func)
+        async def async_wrapper(*args, **kwargs):
+            try:
+                return await func(*args, **kwargs)
+            except Exception as e:
+                raise handle_database_error(e, operation_name)
+
+        @functools.wraps(func)
+        def sync_wrapper(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
             except Exception as e:
                 raise handle_database_error(e, operation_name)
 
-        return wrapper
+        if asyncio.iscoroutinefunction(func):
+            return async_wrapper
+        return sync_wrapper
 
     return decorator
 

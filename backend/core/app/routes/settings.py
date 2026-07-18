@@ -21,7 +21,10 @@ async def get_platform_settings():
         settings = json.loads(res.decode("utf-8"))
         return settings
     except Exception as e:
-        logger.error(f"Error fetching settings, returning defaults: {e}")
+        if "Bucket not found" in str(e):
+            logger.info("Settings bucket not found, returning defaults.")
+        else:
+            logger.warning(f"Error fetching settings, returning defaults: {e}")
         # Return sensible defaults if the file doesn't exist yet
         return {
             "github_url": "https://github.com/sunaypotnuru",

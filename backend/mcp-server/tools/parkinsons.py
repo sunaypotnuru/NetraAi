@@ -14,20 +14,20 @@ from utils.audit import audit_log
 
 async def screen_parkinsons(
     ctx: Optional[Context] = None,
-    image_url: Optional[str] = None,
+    audio_url: Optional[str] = None,
     patient_id: Optional[str] = None,
     **kwargs,
 ) -> Dict:
-    """Screen for Parkinson's disease via spiral drawing analysis."""
+    """Screen for Parkinson's disease via voice analysis."""
     # 💎 Input Validation (FIXED: Prevent None crash)
-    if not image_url:
+    if not audio_url:
         return {
             "resourceType": "OperationOutcome",
             "issue": [
                 {
                     "severity": "error",
                     "code": "required",
-                    "diagnostics": "image_url (spiral drawing) is required",
+                    "diagnostics": "audio_url (voice recording) is required",
                 }
             ],
         }
@@ -48,13 +48,13 @@ async def screen_parkinsons(
     )
 
     try:
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            img_response = await client.get(image_url)
-            img_response.raise_for_status()
+        async with httpx.AsyncClient(timeout=120.0, follow_redirects=True) as client:
+            audio_response = await client.get(audio_url)
+            audio_response.raise_for_status()
 
             ml_response = await client.post(
                 f"{service_url}/predict",
-                files={"file": ("spiral.jpg", img_response.content, "image/jpeg")},
+                files={"file": ("voice.wav", audio_response.content, "audio/wav")},
             )
             ml_response.raise_for_status()
             ml_result = ml_response.json()

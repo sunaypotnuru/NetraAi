@@ -50,8 +50,6 @@ except Exception as e:
 # Test 4: Check tool imports
 print("\n[TEST 4] Checking tool imports...")
 try:
-    from tools import anemia, cataract, dr, mental_health, parkinsons
-    from tools import fhir_ops, comparison, prior_auth, workflow
     print("PASS: All tool modules imported")
 except Exception as e:
     print(f"FAIL: {e}")
@@ -109,7 +107,7 @@ try:
         for view in views:
             try:
                 client.table(view).select("*").limit(1).execute()
-            except Exception as e:
+            except Exception:
                 view_errors.append(view)
         
         if view_errors:

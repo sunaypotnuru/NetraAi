@@ -1093,6 +1093,7 @@ async def _authenticate_admin_websocket(websocket: WebSocket) -> bool:
         token = websocket.query_params.get("token")
 
     if not token:
+        await websocket.accept()
         await websocket.close(
             code=status.WS_1008_POLICY_VIOLATION,
             reason="Authentication token required",
@@ -1109,14 +1110,14 @@ async def _authenticate_admin_websocket(websocket: WebSocket) -> bool:
             )
             return False
         return True
-    except Exception:
-        pass
-    
-    await websocket.close(
-        code=status.WS_1008_POLICY_VIOLATION,
-        reason="Invalid token",
-    )
-    return False
+    except Exception as e:
+        logger.warning(f"WebSocket auth failed: {e}")
+        await websocket.accept()
+        await websocket.close(
+            code=status.WS_1008_POLICY_VIOLATION,
+            reason="Invalid token",
+        )
+        return False
 
 
 @router.websocket("/ws/audit-logs")

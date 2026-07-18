@@ -42,80 +42,7 @@ interface ReviewsResponse {
   };
 }
 
-const MOCK_REVIEWS: Review[] = [
-  {
-    id: "rev_01",
-    patient_id: "pat_01",
-    doctor_id: "doc_01",
-    rating: 5,
-    review: "Dr. Rajesh Kumar was extremely thorough during my diabetic retinopathy scan checkup. The Netra AI pre-screener was remarkably fast, and the doctor verified the clinical findings with great care.",
-    created_at: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString(),
-    patient_name: "Aarav Mehta",
-    patient_email: "aarav.mehta@gmail.com",
-    doctor_name: "Dr. Rajesh Kumar",
-    doctor_specialty: "Oncology",
-    appointment: {
-      id: "app_01",
-      scheduled_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
-      type: "Eye Scan Follow-up",
-      status: "completed"
-    }
-  },
-  {
-    id: "rev_02",
-    patient_id: "pat_02",
-    doctor_id: "doc_02",
-    rating: 4,
-    review: "Loved the AI Nurse triage assistant. It directed me to Dr. Sunita Sharma for my cardiac consultation perfectly. The clinic is highly advanced and compliant.",
-    created_at: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(),
-    patient_name: "Priyanka Patel",
-    patient_email: "priyanka.patel@yahoo.com",
-    doctor_name: "Dr. Sunita Sharma",
-    doctor_specialty: "Cardiology",
-    appointment: {
-      id: "app_02",
-      scheduled_at: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString(),
-      type: "Cardiovascular Consult",
-      status: "completed"
-    }
-  },
-  {
-    id: "rev_03",
-    patient_id: "pat_03",
-    doctor_id: "doc_03",
-    rating: 5,
-    review: "Superb experience with the new cataract ML scanner model. Had immediate feedback and Dr. Ananya's follow-up was highly reassuring. Outstanding portal!",
-    created_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString(),
-    patient_name: "Karan Johar",
-    patient_email: "karan.j@netra.ai",
-    doctor_name: "Dr. Ananya Rao",
-    doctor_specialty: "Ophthalmology",
-    appointment: {
-      id: "app_03",
-      scheduled_at: new Date(Date.now() - 6 * 24 * 3600 * 1000).toISOString(),
-      type: "Cataract Screening",
-      status: "completed"
-    }
-  },
-  {
-    id: "rev_04",
-    patient_id: "pat_04",
-    doctor_id: "doc_01",
-    rating: 3,
-    review: "The medical consultation was great, but the video call had a slight lag in the beginning. Otherwise, Netra AI is highly convenient for scheduling and medication logs.",
-    created_at: new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString(),
-    patient_name: "Amitabh Shah",
-    patient_email: "amitabh.shah@outlook.com",
-    doctor_name: "Dr. Rajesh Kumar",
-    doctor_specialty: "Oncology",
-    appointment: {
-      id: "app_04",
-      scheduled_at: new Date(Date.now() - 8 * 24 * 3600 * 1000).toISOString(),
-      type: "General Follow-up",
-      status: "completed"
-    }
-  }
-];
+
 
 export default function ReviewsPage() {
   const { t } = useTranslation();
@@ -172,7 +99,7 @@ export default function ReviewsPage() {
     return "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300";
   };
 
-  const reviews = (reviewsData?.reviews && reviewsData.reviews.length > 0 ? reviewsData.reviews : MOCK_REVIEWS)
+  const reviews = (reviewsData?.reviews && reviewsData.reviews.length > 0 ? reviewsData.reviews : [])
     .filter(r => !localDeletedIds.includes(r.id));
 
   const filteredReviews = reviews.filter(

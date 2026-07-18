@@ -51,6 +51,10 @@ async def start_room_recording(room_name: str) -> str:
     if not settings.LIVEKIT_API_KEY or not settings.LIVEKIT_API_SECRET:
         return "MOCK_EGRESS_ID"
 
+    if LiveKitAPI is None:
+        logger.error("LiveKitAPI is not available. Please install livekit-api.")
+        return "MOCK_EGRESS_ID"
+
     api = LiveKitAPI(
         url=settings.LIVEKIT_URL or "ws://localhost:7880",
         api_key=settings.LIVEKIT_API_KEY,
@@ -74,6 +78,10 @@ async def stop_room_recording(egress_id: str):
 
     if not settings.LIVEKIT_API_KEY or egress_id == "MOCK_EGRESS_ID":
         return True
+
+    if LiveKitAPI is None:
+        logger.error("LiveKitAPI is not available. Please install livekit-api.")
+        return False
 
     api = LiveKitAPI(
         url=settings.LIVEKIT_URL or "ws://localhost:7880",
