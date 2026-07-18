@@ -122,13 +122,19 @@ export default function NavbarMain() {
     navigate("/");
   };
 
-  const logoLink = user?.role === 'admin'
-    ? '/admin/dashboard'
-    : user?.role === 'doctor'
-      ? '/doctor/dashboard'
-      : user?.role === 'patient'
-        ? '/patient/dashboard'
-        : '/';
+  const isPortal = location.pathname.startsWith('/patient') || 
+                   location.pathname.startsWith('/doctor') || 
+                   location.pathname.startsWith('/admin');
+
+  const logoLink = isPortal
+    ? (user?.role === 'admin'
+      ? '/admin/dashboard'
+      : user?.role === 'doctor'
+        ? '/doctor/dashboard'
+        : user?.role === 'patient'
+          ? '/patient/dashboard'
+          : '/')
+    : '/';
 
   return (
     <>
