@@ -112,7 +112,7 @@ async def get_doctor_availability(
 
 
 @router.get("/revenue")
-async def get_revenue(
+async def get_doctor_portal_revenue(
     period: str = Query(default="month", pattern="^(day|week|month|year)$"),
     current_user: TokenPayload = Depends(get_current_doctor),
 ):

@@ -1117,7 +1117,7 @@ async def get_risk_assessment(
 
 
 @router.get("/family-members")
-async def get_family_members(current_user: TokenPayload = Depends(get_current_patient)):
+async def get_patient_family_members(current_user: TokenPayload = Depends(get_current_patient)):
     """Get all family members (dependents) under this patient account."""
     try:
         # Query the family_members table (not profiles_patient)
@@ -1134,7 +1134,7 @@ async def get_family_members(current_user: TokenPayload = Depends(get_current_pa
 
 
 @router.post("/family-members")
-async def add_family_member(
+async def add_patient_family_member(
     data: dict, current_user: TokenPayload = Depends(get_current_patient)
 ):
     """Add a new family member (dependent) under the current patient's account.
@@ -1184,7 +1184,7 @@ async def add_family_member(
 
 
 @router.get("/medications")
-async def get_medications(current_user: TokenPayload = Depends(get_current_patient)):
+async def get_patient_medications(current_user: TokenPayload = Depends(get_current_patient)):
     """Get active medication reminders for patient."""
     try:
         res = (
