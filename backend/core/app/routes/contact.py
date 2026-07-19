@@ -19,7 +19,7 @@ class ContactMessageRequest(BaseModel):
 
 @router.post("/submit")
 async def submit_contact_message(request: ContactMessageRequest):
-    """Submit a contact form message (public endpoint - no auth required)."""
+    """Submit a contact form message and send email confirmation."""
     try:
         # Insert into contact_messages table
         result = (
@@ -38,6 +38,33 @@ async def submit_contact_message(request: ContactMessageRequest):
         )
 
         logger.info(f"Contact message received from {request.email}")
+
+        # Send confirmation email to user via SendGrid provider
+        try:
+            from app.services.email_provider import SendGridProvider
+            email_provider = SendGridProvider()
+            
+            subject = "Thank you for contacting Netra AI"
+            html_body = f"""
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #0D9488;">Netra AI — We Received Your Message</h2>
+                <p>Dear {request.name},</p>
+                <p>Thank you for reaching out to Netra AI! We have received your inquiry:</p>
+                <blockquote style="background: #F8FAFC; border-left: 4px solid #0D9488; padding: 12px; font-style: italic;">
+                    "{request.message}"
+                </blockquote>
+                <p>Our clinical & technical support team will review your message and respond within 24 hours.</p>
+                <hr style="border: 0; border-top: 1px solid #E2E8F0; margin: 20px 0;" />
+                <p style="font-size: 12px; color: #64748B;">Netra AI Tele-Health Platform — Non-Invasive Diagnostics</p>
+            </div>
+            """
+            await email_provider.send_email(
+                to_email=request.email,
+                subject=subject,
+                html_content=html_body,
+            )
+        except Exception as email_err:
+            logger.warning(f"Contact email confirmation skipped/failed: {email_err}")
 
         return {
             "success": True,
