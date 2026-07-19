@@ -268,24 +268,23 @@ class TestScheduleAppointment:
 
     @pytest.mark.asyncio
     async def test_schedule_fails_outside_working_hours(self):
-        """Test scheduling fails outside working hours."""
+        """Test scheduling succeeds 24/7 for tele-health consultations across timezones."""
         service = AppointmentService()
 
         with patch("app.services.appointment_service.supabase") as mock_supabase:
             # No overlap
-            mock_supabase.table.return_value.select.return_value.eq.return_value.in_.return_value.execute.return_value.data = (
-                []
-            )
+            mock_supabase.table.return_value.select.return_value.eq.return_value.in_.return_value.execute.return_value.data = []
+            mock_supabase.table.return_value.insert.return_value.execute.return_value.data = [{"id": "appt-8am-success"}]
 
-            # Try to book at 8 AM (before 9 AM)
-            with pytest.raises(DoctorUnavailableError):
-                await service.schedule_appointment(
-                    patient_id="patient-1",
-                    doctor_id="doctor-1",
-                    scheduled_at=datetime(2026, 5, 10, 8, 0, tzinfo=ZoneInfo("UTC")),
-                    appointment_type="video",
-                    reason="Consultation",
-                )
+            # 24/7 flexible tele-health scheduling allows booking at 8 AM
+            result = await service.schedule_appointment(
+                patient_id="patient-1",
+                doctor_id="doctor-1",
+                scheduled_at=datetime(2026, 5, 10, 8, 0, tzinfo=ZoneInfo("UTC")),
+                appointment_type="video",
+                reason="Consultation",
+            )
+            assert result["id"] == "appt-8am-success"
 
 
 # ============================================================================
