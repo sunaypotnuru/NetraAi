@@ -1,7 +1,7 @@
 -- ============================================================
 -- NETRA AI COMPLETE SCHEMA v3.2.0 — PART 08
 -- Section : Views_Grants_Finalize
--- Lines   : 10951-12584 in NETRA_COMPLETE_SCHEMA.sql
+-- Lines   : 10944-12574 in NETRA_COMPLETE_SCHEMA.sql
 -- SAFE TO RE-RUN: All objects use DROP IF EXISTS guards
 -- ============================================================
 
@@ -766,7 +766,6 @@ END $$;
 -- ============================================================
 
 -- Status + Scheduled (for reminder queries - runs every 5 minutes)
-CREATE INDEX IF NOT EXISTS idx_appointments_status_scheduled 
 ON appointments(status, scheduled_at) 
 WHERE status IN ('booked', 'scheduled', 'confirmed');
 
@@ -790,7 +789,6 @@ WHERE status = 'cancelled';
 -- ============================================================
 
 -- Patient + Created (for patient history - most common query)
-CREATE INDEX IF NOT EXISTS idx_scans_patient_created 
 ON scans(patient_id, created_at DESC);
 
 -- Reviewed status (for doctor pending scans)
@@ -878,7 +876,6 @@ ON video_consultations(doctor_id, status, started_at DESC)
 WHERE status IN ('waiting', 'active');
 
 -- Patient + Status (for patient's consultations)
-CREATE INDEX IF NOT EXISTS idx_video_consultations_patient
 ON video_consultations(patient_id, started_at DESC);
 
 -- ============================================================

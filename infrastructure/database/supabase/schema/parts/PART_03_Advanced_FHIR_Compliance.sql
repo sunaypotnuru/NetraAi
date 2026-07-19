@@ -1,7 +1,7 @@
 -- ============================================================
 -- NETRA AI COMPLETE SCHEMA v3.2.0 — PART 03
 -- Section : Advanced_FHIR_Compliance
--- Lines   : 3168-4729 in NETRA_COMPLETE_SCHEMA.sql
+-- Lines   : 3164-4725 in NETRA_COMPLETE_SCHEMA.sql
 -- SAFE TO RE-RUN: All objects use DROP IF EXISTS guards
 -- ============================================================
 

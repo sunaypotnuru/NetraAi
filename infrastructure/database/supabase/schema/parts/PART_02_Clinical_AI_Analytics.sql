@@ -1,7 +1,7 @@
 -- ============================================================
 -- NETRA AI COMPLETE SCHEMA v3.2.0 — PART 02
 -- Section : Clinical_AI_Analytics
--- Lines   : 1565-3167 in NETRA_COMPLETE_SCHEMA.sql
+-- Lines   : 1565-3163 in NETRA_COMPLETE_SCHEMA.sql
 -- SAFE TO RE-RUN: All objects use DROP IF EXISTS guards
 -- ============================================================
 
@@ -1278,10 +1278,6 @@ CREATE INDEX IF NOT EXISTS idx_fhir_patients_birth_date ON public.fhir_patients(
 CREATE INDEX IF NOT EXISTS idx_fhir_patients_managing_org ON public.fhir_patients(managing_organization);
 
 -- Specialties
-CREATE INDEX IF NOT EXISTS idx_specialties_name ON public.specialties(name);
-CREATE INDEX IF NOT EXISTS idx_specialties_category ON public.specialties(category);
-CREATE INDEX IF NOT EXISTS idx_specialties_active ON public.specialties(is_active, display_order) WHERE is_active = TRUE;
-CREATE INDEX IF NOT EXISTS idx_specialties_parent ON public.specialties(parent_specialty_id);
 
 -- Insurance Providers
 CREATE INDEX IF NOT EXISTS idx_insurance_providers_code ON public.insurance_providers(code);

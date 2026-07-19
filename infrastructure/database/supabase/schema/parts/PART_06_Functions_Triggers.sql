@@ -1,9 +1,29 @@
 -- ============================================================
 -- NETRA AI COMPLETE SCHEMA v3.2.0 — PART 06
 -- Section : Functions_Triggers
--- Lines   : 7874-9437 in NETRA_COMPLETE_SCHEMA.sql
+-- Lines   : 7849-9427 in NETRA_COMPLETE_SCHEMA.sql
 -- SAFE TO RE-RUN: All objects use DROP IF EXISTS guards
 -- ============================================================
+
+-- ---------------------------------------------------------------------
+
+INSERT INTO public.achievements (code, name, title, description, icon, points, category, requirement_type, requirement_value, target_value, role_type) VALUES
+('first_scan', 'First Scan', 'First Steps', 'Complete your first anemia scan', 'Ã°Å¸â€Â¬', 10, 'health', 'scan_count', 1, 1, 'patient'),
+('scan_streak_7', '7-Day Scan Streak', 'Consistent Scanner', 'Complete scans for 7 consecutive days', 'Ã°Å¸â€œâ€¦', 50, 'health', 'scan_streak', 7, 7, 'patient'),
+('scan_streak_30', '30-Day Scan Streak', 'Health Champion', 'Complete scans for 30 consecutive days', 'Ã°Å¸Ââ€ ', 200, 'health', 'scan_streak', 30, 30, 'patient'),
+('first_appointment', 'First Appointment', 'Getting Started', 'Book your first appointment', 'Ã°Å¸â€œâ€¦', 10, 'engagement', 'appointment_count', 1, 1, 'patient'),
+('appointments_10', '10 Appointments', 'Regular Visitor', 'Complete 10 appointments', 'Ã°Å¸Å½Â¯', 100, 'engagement', 'appointment_count', 10, 10, 'patient'),
+('login_streak_7', '7-Day Login Streak', 'Dedicated User', 'Log in for 7 consecutive days', 'Ã°Å¸â€Â¥', 30, 'engagement', 'login_streak', 7, 7, 'patient'),
+('login_streak_30', '30-Day Login Streak', 'Super Dedicated', 'Log in for 30 consecutive days', 'Ã¢Â­Â', 150, 'engagement', 'login_streak', 30, 30, 'patient'),
+('referral_1', 'First Referral', 'Sharing is Caring', 'Refer your first friend', 'Ã°Å¸Â¤Â', 25, 'social', 'referral_count', 1, 1, 'patient'),
+('referral_5', '5 Referrals', 'Influencer', 'Refer 5 friends', 'Ã°Å¸Å’Å¸', 100, 'social', 'referral_count', 5, 5, 'patient'),
+('profile_complete', 'Profile Complete', 'All Set', 'Complete your profile 100%', 'A', 20, 'profile', 'profile_completion', 100, 100, 'patient'),
+('first_consultation', 'First Consultation', 'Doctor Debut', 'Complete your first consultation', 'Ã°Å¸â€˜Â¨Ã¢â‚¬ÂÃ¢Å¡â€¢Ã¯Â¸Â', 10, 'professional', 'consultation_count', 1, 1, 'doctor'),
+('consultations_50', '50 Consultations', 'Experienced Doctor', 'Complete 50 consultations', 'Ã°Å¸Â©Âº', 200, 'professional', 'consultation_count', 50, 50, 'doctor'),
+('consultations_100', '100 Consultations', 'Expert Doctor', 'Complete 100 consultations', 'Ã°Å¸ÂÂ¥', 500, 'professional', 'consultation_count', 100, 100, 'doctor'),
+('high_rating', 'Highly Rated', '5-Star Doctor', 'Maintain 4.5+ rating with 20+ reviews', 'Ã¢Â­Â', 150, 'professional', 'rating', 45, 45, 'doctor'),
+('early_bird', 'Early Bird', 'Morning Person', 'Complete 10 appointments before 9 AM', 'Ã°Å¸Å’â€¦', 50, 'professional', 'early_appointments', 10, 10, 'doctor')
+ON CONFLICT (code) DO NOTHING;
 
 -- ---------------------------------------------------------------------
 -- 10.2 Badges seed data
@@ -1325,7 +1345,6 @@ CREATE INDEX IF NOT EXISTS idx_model_telemetry_status ON public.model_telemetry(
 
 -- SOC 2 Evidence
 
-CREATE INDEX IF NOT EXISTS idx_soc2_evidence_control ON public.soc2_evidence(control_id);
 
 -- 11.3 RLS Policies for Compliance Tables
 -- ---------------------------------------------------------------------
@@ -1486,7 +1505,6 @@ WHERE status = 'pending';
 CREATE INDEX IF NOT EXISTS idx_risk_assessments_recent ON public.risk_assessments(patient_id, created_at DESC, risk_level);
 
 -- Index for active scheduled reports
-CREATE INDEX IF NOT EXISTS idx_scheduled_reports_next_run ON public.scheduled_reports(next_run, enabled) 
 WHERE enabled = TRUE AND next_run IS NOT NULL;
 
 -- Index for pending payments
@@ -1566,6 +1584,3 @@ BEGIN
     FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
 END $$;
 
--- ---------------------------------------------------------------------
--- IMPROVEMENT 4: dd Materialized View for Doctor Ratings
--- Priority: Low (Performance optimization)

@@ -2835,10 +2835,6 @@ CREATE INDEX IF NOT EXISTS idx_fhir_patients_birth_date ON public.fhir_patients(
 CREATE INDEX IF NOT EXISTS idx_fhir_patients_managing_org ON public.fhir_patients(managing_organization);
 
 -- Specialties
-CREATE INDEX IF NOT EXISTS idx_specialties_name ON public.specialties(name);
-CREATE INDEX IF NOT EXISTS idx_specialties_category ON public.specialties(category);
-CREATE INDEX IF NOT EXISTS idx_specialties_active ON public.specialties(is_active, display_order) WHERE is_active = TRUE;
-CREATE INDEX IF NOT EXISTS idx_specialties_parent ON public.specialties(parent_specialty_id);
 
 -- Insurance Providers
 CREATE INDEX IF NOT EXISTS idx_insurance_providers_code ON public.insurance_providers(code);
@@ -6003,7 +5999,6 @@ CREATE TABLE IF NOT EXISTS public.complaint_analytics (
 -- Performance indexes for complaints table
 CREATE INDEX IF NOT EXISTS idx_complaints_ticket_id ON public.complaints(ticket_id);
 CREATE INDEX IF NOT EXISTS idx_complaints_submitted_by ON public.complaints(reporter_id);
-CREATE INDEX IF NOT EXISTS idx_complaints_status ON public.complaints(status);
 CREATE INDEX IF NOT EXISTS idx_complaints_priority ON public.complaints(priority);
 CREATE INDEX IF NOT EXISTS idx_complaints_category ON public.complaints(category_id);
 CREATE INDEX IF NOT EXISTS idx_complaints_assigned_to ON public.complaints(assigned_to_id);
@@ -9191,7 +9186,6 @@ CREATE INDEX IF NOT EXISTS idx_model_telemetry_status ON public.model_telemetry(
 
 -- SOC 2 Evidence
 
-CREATE INDEX IF NOT EXISTS idx_soc2_evidence_control ON public.soc2_evidence(control_id);
 
 -- 11.3 RLS Policies for Compliance Tables
 -- ---------------------------------------------------------------------
@@ -9352,7 +9346,6 @@ WHERE status = 'pending';
 CREATE INDEX IF NOT EXISTS idx_risk_assessments_recent ON public.risk_assessments(patient_id, created_at DESC, risk_level);
 
 -- Index for active scheduled reports
-CREATE INDEX IF NOT EXISTS idx_scheduled_reports_next_run ON public.scheduled_reports(next_run, enabled) 
 WHERE enabled = TRUE AND next_run IS NOT NULL;
 
 -- Index for pending payments
@@ -11709,7 +11702,6 @@ END $$;
 -- ============================================================
 
 -- Status + Scheduled (for reminder queries - runs every 5 minutes)
-CREATE INDEX IF NOT EXISTS idx_appointments_status_scheduled 
 ON appointments(status, scheduled_at) 
 WHERE status IN ('booked', 'scheduled', 'confirmed');
 
@@ -11733,7 +11725,6 @@ WHERE status = 'cancelled';
 -- ============================================================
 
 -- Patient + Created (for patient history - most common query)
-CREATE INDEX IF NOT EXISTS idx_scans_patient_created 
 ON scans(patient_id, created_at DESC);
 
 -- Reviewed status (for doctor pending scans)
@@ -11821,7 +11812,6 @@ ON video_consultations(doctor_id, status, started_at DESC)
 WHERE status IN ('waiting', 'active');
 
 -- Patient + Status (for patient's consultations)
-CREATE INDEX IF NOT EXISTS idx_video_consultations_patient
 ON video_consultations(patient_id, started_at DESC);
 
 -- ============================================================

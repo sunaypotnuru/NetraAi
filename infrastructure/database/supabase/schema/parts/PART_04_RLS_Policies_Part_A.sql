@@ -1,7 +1,7 @@
 -- ============================================================
 -- NETRA AI COMPLETE SCHEMA v3.2.0 — PART 04
 -- Section : RLS_Policies_Part_A
--- Lines   : 4730-6286 in NETRA_COMPLETE_SCHEMA.sql
+-- Lines   : 4726-6281 in NETRA_COMPLETE_SCHEMA.sql
 -- SAFE TO RE-RUN: All objects use DROP IF EXISTS guards
 -- ============================================================
 
@@ -1281,7 +1281,6 @@ CREATE TABLE IF NOT EXISTS public.complaint_analytics (
 -- Performance indexes for complaints table
 CREATE INDEX IF NOT EXISTS idx_complaints_ticket_id ON public.complaints(ticket_id);
 CREATE INDEX IF NOT EXISTS idx_complaints_submitted_by ON public.complaints(reporter_id);
-CREATE INDEX IF NOT EXISTS idx_complaints_status ON public.complaints(status);
 CREATE INDEX IF NOT EXISTS idx_complaints_priority ON public.complaints(priority);
 CREATE INDEX IF NOT EXISTS idx_complaints_category ON public.complaints(category_id);
 CREATE INDEX IF NOT EXISTS idx_complaints_assigned_to ON public.complaints(assigned_to_id);

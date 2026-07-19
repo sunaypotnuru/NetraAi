@@ -1,10 +1,13 @@
 -- ============================================================
 -- NETRA AI COMPLETE SCHEMA v3.2.0 — PART 07
 -- Section : Indexes_Verify
--- Lines   : 9438-10950 in NETRA_COMPLETE_SCHEMA.sql
+-- Lines   : 9428-10943 in NETRA_COMPLETE_SCHEMA.sql
 -- SAFE TO RE-RUN: All objects use DROP IF EXISTS guards
 -- ============================================================
 
+-- ---------------------------------------------------------------------
+-- IMPROVEMENT 4: dd Materialized View for Doctor Ratings
+-- Priority: Low (Performance optimization)
 -- ---------------------------------------------------------------------
 
 -- Drop existing view if it exists
