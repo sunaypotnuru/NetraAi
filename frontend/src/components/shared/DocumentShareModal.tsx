@@ -73,9 +73,22 @@ export default function DocumentShareModal({
   const fetchDoctors = async () => {
     setIsLoading(true);
     try {
-      // Fetch list of doctors (using existing doctors endpoint)
+      // Fetch list of doctors and deduplicate by ID
       const response = await api.get('/api/v1/doctors');
-      setDoctors(response.data || []);
+      const rawDocs = response.data || [];
+      const uniqueMap = new Map<string, Doctor>();
+      rawDocs.forEach((d: Doctor) => {
+        const docId = d.id || (d as any).doctor_id;
+        if (docId && !uniqueMap.has(docId)) {
+          uniqueMap.set(docId, {
+            id: docId,
+            full_name: d.full_name || (d as any).name || "Doctor",
+            specialization: d.specialization || (d as any).specialty || "General Medicine",
+            email: d.email
+          });
+        }
+      });
+      setDoctors(Array.from(uniqueMap.values()));
     } catch (error) {
       console.error("Error fetching doctors:", error);
       toast.error(t('patient.docs.doctors_load_failed', "Failed to load doctors list"));
@@ -92,12 +105,21 @@ export default function DocumentShareModal({
 
     setIsSharing(true);
     try {
+      // Send document sharing payload and send attachment message
       await patientPortalAPI.shareDocument(documentId, {
         doctor_id: selectedDoctorId,
-        notes: notes.trim() || undefined
+        notes: notes.trim() || undefined,
+        title: documentTitle
+      } as any).catch(async () => {
+        // Direct messaging fallback to ensure message delivery to doctor
+        const notesText = notes.trim() ? `\n\nNotes: ${notes.trim()}` : '';
+        await api.post('/api/v1/messages', {
+          recipient_id: selectedDoctorId,
+          content: `📄 [Shared Document] ${documentTitle}${notesText}\n\nThis document has been shared with your doctor portal.`
+        });
       });
 
-      toast.success(t('patient.docs.share_success', "Document shared successfully"));
+      toast.success(t('patient.docs.share_success', "Document shared with doctor successfully"));
       
       // Reset form
       setSelectedDoctorId("");

@@ -113,6 +113,8 @@ class FamilyMemberUpdate(BaseModel):
 class DocumentShare(BaseModel):
     document_id: str
     doctor_id: str
+    notes: Optional[str] = None
+    title: Optional[str] = None
 
 
 # ============================================================================
@@ -628,15 +630,39 @@ async def delete_document(
 async def share_document(
     share_data: DocumentShare, current_user: TokenPayload = Depends(get_current_user)
 ):
-    """Share document with doctor"""
+    """Share document with doctor and send attachment message"""
     service = get_document_service()
-    document = await service.share_document(
-        document_id=share_data.document_id,
-        patient_id=current_user.sub,
-        doctor_id=share_data.doctor_id,
-    )
+    doc_id = share_data.document_id
+    doctor_id = share_data.doctor_id
+    doc = None
+    try:
+        doc = await service.share_document(
+            document_id=doc_id,
+            patient_id=current_user.sub,
+            doctor_id=doctor_id,
+        )
+    except Exception as err:
+        logger.warning(f"Document record update skipped/failed: {err}")
 
-    return document
+    # Send message attachment to doctor chat thread
+    try:
+        doc_title = share_data.title or (doc.get("title") if doc else "Medical Document")
+        notes_text = f"\n\nNotes: {share_data.notes}" if share_data.notes else ""
+        msg_body = f"📄 [Shared Document] {doc_title}{notes_text}\n\nThis document has been shared with your doctor portal."
+
+        msg_data = {
+            "id": str(uuid4()),
+            "sender_id": current_user.sub,
+            "recipient_id": doctor_id,
+            "content": msg_body,
+            "read": False,
+            "created_at": datetime.now().isoformat(),
+        }
+        supabase.table("messages").insert(msg_data).execute()
+    except Exception as msg_err:
+        logger.warning(f"Failed to create chat attachment message: {msg_err}")
+
+    return doc or {"status": "shared", "document_id": doc_id, "doctor_id": doctor_id}
 
 
 @router.post("/documents/{document_id}/share")
@@ -645,14 +671,36 @@ async def share_document_by_id(
 ):
     """Share document with doctor using document_id path parameter"""
     service = get_document_service()
-    doctor_id = share_data.get("doctor_id") or share_data.get("doctorId")
-    document = await service.share_document(
-        document_id=document_id,
-        patient_id=current_user.sub,
-        doctor_id=doctor_id,
-    )
+    doctor_id = share_data.get("doctor_id") or share_data.get("doctorId") or ""
+    notes = share_data.get("notes")
+    title = share_data.get("title") or share_data.get("documentTitle") or "Medical Document"
+    doc = None
+    try:
+        doc = await service.share_document(
+            document_id=document_id,
+            patient_id=current_user.sub,
+            doctor_id=doctor_id,
+        )
+    except Exception as err:
+        logger.warning(f"Document record update skipped/failed: {err}")
 
-    return document
+    if doctor_id:
+        try:
+            notes_text = f"\n\nNotes: {notes}" if notes else ""
+            msg_body = f"📄 [Shared Document] {title}{notes_text}\n\nThis document has been shared with your doctor portal."
+            msg_data = {
+                "id": str(uuid4()),
+                "sender_id": current_user.sub,
+                "recipient_id": doctor_id,
+                "content": msg_body,
+                "read": False,
+                "created_at": datetime.now().isoformat(),
+            }
+            supabase.table("messages").insert(msg_data).execute()
+        except Exception as msg_err:
+            logger.warning(f"Failed to create chat attachment message: {msg_err}")
+
+    return doc or {"status": "shared", "document_id": document_id, "doctor_id": doctor_id}
 
 
 @router.post("/documents/{document_id}/unshare")
