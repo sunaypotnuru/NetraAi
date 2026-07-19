@@ -170,7 +170,9 @@ export const patientPortalAPI = {
   shareDocument: (documentId: string, data: {
     doctor_id: string;
     notes?: string;
-  }) => api.post(`/api/v1/patient/documents/${documentId}/share`, data),
+  }) => api.post('/api/v1/patient/documents/share', { document_id: documentId, ...data }).catch(() => 
+    api.post(`/api/v1/patient/documents/${documentId}/share`, data)
+  ),
   
   // ==================== HEALTH RECORDS ====================
   

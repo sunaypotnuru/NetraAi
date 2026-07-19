@@ -639,6 +639,22 @@ async def share_document(
     return document
 
 
+@router.post("/documents/{document_id}/share")
+async def share_document_by_id(
+    document_id: str, share_data: dict, current_user: TokenPayload = Depends(get_current_user)
+):
+    """Share document with doctor using document_id path parameter"""
+    service = get_document_service()
+    doctor_id = share_data.get("doctor_id") or share_data.get("doctorId")
+    document = await service.share_document(
+        document_id=document_id,
+        patient_id=current_user.sub,
+        doctor_id=doctor_id,
+    )
+
+    return document
+
+
 @router.post("/documents/{document_id}/unshare")
 async def unshare_document(
     document_id: str, current_user: TokenPayload = Depends(get_current_user)

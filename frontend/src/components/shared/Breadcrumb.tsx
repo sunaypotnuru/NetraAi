@@ -1,10 +1,12 @@
 import { Link, useLocation } from "react-router";
 import { ChevronRight, Home } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
+import { useAuthStore } from "@/lib/store";
 
 export default function Breadcrumb() {
   const location = useLocation();
   const { t } = useTranslation();
+  const { user } = useAuthStore();
 
   // Don't show breadcrumb on home or auth pages
   if (
@@ -13,6 +15,24 @@ export default function Breadcrumb() {
     location.pathname.startsWith("/signup")
   ) {
     return null;
+  }
+
+  // Determine intelligent home link based on current portal path or user role
+  let homePath = "/";
+  if (location.pathname.startsWith("/patient")) {
+    homePath = "/patient/dashboard";
+  } else if (location.pathname.startsWith("/doctor")) {
+    homePath = "/doctor/dashboard";
+  } else if (location.pathname.startsWith("/admin")) {
+    homePath = "/admin/dashboard";
+  } else if (user) {
+    if (user.role === "doctor") {
+      homePath = "/doctor/dashboard";
+    } else if (user.role === "admin") {
+      homePath = "/admin/dashboard";
+    } else {
+      homePath = "/patient/dashboard";
+    }
   }
 
   // Parse pathname into segments
@@ -73,9 +93,9 @@ export default function Breadcrumb() {
     <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isAdmin ? 'pt-2 pb-4' : 'pt-20 pb-2'}`}>
       <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md px-4 py-2 rounded-xl border border-gray-200/60 dark:border-gray-700/60 shadow-xs">
         <Link
-          to="/"
+          to={homePath}
           className="flex items-center gap-1 hover:text-[#0D9488] transition-colors"
-          title="Home"
+          title={homePath === "/" ? "Landing Page" : "Portal Dashboard"}
         >
           <Home className="w-3.5 h-3.5" />
         </Link>
