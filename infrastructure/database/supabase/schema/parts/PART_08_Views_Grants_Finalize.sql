@@ -1,7 +1,7 @@
 -- ============================================================
 -- NETRA AI COMPLETE SCHEMA v3.2.0 — PART 08
 -- Section : Views_Grants_Finalize
--- Lines   : 10944-12574 in NETRA_COMPLETE_SCHEMA.sql
+-- Lines   : 10839-12445 in NETRA_COMPLETE_SCHEMA.sql
 -- SAFE TO RE-RUN: All objects use DROP IF EXISTS guards
 -- ============================================================
 
@@ -193,13 +193,6 @@ CREATE TRIGGER trigger_scan_processing_timestamps
   FOR EACH ROW
   EXECUTE FUNCTION public.update_scan_processing_timestamps();
 
-
-
-
-
-
-
-
 -- ============================================================
 -- --- CLINICAL MIGRATIONS & PERFORMANCE INDEXES (2026 UPDATE) ---
 -- ============================================================
@@ -274,7 +267,6 @@ FROM appointments
 GROUP BY status
 ORDER BY count DESC;
 
-
 -- ============================================================
 
 -- ============================================================
@@ -328,7 +320,6 @@ SELECT
 FROM appointments
 GROUP BY duration_minutes
 ORDER BY duration_minutes;
-
 
 -- ============================================================
 
@@ -452,7 +443,6 @@ SELECT
 FROM appointments
 WHERE status IN ('booked', 'scheduled', 'confirmed');
 
-
 -- ============================================================
 
 -- ============================================================
@@ -529,7 +519,6 @@ SELECT
   ) as late_cancellation_rate
 FROM appointments;
 
-
 -- ============================================================
 
 -- ============================================================
@@ -577,7 +566,6 @@ SELECT
   COUNT(pdf_url) as prescriptions_with_pdf,
   ROUND(COUNT(pdf_url) * 100.0 / NULLIF(COUNT(*), 0), 2) as pdf_generation_rate
 FROM prescriptions;
-
 
 -- ============================================================
 
@@ -700,7 +688,6 @@ SELECT 'prescriptions.status', status, COUNT(*)
 FROM prescriptions GROUP BY status
 ORDER BY table_column, count DESC;
 
-
 -- ============================================================
 
 -- ============================================================
@@ -750,7 +737,6 @@ BEGIN
   END IF;
 END $$;
 
-
 -- ============================================================
 
 -- ============================================================
@@ -789,7 +775,6 @@ WHERE status = 'cancelled';
 -- ============================================================
 
 -- Patient + Created (for patient history - most common query)
-ON scans(patient_id, created_at DESC);
 
 -- Reviewed status (for doctor pending scans)
 CREATE INDEX IF NOT EXISTS idx_scans_pending_review 
@@ -876,7 +861,6 @@ ON video_consultations(doctor_id, status, started_at DESC)
 WHERE status IN ('waiting', 'active');
 
 -- Patient + Status (for patient's consultations)
-ON video_consultations(patient_id, started_at DESC);
 
 -- ============================================================
 -- PROFILES INDEXES
@@ -977,7 +961,6 @@ SELECT
 FROM pg_indexes
 WHERE schemaname = 'public'
   AND indexname LIKE 'idx_%';
-
 
 -- ============================================================
 
@@ -1213,8 +1196,6 @@ SELECT
 
 SELECT 'VERIFICATION COMPLETE' as status;
 
-
-
 -- ============================================================
 -- --- ADMIN PORTAL VIEWS ---
 -- ============================================================
@@ -1309,8 +1290,6 @@ FROM
     public.scans s
 LEFT JOIN
     public.profiles_patient p ON s.patient_id = p.id;
-
-
 
 -- ============================================================
 -- --- MCP PERFORMANCE ANALYTICS VIEWS ---
@@ -1435,8 +1414,6 @@ WHERE
     new_data->>'latency_ms' IS NOT NULL
     AND resource_type LIKE '%_tool';
 
-
-
 -- ============================================================
 -- --- HIPAA SECURITY & VIEW PERMISSIONS CONTROLS ---
 -- ============================================================
@@ -1447,7 +1424,6 @@ WHERE
 -- ============================================================
 -- STEP 1: Add is_admin column to profiles_doctor table
 -- ============================================================
-
 
 -- ============================================================
 -- STEP 2: Grant SELECT permissions on all views

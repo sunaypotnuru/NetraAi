@@ -1,10 +1,12 @@
 -- ============================================================
 -- NETRA AI COMPLETE SCHEMA v3.2.0 — PART 02
 -- Section : Clinical_AI_Analytics
--- Lines   : 1565-3163 in NETRA_COMPLETE_SCHEMA.sql
+-- Lines   : 1557-3151 in NETRA_COMPLETE_SCHEMA.sql
 -- SAFE TO RE-RUN: All objects use DROP IF EXISTS guards
 -- ============================================================
 
+-- ---------------------------------------------------------------------
+-- 2.12b Telemedicine Policies and Security
 -- ---------------------------------------------------------------------
 
 ALTER TABLE public.video_consultations ENABLE ROW LEVEL SECURITY;
@@ -792,7 +794,6 @@ CREATE TABLE IF NOT EXISTS public.symptom_reports (
 -- 2.14 FDAAI/ML LGORITHM PERFORM NCE MONITORING ( PM) SYSTEM
 -- ============================================================
 
-
 -- AI Performance Metrics Table (APM Metrics)
 CREATE TABLE IF NOT EXISTS public.ai_apm_metrics (
   id SERIAL PRIMARY KEY,
@@ -976,7 +977,6 @@ CREATE INDEX IF NOT EXISTS idx_adverse_events_model ON public.adverse_events (mo
 -- 2.15 IEC 62304 SOFTWARE LIFECYCLE TRACEABILITY
 -- ============================================================
 
-
 -- Requirements Table
 CREATE TABLE IF NOT EXISTS public.requirements (
   id VARCHAR(50) PRIMARY KEY,
@@ -1075,7 +1075,6 @@ GROUP BY r.safety_class;
 -- 2.16 SOC 2 EVIDENCE COLLECTION & COMPLIANCE
 -- ============================================================
 
-
 -- SOC 2 Evidence Table
 CREATE TABLE IF NOT EXISTS public.soc2_evidence (
   id SERIAL PRIMARY KEY,
@@ -1159,7 +1158,6 @@ GROUP BY control_category;
 -- 2.17 COMPREHENSIVE AUDIT TRAIL (HIPAA+ SOC 2 + FDA)
 -- ============================================================
 
-
 CREATE TABLE IF NOT EXISTS public.audit_trail (
   id SERIAL PRIMARY KEY,
   event_type VARCHAR(100) NOT NULL,
@@ -1181,7 +1179,6 @@ CREATE INDEX idx_audit_user ON public.audit_trail(user_id);
 
 -- 2.18 COMPLIANCE DASHBOARD FUNCTION
 -- ============================================================
-
 
 CREATE OR REPLACE FUNCTION get_compliance_dashboard()
 RETURNS JSON AS $$
@@ -1220,7 +1217,6 @@ $$ LANGUAGE plpgsql;
 
 -- 3. CREATE INDEXES FOR PERFORM NCE
 -- ============================================================
-
 
 -- Appointments
 CREATE INDEX IF NOT EXISTS idx_appointments_patient ON public.appointments(patient_id);

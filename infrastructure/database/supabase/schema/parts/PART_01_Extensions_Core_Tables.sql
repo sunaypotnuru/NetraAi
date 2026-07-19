@@ -1,7 +1,7 @@
 -- ============================================================
 -- NETRA AI COMPLETE SCHEMA v3.2.0 — PART 01
 -- Section : Extensions_Core_Tables
--- Lines   : 1-1564 in NETRA_COMPLETE_SCHEMA.sql
+-- Lines   : 1-1556 in NETRA_COMPLETE_SCHEMA.sql
 -- SAFE TO RE-RUN: All objects use DROP IF EXISTS guards
 -- ============================================================
 
@@ -30,8 +30,6 @@
 --
 -- SAFE TO RE-RUN: All definitions use IF NOT EXISTS / OR REPLACE.
 -- ============================================================
-
-
 
 -- FILE: 01_auth_extensions.sql
 -- ============================================================
@@ -70,7 +68,6 @@
 -- VERSION: 2.0.0
 -- LAST UPDATED: April 23, 2026
 -- ============================================================
-
 
 -- ============================================================
 
@@ -248,7 +245,6 @@ CREATE EXTENSION IF NOT EXISTS "btree_gist";
 -- 1.1 UTILITY FUNCTIONS (Must be defined before use in policies)
 -- ============================================================
 
-
 -- Check if user is admin
 CREATE OR REPLACE FUNCTION public.is_admin(user_uuid UUID)
 RETURNS BOOLEAN AS $$
@@ -284,7 +280,6 @@ $$ LANGUAGE plpgsql;
 
 -- 2. ENHANCED CORE TABLES WITH FHIR COMPLIANCE
 -- ============================================================
-
 
 -- ---------------------------------------------------------------------
 -- 2.1 FHIR Resource Base Tables
@@ -1302,7 +1297,6 @@ CREATE TABLE IF NOT EXISTS public.soap_notes (
   UNIQUE(appointment_id)
 );
 
-
 -- Clinical Notes (used by doctor routes)
 CREATE TABLE IF NOT EXISTS public.clinical_notes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -1567,5 +1561,3 @@ CREATE TABLE IF NOT EXISTS public.emergency_disconnects (
     recorded_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- ---------------------------------------------------------------------
--- 2.12b Telemedicine Policies and Security

@@ -1,7 +1,7 @@
 -- ============================================================
 -- NETRA AI COMPLETE SCHEMA v3.2.0 — PART 03
 -- Section : Advanced_FHIR_Compliance
--- Lines   : 3164-4725 in NETRA_COMPLETE_SCHEMA.sql
+-- Lines   : 3152-4706 in NETRA_COMPLETE_SCHEMA.sql
 -- SAFE TO RE-RUN: All objects use DROP IF EXISTS guards
 -- ============================================================
 
@@ -9,7 +9,6 @@
 
 -- 3.1 CRITICAL PERFORM NCE INDEXES ( dded for Production)
 -- ============================================================
-
 
 -- Critical composite indexes for common query patterns
 CREATE INDEX IF NOT EXISTS idx_appointments_patient_status_date 
@@ -70,11 +69,8 @@ CREATE INDEX IF NOT EXISTS idx_prescriptions_doctor_date
 CREATE INDEX IF NOT EXISTS idx_patient_lab_results_patient_date 
   ON public.patient_lab_results(patient_id, collected_date DESC);
 
-
-
 -- FILE: 04_indexes_and_rls.sql
 -- ============================================================
-
 
 -- Wearable Devices (Patient connected devices)
 CREATE TABLE IF NOT EXISTS public.wearable_devices (
@@ -420,7 +416,6 @@ CREATE TRIGGER update_wearable_devices_updated_at BEFORE UPDATE ON public.wearab
 -- Comprehensive social, economic, and environmental health factors
 -- ============================================================
 
-
 -- Social Determinants Assessment
 CREATE TABLE IF NOT EXISTS public.social_determinants_assessment (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -744,7 +739,6 @@ CREATE TRIGGER update_resource_referrals_updated_at BEFORE UPDATE ON public.reso
 
 -- 19. ADVANCED AI AND MACHINE LEARNING (2026 ENHANCEMENT)
 -- Next-generation AI models, federated learning, and explainable AI -- ============================================================
-
 
 -- AI Model Versions table moved earlier to resolve forward references
 
@@ -1150,7 +1144,6 @@ CREATE TRIGGER update_federated_learning_experiments_updated_at BEFORE UPDATE ON
 -- 20. BLOCKCHAIN AND INTEROPERABILITY (2026 ENHANCEMENT)
 -- Decentralized health records and cross-system interoperability
 -- ============================================================
-
 
 -- Blockchain Health Records (Immutable health record references)
 CREATE TABLE IF NOT EXISTS public.blockchain_health_records (

@@ -1,12 +1,37 @@
 -- ============================================================
 -- NETRA AI COMPLETE SCHEMA v3.2.0 — PART 05
 -- Section : RLS_Policies_Part_B
--- Lines   : 6282-7848 in NETRA_COMPLETE_SCHEMA.sql
+-- Lines   : 6221-7776 in NETRA_COMPLETE_SCHEMA.sql
 -- SAFE TO RE-RUN: All objects use DROP IF EXISTS guards
 -- ============================================================
 
 -- ============================================================
 
+-- 3. CHECK REQUIRED EXTENSIONS
+-- ============================================================
+
+SELECT 
+  '========================================' as info
+UNION ALL
+SELECT '3. POSTGRESQL EXTENSIONS CHECK'
+UNION ALL
+SELECT '========================================';
+
+SELECT 
+  name,
+  CASE 
+    WHEN installed_version IS NOT NULL THEN 'A INSTALLED (' || installed_version || ')'
+    ELSE 'Ã¢ÂÅ’ NOT INSTALLED'
+  END as status,
+  comment
+FROM pg_available_extensions
+WHERE name IN ('pgcrypto', 'postgis', 'pg_stat_statements', 'pg_trgm', 'btree_gin', 'btree_gist')
+ORDER BY name;
+
+-- ============================================================
+
+-- 4. CHECK EXISTING FUNCTIONS
+-- ============================================================
 
 SELECT 
   '========================================' as info
@@ -32,7 +57,6 @@ ORDER BY routine_name;
 -- 5. CHECK EXISTING TRIGGERS
 -- ============================================================
 
-
 SELECT 
   '========================================' as info
 UNION ALL
@@ -49,14 +73,11 @@ FROM information_schema.triggers
 WHERE trigger_schema = 'public'
 ORDER BY event_object_table, trigger_name;
 
-
-
 -- FILE: 02_core_tables.sql
 -- ============================================================
 
 -- 4. ENABLE ROW LEVEL SECURITY (RLS)
 -- ============================================================
-
 
  ALTER TABLE public.profiles_patient ENABLE ROW LEVEL SECURITY;
  ALTER TABLE public.profiles_doctor ENABLE ROW LEVEL SECURITY;
@@ -172,11 +193,9 @@ ORDER BY event_object_table, trigger_name;
 -- 5. CREATE RLS POLICIES
 -- ============================================================
 
-
 -- ---------------------------------------------------------------------
 -- 5.1 Helper functions for RLS
 -- ---------------------------------------------------------------------
-
 
 -- Check if user is a patient
 CREATE OR REPLACE FUNCTION public.is_patient(user_uuid UUID)
@@ -814,7 +833,6 @@ CREATE POLICY "System can create patient statements"
   ON public.patient_statements FOR INSERT
   WITH CHECK (true);
 
-
 -- (Telemedicine Policies relocated to Category 2.12b)
 
 -- Analytics Dashboards
@@ -1293,8 +1311,6 @@ CREATE POLICY "Users can create symptom_reports"
 -- 6. CREATE TRIGGERS FOR UPDATED_ AT
 -- ============================================================
 
-
-
 -- pply trigger to all tables with updated_at
 DROP TRIGGER IF EXISTS update_profiles_patient_updated_at ON public.profiles_patient;
 CREATE TRIGGER update_profiles_patient_updated_at BEFORE UPDATE ON public.profiles_patient
@@ -1380,7 +1396,6 @@ CREATE TRIGGER update_notification_preferences_updated_at BEFORE UPDATE ON publi
 
 -- 7. UTILITY FUNCTIONS
 -- ============================================================
-
 
 -- Get user statistics
 CREATE OR REPLACE FUNCTION public.get_user_stats(user_uuid UUID)
@@ -1506,7 +1521,6 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- 8. UDIT TRIGGER FUNCTION
 -- ============================================================
 
-
 CREATE OR REPLACE FUNCTION public.audit_trigger_func()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -1547,28 +1561,3 @@ DROP TRIGGER IF EXISTS audit_profiles_doctor ON public.profiles_doctor;
 CREATE TRIGGER audit_profiles_doctor AFTER UPDATE ON public.profiles_doctor
   FOR EACH ROW EXECUTE FUNCTION public.audit_trigger_func();
 
--- ============================================================
-
--- 9. GRANT PERMISSIONS
--- ============================================================
-
-
--- Grant usage on schema
-GRANT USAGE ON SCHEMA public TO anon, authenticated;
-
--- Grant select on all tables to authenticated users
-GRANT SELECT ON ALL TABLES IN SCHEMA public TO authenticated;
-
--- Grant insert/update/delete based on RLS policies
-GRANT INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO authenticated;
-
--- Grant execute on functions
-GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO authenticated;
-
--- ============================================================
-
--- 10. SEED DATA -- ============================================================
-
-
--- ---------------------------------------------------------------------
--- 10.1 Achievements seed data

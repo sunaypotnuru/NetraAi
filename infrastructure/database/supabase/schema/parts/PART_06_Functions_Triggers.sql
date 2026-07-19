@@ -1,10 +1,33 @@
 -- ============================================================
 -- NETRA AI COMPLETE SCHEMA v3.2.0 — PART 06
 -- Section : Functions_Triggers
--- Lines   : 7849-9427 in NETRA_COMPLETE_SCHEMA.sql
+-- Lines   : 7777-9344 in NETRA_COMPLETE_SCHEMA.sql
 -- SAFE TO RE-RUN: All objects use DROP IF EXISTS guards
 -- ============================================================
 
+-- ============================================================
+
+-- 9. GRANT PERMISSIONS
+-- ============================================================
+
+-- Grant usage on schema
+GRANT USAGE ON SCHEMA public TO anon, authenticated;
+
+-- Grant select on all tables to authenticated users
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO authenticated;
+
+-- Grant insert/update/delete based on RLS policies
+GRANT INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO authenticated;
+
+-- Grant execute on functions
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO authenticated;
+
+-- ============================================================
+
+-- 10. SEED DATA -- ============================================================
+
+-- ---------------------------------------------------------------------
+-- 10.1 Achievements seed data
 -- ---------------------------------------------------------------------
 
 INSERT INTO public.achievements (code, name, title, description, icon, points, category, requirement_type, requirement_value, target_value, role_type) VALUES
@@ -152,7 +175,6 @@ ON CONFLICT DO NOTHING;
 -- 11. CREATE UTH TRIGGER FOR NEW USER PROFILE
 -- ============================================================
 
-
 -- Function to create profile when new user signs up
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
@@ -225,7 +247,6 @@ CREATE TRIGGER on_auth_user_created
 -- 12. NOTIFIC TION TEMPL TES
 -- ============================================================
 
-
 -- Insert notification templates for common events
 INSERT INTO public.email_templates (name, subject, html_content, text_content, variables, category, is_active) VALUES
 (
@@ -284,7 +305,6 @@ ON CONFLICT (name) DO UPDATE SET
 
 -- 13. VERIFICATION QUERIES
 -- ============================================================
-
 
 -- Check all tables exist
 DO $$
@@ -352,7 +372,6 @@ END $$;
 -- SETUP COMPLETE!
 -- ============================================================
 
-
 -- Summary message
 DO $$
 BEGIN
@@ -371,7 +390,6 @@ END $$;
 
 -- 14. DDITION L MISSING TABLES (DISCOVERED FROM CODE REVIEW)
 -- ============================================================
-
 
 -- Medications (patient medication reminders)
 CREATE TABLE IF NOT EXISTS public.medications (
@@ -472,7 +490,6 @@ CREATE TRIGGER update_medical_referrals_updated_at BEFORE UPDATE ON public.medic
 
 -- END OF INITI L SCHEMA SECTION
 -- ============================================================
-
 
 -- Risk assessments (health risk evaluations)
 CREATE TABLE IF NOT EXISTS public.risk_assessments (
@@ -702,9 +719,6 @@ CREATE POLICY "Doctors can view intake_responses for their appointments"
     )
   );
 
-
-
-
 -- (Complaints table moved to line 5685 for reconciliation)
 
 CREATE INDEX IF NOT EXISTS idx_complaints_severity ON public.complaints(severity);
@@ -725,15 +739,12 @@ DROP TRIGGER IF EXISTS update_complaints_updated_at ON public.complaints;
 CREATE TRIGGER update_complaints_updated_at BEFORE UPDATE ON public.complaints
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
-
 -- ============================================================
 
 -- 15. FINAL VERIFICATION & SUMMARY
 
-
 -- FILE: 03_advanced_tables.sql
 -- ============================================================
-
 
 -- Final table count
 DO $$
@@ -802,7 +813,6 @@ END $$;
 --
 -- ============================================================
 
-
 -- Final completion message
 DO $$
 BEGIN
@@ -812,16 +822,12 @@ BEGIN
   RAISE NOTICE '========================================';
 END $$;
 
-
-
-
 -- ============================================================
 
 -- INDUSTRIAL STANDARDS IMPLEMENTATION - PHASE 1 & 2
 -- Added: April 12, 2026
 -- Purpose: Enterprise-grade system health, configuration, security, and audit logging
 -- ============================================================
-
 
 -- ---------------------------------------------------------------------
 -- Phase 1: System Health, Configuration, and Security Management
@@ -981,7 +987,6 @@ CREATE INDEX IF NOT EXISTS idx_data_export_requested ON public.data_export_reque
 -- ROW LEVEL SECURITY (RLS) POLICIES - INDUSTRI LAST AND RDS
 -- ============================================================
 
-
 -- Service Health: Admin only
  ALTER TABLE public.service_health ENABLE ROW LEVEL SECURITY;
 
@@ -1101,7 +1106,6 @@ CREATE POLICY data_export_admin_all ON public.data_export_requests
 -- FUNCTIONS AND TRIGGERS - INDUSTRI LAST AND RDS
 -- ============================================================
 
-
 -- Function to automatically clean up expired sessions
 CREATE OR REPLACE FUNCTION cleanup_expired_sessions_enhanced()
 RETURNS void AS $$
@@ -1153,7 +1157,6 @@ $$ LANGUAGE plpgsql;
 -- INITI L DATA - INDUSTRI LAST AND RDS
 -- ============================================================
 
-
 -- Insert default system configuration
 INSERT INTO public.system_config (key, value, description) VALUES
   ('session_timeout_minutes', '60', 'Session timeout in minutes'),
@@ -1197,7 +1200,6 @@ ON CONFLICT (resource_type) DO NOTHING;
 -- INDUSTRI LAST AND RDS IMPLEMENT TION COMPLETE
 -- ============================================================
 
-
 DO $$
 BEGIN
   RAISE NOTICE '========================================';
@@ -1228,7 +1230,6 @@ BEGIN
   RAISE NOTICE '';
   RAISE NOTICE '========================================';
 END $$;
-
 
 -- ============================================================
 -- ============================================
@@ -1265,14 +1266,11 @@ CREATE POLICY blogs_admin_all ON public.blogs
   FOR ALL
   USING (public.is_admin(auth.uid()));
 
-
-
 -- ============================================================
 
 -- SECTION: MISSING TABLE DDITION ( April 15, 2026)
 -- dded after comprehensive schema analysis
 -- ============================================================
-
 
 -- Specialties (doctor specializations)
 -- Seed specialties data (moved to SEED_DATA.sql)
@@ -1281,7 +1279,6 @@ CREATE POLICY blogs_admin_all ON public.blogs
 
 -- FINAL SCHEMA SUMMARY (Updated April 15, 2026)
 -- ============================================================
-
 
 DO $$
 BEGIN
@@ -1308,14 +1305,12 @@ END $$;
 -- Status: Production-Ready (Industrial Compliance Enhanced)
 -- ============================================================
 
-
 -- ============================================================
 
 -- 11. INDUSTRIAL COMPLIANCE & MONITORING (FDA APM, SOC 2, ISO 13485)
 -- Added: May 9, 2026
 -- Purpose: Real-time telemetry, model performance monitoring, and compliance tracking
 -- ============================================================
-
 
 -- 11.1 FDA APM (AI Performance Monitoring)
 -- ---------------------------------------------------------------------
@@ -1344,7 +1339,6 @@ CREATE INDEX IF NOT EXISTS idx_model_telemetry_status ON public.model_telemetry(
 -- SOC 2 Control Status
 
 -- SOC 2 Evidence
-
 
 -- 11.3 RLS Policies for Compliance Tables
 -- ---------------------------------------------------------------------
@@ -1378,11 +1372,7 @@ BEGIN
   RAISE NOTICE '========================================';
 END $$;
 
-
 -- ============================================================
-
-
-
 
 -- ============================================================
 
@@ -1390,7 +1380,6 @@ END $$;
 -- Purpose: pply all recommended improvements from verification report
 -- Status: Production-ready enhancements
 -- ============================================================
-
 
 -- ---------------------------------------------------------------------
 -- IMPROVEMENT 1: Specialties Table

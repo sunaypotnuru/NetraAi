@@ -1,7 +1,7 @@
 -- ============================================================
 -- NETRA AI COMPLETE SCHEMA v3.2.0 — PART 04
 -- Section : RLS_Policies_Part_A
--- Lines   : 4726-6281 in NETRA_COMPLETE_SCHEMA.sql
+-- Lines   : 4707-6220 in NETRA_COMPLETE_SCHEMA.sql
 -- SAFE TO RE-RUN: All objects use DROP IF EXISTS guards
 -- ============================================================
 
@@ -10,7 +10,6 @@
 -- 21. ADVANCED ANALYTICS AND RESEARCH (2026 ENHANCEMENT)
 -- Real-world evidence, clinical trials, and advanced analytics
 -- ============================================================
-
 
 -- Clinical Research Studies (Clinical trials and research protocols)
 CREATE TABLE IF NOT EXISTS public.clinical_research_studies (
@@ -521,7 +520,6 @@ CREATE TRIGGER update_predictive_models_updated_at BEFORE UPDATE ON public.predi
 -- Comprehensive healthcare-specific utility functions
 -- ============================================================
 
-
 -- Function to calculate patient age from date of birth
 CREATE OR REPLACE FUNCTION public.calculate_age(birth_date DATE)
 RETURNS INTEGER AS $$
@@ -796,7 +794,6 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- Additional seed data for new tables
 -- ============================================================
 
-
 -- Insert genomic test types
 INSERT INTO public.lab_tests_reference (loinc_code, test_name, test_category, specimen_type, clinical_significance, cost) VALUES
 ('81247-9', 'MasterHL7 genetic variant reporting', 'genomics', 'blood', 'Comprehensive genetic analysis for disease risk and drug response', 2500.00),
@@ -846,7 +843,6 @@ ON CONFLICT (name) DO NOTHING;
 
 -- 24. FINAL SCHEMA VALIDATION AND SUMMARY
 -- ============================================================
-
 
 -- Function to validate schema completeness
 CREATE OR REPLACE FUNCTION public.validate_schema_completeness()
@@ -933,7 +929,6 @@ $$ LANGUAGE plpgsql;
 
 -- FINAL COMPREHENSIVE SUMMARY
 -- ============================================================
-
 
 DO $$
 BEGIN
@@ -1028,12 +1023,10 @@ END $$;
 -- New Features: Genomics, IoT, SDOH, Advanced I, Blockchain, Research
 -- ============================================================
 
-
 -- ============================================================
 
 -- 18. COMPLAINT MANAGEMENT SYSTEM TABLES A NEW
 -- ============================================================
-
 
 -- Complaint Categories Reference Table
 CREATE TABLE IF NOT EXISTS public.complaint_categories (
@@ -1277,7 +1270,6 @@ CREATE TABLE IF NOT EXISTS public.complaint_analytics (
 -- COMPLAINT SYSTEM INDEXES
 -- ============================================================
 
-
 -- Performance indexes for complaints table
 CREATE INDEX IF NOT EXISTS idx_complaints_ticket_id ON public.complaints(ticket_id);
 CREATE INDEX IF NOT EXISTS idx_complaints_submitted_by ON public.complaints(reporter_id);
@@ -1310,7 +1302,6 @@ CREATE INDEX IF NOT EXISTS idx_complaint_analytics_category ON public.complaint_
 
 -- COMPLAINT SYSTEM TRIGGERS
 -- ============================================================
-
 
 -- Trigger to update last_updated_at on complaints
 CREATE OR REPLACE FUNCTION update_complaint_timestamp()
@@ -1357,7 +1348,6 @@ CREATE TRIGGER trigger_calculate_complaint_metrics
 -- COMPLAINT SYSTEM VIEWS
 -- ============================================================
 
-
 -- View for complaint dashboard statistics
 CREATE OR REPLACE VIEW public.v_complaint_dashboard_stats AS SELECT 
   COUNT(*) as total_complaints,
@@ -1401,7 +1391,6 @@ GROUP BY c.priority, c.submitter_type, c.affects_patient_care;
 -- ============================================================
 
 -- COMPLAINT SYSTEM SEED DATA -- ============================================================
-
 
 -- Insert complaint categories
 INSERT INTO public.complaint_categories (category_key, category_name, user_type, icon, color, description) VALUES
@@ -1453,7 +1442,6 @@ ON CONFLICT DO NOTHING;
 -- END OF COMPLAINT MANAGEMENT SYSTEM
 -- ============================================================
 
-
 -- ============================================================
 
 -- APPENDIX : PRE-FLIGHT CHECKS (OPTIONAL)
@@ -1472,12 +1460,10 @@ ON CONFLICT DO NOTHING;
 -- Purpose: Inspect your current database state
 -- ============================================================
 
-
 -- ============================================================
 
 -- 1. CHECK EXISTING TABLES
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -1503,7 +1489,6 @@ ORDER BY table_name;
 
 -- 2. CHECK ROW COUNTS IN KEY TABLES
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -1534,30 +1519,3 @@ BEGIN
   END LOOP;
 END $$;
 
--- ============================================================
-
--- 3. CHECK REQUIRED EXTENSIONS
--- ============================================================
-
-
-SELECT 
-  '========================================' as info
-UNION ALL
-SELECT '3. POSTGRESQL EXTENSIONS CHECK'
-UNION ALL
-SELECT '========================================';
-
-SELECT 
-  name,
-  CASE 
-    WHEN installed_version IS NOT NULL THEN 'A INSTALLED (' || installed_version || ')'
-    ELSE 'Ã¢ÂÅ’ NOT INSTALLED'
-  END as status,
-  comment
-FROM pg_available_extensions
-WHERE name IN ('pgcrypto', 'postgis', 'pg_stat_statements', 'pg_trgm', 'btree_gin', 'btree_gist')
-ORDER BY name;
-
--- ============================================================
-
--- 4. CHECK EXISTING FUNCTIONS

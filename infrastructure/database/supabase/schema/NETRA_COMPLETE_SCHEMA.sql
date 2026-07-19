@@ -24,8 +24,6 @@
 -- SAFE TO RE-RUN: All definitions use IF NOT EXISTS / OR REPLACE.
 -- ============================================================
 
-
-
 -- FILE: 01_auth_extensions.sql
 -- ============================================================
 -- ============================================================
@@ -63,7 +61,6 @@
 -- VERSION: 2.0.0
 -- LAST UPDATED: April 23, 2026
 -- ============================================================
-
 
 -- ============================================================
 
@@ -241,7 +238,6 @@ CREATE EXTENSION IF NOT EXISTS "btree_gist";
 -- 1.1 UTILITY FUNCTIONS (Must be defined before use in policies)
 -- ============================================================
 
-
 -- Check if user is admin
 CREATE OR REPLACE FUNCTION public.is_admin(user_uuid UUID)
 RETURNS BOOLEAN AS $$
@@ -277,7 +273,6 @@ $$ LANGUAGE plpgsql;
 
 -- 2. ENHANCED CORE TABLES WITH FHIR COMPLIANCE
 -- ============================================================
-
 
 -- ---------------------------------------------------------------------
 -- 2.1 FHIR Resource Base Tables
@@ -1294,7 +1289,6 @@ CREATE TABLE IF NOT EXISTS public.soap_notes (
   updated_at TIMESTAMPTZ DEFAULT now(),
   UNIQUE(appointment_id)
 );
-
 
 -- Clinical Notes (used by doctor routes)
 CREATE TABLE IF NOT EXISTS public.clinical_notes (
@@ -2349,7 +2343,6 @@ CREATE TABLE IF NOT EXISTS public.symptom_reports (
 -- 2.14 FDAAI/ML LGORITHM PERFORM NCE MONITORING ( PM) SYSTEM
 -- ============================================================
 
-
 -- AI Performance Metrics Table (APM Metrics)
 CREATE TABLE IF NOT EXISTS public.ai_apm_metrics (
   id SERIAL PRIMARY KEY,
@@ -2533,7 +2526,6 @@ CREATE INDEX IF NOT EXISTS idx_adverse_events_model ON public.adverse_events (mo
 -- 2.15 IEC 62304 SOFTWARE LIFECYCLE TRACEABILITY
 -- ============================================================
 
-
 -- Requirements Table
 CREATE TABLE IF NOT EXISTS public.requirements (
   id VARCHAR(50) PRIMARY KEY,
@@ -2632,7 +2624,6 @@ GROUP BY r.safety_class;
 -- 2.16 SOC 2 EVIDENCE COLLECTION & COMPLIANCE
 -- ============================================================
 
-
 -- SOC 2 Evidence Table
 CREATE TABLE IF NOT EXISTS public.soc2_evidence (
   id SERIAL PRIMARY KEY,
@@ -2716,7 +2707,6 @@ GROUP BY control_category;
 -- 2.17 COMPREHENSIVE AUDIT TRAIL (HIPAA+ SOC 2 + FDA)
 -- ============================================================
 
-
 CREATE TABLE IF NOT EXISTS public.audit_trail (
   id SERIAL PRIMARY KEY,
   event_type VARCHAR(100) NOT NULL,
@@ -2738,7 +2728,6 @@ CREATE INDEX idx_audit_user ON public.audit_trail(user_id);
 
 -- 2.18 COMPLIANCE DASHBOARD FUNCTION
 -- ============================================================
-
 
 CREATE OR REPLACE FUNCTION get_compliance_dashboard()
 RETURNS JSON AS $$
@@ -2777,7 +2766,6 @@ $$ LANGUAGE plpgsql;
 
 -- 3. CREATE INDEXES FOR PERFORM NCE
 -- ============================================================
-
 
 -- Appointments
 CREATE INDEX IF NOT EXISTS idx_appointments_patient ON public.appointments(patient_id);
@@ -3166,7 +3154,6 @@ CREATE INDEX IF NOT EXISTS symptom_reports_gix ON symptom_reports USING GIST (lo
 -- 3.1 CRITICAL PERFORM NCE INDEXES ( dded for Production)
 -- ============================================================
 
-
 -- Critical composite indexes for common query patterns
 CREATE INDEX IF NOT EXISTS idx_appointments_patient_status_date 
   ON public.appointments(patient_id, status, scheduled_at DESC);
@@ -3226,11 +3213,8 @@ CREATE INDEX IF NOT EXISTS idx_prescriptions_doctor_date
 CREATE INDEX IF NOT EXISTS idx_patient_lab_results_patient_date 
   ON public.patient_lab_results(patient_id, collected_date DESC);
 
-
-
 -- FILE: 04_indexes_and_rls.sql
 -- ============================================================
-
 
 -- Wearable Devices (Patient connected devices)
 CREATE TABLE IF NOT EXISTS public.wearable_devices (
@@ -3576,7 +3560,6 @@ CREATE TRIGGER update_wearable_devices_updated_at BEFORE UPDATE ON public.wearab
 -- Comprehensive social, economic, and environmental health factors
 -- ============================================================
 
-
 -- Social Determinants Assessment
 CREATE TABLE IF NOT EXISTS public.social_determinants_assessment (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -3900,7 +3883,6 @@ CREATE TRIGGER update_resource_referrals_updated_at BEFORE UPDATE ON public.reso
 
 -- 19. ADVANCED AI AND MACHINE LEARNING (2026 ENHANCEMENT)
 -- Next-generation AI models, federated learning, and explainable AI -- ============================================================
-
 
 -- AI Model Versions table moved earlier to resolve forward references
 
@@ -4306,7 +4288,6 @@ CREATE TRIGGER update_federated_learning_experiments_updated_at BEFORE UPDATE ON
 -- 20. BLOCKCHAIN AND INTEROPERABILITY (2026 ENHANCEMENT)
 -- Decentralized health records and cross-system interoperability
 -- ============================================================
-
 
 -- Blockchain Health Records (Immutable health record references)
 CREATE TABLE IF NOT EXISTS public.blockchain_health_records (
@@ -4728,7 +4709,6 @@ CREATE TRIGGER update_smart_contracts_updated_at BEFORE UPDATE ON public.smart_c
 -- 21. ADVANCED ANALYTICS AND RESEARCH (2026 ENHANCEMENT)
 -- Real-world evidence, clinical trials, and advanced analytics
 -- ============================================================
-
 
 -- Clinical Research Studies (Clinical trials and research protocols)
 CREATE TABLE IF NOT EXISTS public.clinical_research_studies (
@@ -5239,7 +5219,6 @@ CREATE TRIGGER update_predictive_models_updated_at BEFORE UPDATE ON public.predi
 -- Comprehensive healthcare-specific utility functions
 -- ============================================================
 
-
 -- Function to calculate patient age from date of birth
 CREATE OR REPLACE FUNCTION public.calculate_age(birth_date DATE)
 RETURNS INTEGER AS $$
@@ -5514,7 +5493,6 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- Additional seed data for new tables
 -- ============================================================
 
-
 -- Insert genomic test types
 INSERT INTO public.lab_tests_reference (loinc_code, test_name, test_category, specimen_type, clinical_significance, cost) VALUES
 ('81247-9', 'MasterHL7 genetic variant reporting', 'genomics', 'blood', 'Comprehensive genetic analysis for disease risk and drug response', 2500.00),
@@ -5564,7 +5542,6 @@ ON CONFLICT (name) DO NOTHING;
 
 -- 24. FINAL SCHEMA VALIDATION AND SUMMARY
 -- ============================================================
-
 
 -- Function to validate schema completeness
 CREATE OR REPLACE FUNCTION public.validate_schema_completeness()
@@ -5651,7 +5628,6 @@ $$ LANGUAGE plpgsql;
 
 -- FINAL COMPREHENSIVE SUMMARY
 -- ============================================================
-
 
 DO $$
 BEGIN
@@ -5746,12 +5722,10 @@ END $$;
 -- New Features: Genomics, IoT, SDOH, Advanced I, Blockchain, Research
 -- ============================================================
 
-
 -- ============================================================
 
 -- 18. COMPLAINT MANAGEMENT SYSTEM TABLES A NEW
 -- ============================================================
-
 
 -- Complaint Categories Reference Table
 CREATE TABLE IF NOT EXISTS public.complaint_categories (
@@ -5995,7 +5969,6 @@ CREATE TABLE IF NOT EXISTS public.complaint_analytics (
 -- COMPLAINT SYSTEM INDEXES
 -- ============================================================
 
-
 -- Performance indexes for complaints table
 CREATE INDEX IF NOT EXISTS idx_complaints_ticket_id ON public.complaints(ticket_id);
 CREATE INDEX IF NOT EXISTS idx_complaints_submitted_by ON public.complaints(reporter_id);
@@ -6028,7 +6001,6 @@ CREATE INDEX IF NOT EXISTS idx_complaint_analytics_category ON public.complaint_
 
 -- COMPLAINT SYSTEM TRIGGERS
 -- ============================================================
-
 
 -- Trigger to update last_updated_at on complaints
 CREATE OR REPLACE FUNCTION update_complaint_timestamp()
@@ -6075,7 +6047,6 @@ CREATE TRIGGER trigger_calculate_complaint_metrics
 -- COMPLAINT SYSTEM VIEWS
 -- ============================================================
 
-
 -- View for complaint dashboard statistics
 CREATE OR REPLACE VIEW public.v_complaint_dashboard_stats AS SELECT 
   COUNT(*) as total_complaints,
@@ -6119,7 +6090,6 @@ GROUP BY c.priority, c.submitter_type, c.affects_patient_care;
 -- ============================================================
 
 -- COMPLAINT SYSTEM SEED DATA -- ============================================================
-
 
 -- Insert complaint categories
 INSERT INTO public.complaint_categories (category_key, category_name, user_type, icon, color, description) VALUES
@@ -6171,7 +6141,6 @@ ON CONFLICT DO NOTHING;
 -- END OF COMPLAINT MANAGEMENT SYSTEM
 -- ============================================================
 
-
 -- ============================================================
 
 -- APPENDIX : PRE-FLIGHT CHECKS (OPTIONAL)
@@ -6190,12 +6159,10 @@ ON CONFLICT DO NOTHING;
 -- Purpose: Inspect your current database state
 -- ============================================================
 
-
 -- ============================================================
 
 -- 1. CHECK EXISTING TABLES
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -6221,7 +6188,6 @@ ORDER BY table_name;
 
 -- 2. CHECK ROW COUNTS IN KEY TABLES
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -6257,7 +6223,6 @@ END $$;
 -- 3. CHECK REQUIRED EXTENSIONS
 -- ============================================================
 
-
 SELECT 
   '========================================' as info
 UNION ALL
@@ -6280,7 +6245,6 @@ ORDER BY name;
 
 -- 4. CHECK EXISTING FUNCTIONS
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -6306,7 +6270,6 @@ ORDER BY routine_name;
 -- 5. CHECK EXISTING TRIGGERS
 -- ============================================================
 
-
 SELECT 
   '========================================' as info
 UNION ALL
@@ -6323,14 +6286,11 @@ FROM information_schema.triggers
 WHERE trigger_schema = 'public'
 ORDER BY event_object_table, trigger_name;
 
-
-
 -- FILE: 02_core_tables.sql
 -- ============================================================
 
 -- 4. ENABLE ROW LEVEL SECURITY (RLS)
 -- ============================================================
-
 
  ALTER TABLE public.profiles_patient ENABLE ROW LEVEL SECURITY;
  ALTER TABLE public.profiles_doctor ENABLE ROW LEVEL SECURITY;
@@ -6446,11 +6406,9 @@ ORDER BY event_object_table, trigger_name;
 -- 5. CREATE RLS POLICIES
 -- ============================================================
 
-
 -- ---------------------------------------------------------------------
 -- 5.1 Helper functions for RLS
 -- ---------------------------------------------------------------------
-
 
 -- Check if user is a patient
 CREATE OR REPLACE FUNCTION public.is_patient(user_uuid UUID)
@@ -7088,7 +7046,6 @@ CREATE POLICY "System can create patient statements"
   ON public.patient_statements FOR INSERT
   WITH CHECK (true);
 
-
 -- (Telemedicine Policies relocated to Category 2.12b)
 
 -- Analytics Dashboards
@@ -7567,8 +7524,6 @@ CREATE POLICY "Users can create symptom_reports"
 -- 6. CREATE TRIGGERS FOR UPDATED_ AT
 -- ============================================================
 
-
-
 -- pply trigger to all tables with updated_at
 DROP TRIGGER IF EXISTS update_profiles_patient_updated_at ON public.profiles_patient;
 CREATE TRIGGER update_profiles_patient_updated_at BEFORE UPDATE ON public.profiles_patient
@@ -7654,7 +7609,6 @@ CREATE TRIGGER update_notification_preferences_updated_at BEFORE UPDATE ON publi
 
 -- 7. UTILITY FUNCTIONS
 -- ============================================================
-
 
 -- Get user statistics
 CREATE OR REPLACE FUNCTION public.get_user_stats(user_uuid UUID)
@@ -7780,7 +7734,6 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- 8. UDIT TRIGGER FUNCTION
 -- ============================================================
 
-
 CREATE OR REPLACE FUNCTION public.audit_trigger_func()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -7826,7 +7779,6 @@ CREATE TRIGGER audit_profiles_doctor AFTER UPDATE ON public.profiles_doctor
 -- 9. GRANT PERMISSIONS
 -- ============================================================
 
-
 -- Grant usage on schema
 GRANT USAGE ON SCHEMA public TO anon, authenticated;
 
@@ -7842,7 +7794,6 @@ GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO authenticated;
 -- ============================================================
 
 -- 10. SEED DATA -- ============================================================
-
 
 -- ---------------------------------------------------------------------
 -- 10.1 Achievements seed data
@@ -7993,7 +7944,6 @@ ON CONFLICT DO NOTHING;
 -- 11. CREATE UTH TRIGGER FOR NEW USER PROFILE
 -- ============================================================
 
-
 -- Function to create profile when new user signs up
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
@@ -8066,7 +8016,6 @@ CREATE TRIGGER on_auth_user_created
 -- 12. NOTIFIC TION TEMPL TES
 -- ============================================================
 
-
 -- Insert notification templates for common events
 INSERT INTO public.email_templates (name, subject, html_content, text_content, variables, category, is_active) VALUES
 (
@@ -8125,7 +8074,6 @@ ON CONFLICT (name) DO UPDATE SET
 
 -- 13. VERIFICATION QUERIES
 -- ============================================================
-
 
 -- Check all tables exist
 DO $$
@@ -8193,7 +8141,6 @@ END $$;
 -- SETUP COMPLETE!
 -- ============================================================
 
-
 -- Summary message
 DO $$
 BEGIN
@@ -8212,7 +8159,6 @@ END $$;
 
 -- 14. DDITION L MISSING TABLES (DISCOVERED FROM CODE REVIEW)
 -- ============================================================
-
 
 -- Medications (patient medication reminders)
 CREATE TABLE IF NOT EXISTS public.medications (
@@ -8313,7 +8259,6 @@ CREATE TRIGGER update_medical_referrals_updated_at BEFORE UPDATE ON public.medic
 
 -- END OF INITI L SCHEMA SECTION
 -- ============================================================
-
 
 -- Risk assessments (health risk evaluations)
 CREATE TABLE IF NOT EXISTS public.risk_assessments (
@@ -8543,9 +8488,6 @@ CREATE POLICY "Doctors can view intake_responses for their appointments"
     )
   );
 
-
-
-
 -- (Complaints table moved to line 5685 for reconciliation)
 
 CREATE INDEX IF NOT EXISTS idx_complaints_severity ON public.complaints(severity);
@@ -8566,15 +8508,12 @@ DROP TRIGGER IF EXISTS update_complaints_updated_at ON public.complaints;
 CREATE TRIGGER update_complaints_updated_at BEFORE UPDATE ON public.complaints
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
-
 -- ============================================================
 
 -- 15. FINAL VERIFICATION & SUMMARY
 
-
 -- FILE: 03_advanced_tables.sql
 -- ============================================================
-
 
 -- Final table count
 DO $$
@@ -8643,7 +8582,6 @@ END $$;
 --
 -- ============================================================
 
-
 -- Final completion message
 DO $$
 BEGIN
@@ -8653,16 +8591,12 @@ BEGIN
   RAISE NOTICE '========================================';
 END $$;
 
-
-
-
 -- ============================================================
 
 -- INDUSTRIAL STANDARDS IMPLEMENTATION - PHASE 1 & 2
 -- Added: April 12, 2026
 -- Purpose: Enterprise-grade system health, configuration, security, and audit logging
 -- ============================================================
-
 
 -- ---------------------------------------------------------------------
 -- Phase 1: System Health, Configuration, and Security Management
@@ -8822,7 +8756,6 @@ CREATE INDEX IF NOT EXISTS idx_data_export_requested ON public.data_export_reque
 -- ROW LEVEL SECURITY (RLS) POLICIES - INDUSTRI LAST AND RDS
 -- ============================================================
 
-
 -- Service Health: Admin only
  ALTER TABLE public.service_health ENABLE ROW LEVEL SECURITY;
 
@@ -8942,7 +8875,6 @@ CREATE POLICY data_export_admin_all ON public.data_export_requests
 -- FUNCTIONS AND TRIGGERS - INDUSTRI LAST AND RDS
 -- ============================================================
 
-
 -- Function to automatically clean up expired sessions
 CREATE OR REPLACE FUNCTION cleanup_expired_sessions_enhanced()
 RETURNS void AS $$
@@ -8994,7 +8926,6 @@ $$ LANGUAGE plpgsql;
 -- INITI L DATA - INDUSTRI LAST AND RDS
 -- ============================================================
 
-
 -- Insert default system configuration
 INSERT INTO public.system_config (key, value, description) VALUES
   ('session_timeout_minutes', '60', 'Session timeout in minutes'),
@@ -9038,7 +8969,6 @@ ON CONFLICT (resource_type) DO NOTHING;
 -- INDUSTRI LAST AND RDS IMPLEMENT TION COMPLETE
 -- ============================================================
 
-
 DO $$
 BEGIN
   RAISE NOTICE '========================================';
@@ -9069,7 +8999,6 @@ BEGIN
   RAISE NOTICE '';
   RAISE NOTICE '========================================';
 END $$;
-
 
 -- ============================================================
 -- ============================================
@@ -9106,14 +9035,11 @@ CREATE POLICY blogs_admin_all ON public.blogs
   FOR ALL
   USING (public.is_admin(auth.uid()));
 
-
-
 -- ============================================================
 
 -- SECTION: MISSING TABLE DDITION ( April 15, 2026)
 -- dded after comprehensive schema analysis
 -- ============================================================
-
 
 -- Specialties (doctor specializations)
 -- Seed specialties data (moved to SEED_DATA.sql)
@@ -9122,7 +9048,6 @@ CREATE POLICY blogs_admin_all ON public.blogs
 
 -- FINAL SCHEMA SUMMARY (Updated April 15, 2026)
 -- ============================================================
-
 
 DO $$
 BEGIN
@@ -9149,14 +9074,12 @@ END $$;
 -- Status: Production-Ready (Industrial Compliance Enhanced)
 -- ============================================================
 
-
 -- ============================================================
 
 -- 11. INDUSTRIAL COMPLIANCE & MONITORING (FDA APM, SOC 2, ISO 13485)
 -- Added: May 9, 2026
 -- Purpose: Real-time telemetry, model performance monitoring, and compliance tracking
 -- ============================================================
-
 
 -- 11.1 FDA APM (AI Performance Monitoring)
 -- ---------------------------------------------------------------------
@@ -9185,7 +9108,6 @@ CREATE INDEX IF NOT EXISTS idx_model_telemetry_status ON public.model_telemetry(
 -- SOC 2 Control Status
 
 -- SOC 2 Evidence
-
 
 -- 11.3 RLS Policies for Compliance Tables
 -- ---------------------------------------------------------------------
@@ -9219,11 +9141,7 @@ BEGIN
   RAISE NOTICE '========================================';
 END $$;
 
-
 -- ============================================================
-
-
-
 
 -- ============================================================
 
@@ -9231,7 +9149,6 @@ END $$;
 -- Purpose: pply all recommended improvements from verification report
 -- Status: Production-ready enhancements
 -- ============================================================
-
 
 -- ---------------------------------------------------------------------
 -- IMPROVEMENT 1: Specialties Table
@@ -9866,13 +9783,11 @@ NOTIFY pgrst, 'reload schema';
 -- Status: A COMPLETE
 -- ============================================================
 
-
 -- ============================================================
 
 -- 16. GENOMICS AND PRECISION MEDICINE (2026 ENHANCEMENT)
 -- Advanced genomic data management for personalized healthcare
 -- ============================================================
-
 
 -- Genomic Profiles (Patient genetic information)
 CREATE TABLE IF NOT EXISTS public.genomic_profiles (
@@ -10147,13 +10062,11 @@ CREATE TRIGGER update_genetic_counseling_sessions_updated_at BEFORE UPDATE ON pu
 -- 17. IOT AND WEARABLE DEVICE INTEGRATION (2026 ENHANCEMENT)
 -- Real-time health monitoring and device management
 
-
 -- FILE: 05_seed_and_functions.sql
 -- ============================================================
 
 -- 6. CHECK RLS STATUS
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -10178,7 +10091,6 @@ ORDER BY tablename;
 -- 7. CHECK DATABASE SIZE
 -- ============================================================
 
-
 SELECT 
   '========================================' as info
 UNION ALL
@@ -10196,7 +10108,6 @@ WHERE datname = current_database();
 
 -- 8. CHECK FOR POTENTI L CONFLICTS
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -10249,7 +10160,6 @@ SELECT
 
 -- 9. RECOMMENDATION
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -10333,12 +10243,10 @@ END $$;
 -- Purpose: Verify the database was set up correctly
 -- ============================================================
 
-
 -- ============================================================
 
 -- 1. VERIFY TABLE COUNT
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -10369,7 +10277,6 @@ END $$;
 
 -- 2. VERIFY CRITICAL TABLES EXIST
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -10427,7 +10334,6 @@ ORDER BY table_name;
 -- 3. VERIFY FUNCTIONS EXIST
 -- ============================================================
 
-
 SELECT 
   '========================================' as info
 UNION ALL
@@ -10468,7 +10374,6 @@ ORDER BY function_name;
 -- 4. VERIFY INDEXES EXIST
 -- ============================================================
 
-
 SELECT 
   '========================================' as info
 UNION ALL
@@ -10497,7 +10402,6 @@ END $$;
 
 -- 5. VERIFY RLS IS ENABLED
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -10533,7 +10437,6 @@ END $$;
 -- 6. VERIFY POLICIES EXIST
 -- ============================================================
 
-
 SELECT 
   '========================================' as info
 UNION ALL
@@ -10562,7 +10465,6 @@ END $$;
 
 -- 7. VERIFY TRIGGERS EXIST
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -10593,7 +10495,6 @@ END $$;
 -- 8. VERIFY EXTENSIONS ARE ENABLED
 -- ============================================================
 
-
 SELECT 
   '========================================' as info
 UNION ALL
@@ -10613,7 +10514,6 @@ ORDER BY extname;
 
 -- 9. VERIFY TEST USERS EXIST
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -10644,7 +10544,6 @@ FROM (
 -- ============================================================
 
 -- 10. VERIFY SEED DATA -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -10679,7 +10578,6 @@ END $$;
 -- 11. VERIFY MATERIALIZED VIEWS
 -- ============================================================
 
-
 SELECT 
   '========================================' as info
 UNION ALL
@@ -10698,7 +10596,6 @@ ORDER BY matviewname;
 
 -- 12. TEST BASIC QUERIES
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -10735,7 +10632,6 @@ END $$;
 
 -- 13. TEST HELPER FUNCTIONS
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -10777,7 +10673,6 @@ END $$;
 
 -- 14. FINAL SUMMARY
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -11129,13 +11024,6 @@ CREATE TRIGGER trigger_scan_processing_timestamps
   FOR EACH ROW
   EXECUTE FUNCTION public.update_scan_processing_timestamps();
 
-
-
-
-
-
-
-
 -- ============================================================
 -- --- CLINICAL MIGRATIONS & PERFORMANCE INDEXES (2026 UPDATE) ---
 -- ============================================================
@@ -11210,7 +11098,6 @@ FROM appointments
 GROUP BY status
 ORDER BY count DESC;
 
-
 -- ============================================================
 
 -- ============================================================
@@ -11264,7 +11151,6 @@ SELECT
 FROM appointments
 GROUP BY duration_minutes
 ORDER BY duration_minutes;
-
 
 -- ============================================================
 
@@ -11388,7 +11274,6 @@ SELECT
 FROM appointments
 WHERE status IN ('booked', 'scheduled', 'confirmed');
 
-
 -- ============================================================
 
 -- ============================================================
@@ -11465,7 +11350,6 @@ SELECT
   ) as late_cancellation_rate
 FROM appointments;
 
-
 -- ============================================================
 
 -- ============================================================
@@ -11513,7 +11397,6 @@ SELECT
   COUNT(pdf_url) as prescriptions_with_pdf,
   ROUND(COUNT(pdf_url) * 100.0 / NULLIF(COUNT(*), 0), 2) as pdf_generation_rate
 FROM prescriptions;
-
 
 -- ============================================================
 
@@ -11636,7 +11519,6 @@ SELECT 'prescriptions.status', status, COUNT(*)
 FROM prescriptions GROUP BY status
 ORDER BY table_column, count DESC;
 
-
 -- ============================================================
 
 -- ============================================================
@@ -11686,7 +11568,6 @@ BEGIN
   END IF;
 END $$;
 
-
 -- ============================================================
 
 -- ============================================================
@@ -11725,7 +11606,6 @@ WHERE status = 'cancelled';
 -- ============================================================
 
 -- Patient + Created (for patient history - most common query)
-ON scans(patient_id, created_at DESC);
 
 -- Reviewed status (for doctor pending scans)
 CREATE INDEX IF NOT EXISTS idx_scans_pending_review 
@@ -11812,7 +11692,6 @@ ON video_consultations(doctor_id, status, started_at DESC)
 WHERE status IN ('waiting', 'active');
 
 -- Patient + Status (for patient's consultations)
-ON video_consultations(patient_id, started_at DESC);
 
 -- ============================================================
 -- PROFILES INDEXES
@@ -11913,7 +11792,6 @@ SELECT
 FROM pg_indexes
 WHERE schemaname = 'public'
   AND indexname LIKE 'idx_%';
-
 
 -- ============================================================
 
@@ -12149,8 +12027,6 @@ SELECT
 
 SELECT 'VERIFICATION COMPLETE' as status;
 
-
-
 -- ============================================================
 -- --- ADMIN PORTAL VIEWS ---
 -- ============================================================
@@ -12245,8 +12121,6 @@ FROM
     public.scans s
 LEFT JOIN
     public.profiles_patient p ON s.patient_id = p.id;
-
-
 
 -- ============================================================
 -- --- MCP PERFORMANCE ANALYTICS VIEWS ---
@@ -12371,8 +12245,6 @@ WHERE
     new_data->>'latency_ms' IS NOT NULL
     AND resource_type LIKE '%_tool';
 
-
-
 -- ============================================================
 -- --- HIPAA SECURITY & VIEW PERMISSIONS CONTROLS ---
 -- ============================================================
@@ -12383,7 +12255,6 @@ WHERE
 -- ============================================================
 -- STEP 1: Add is_admin column to profiles_doctor table
 -- ============================================================
-
 
 -- ============================================================
 -- STEP 2: Grant SELECT permissions on all views

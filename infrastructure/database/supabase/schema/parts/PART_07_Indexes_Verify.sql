@@ -1,7 +1,7 @@
 -- ============================================================
 -- NETRA AI COMPLETE SCHEMA v3.2.0 — PART 07
 -- Section : Indexes_Verify
--- Lines   : 9428-10943 in NETRA_COMPLETE_SCHEMA.sql
+-- Lines   : 9345-10838 in NETRA_COMPLETE_SCHEMA.sql
 -- SAFE TO RE-RUN: All objects use DROP IF EXISTS guards
 -- ============================================================
 
@@ -446,13 +446,11 @@ NOTIFY pgrst, 'reload schema';
 -- Status: A COMPLETE
 -- ============================================================
 
-
 -- ============================================================
 
 -- 16. GENOMICS AND PRECISION MEDICINE (2026 ENHANCEMENT)
 -- Advanced genomic data management for personalized healthcare
 -- ============================================================
-
 
 -- Genomic Profiles (Patient genetic information)
 CREATE TABLE IF NOT EXISTS public.genomic_profiles (
@@ -727,13 +725,11 @@ CREATE TRIGGER update_genetic_counseling_sessions_updated_at BEFORE UPDATE ON pu
 -- 17. IOT AND WEARABLE DEVICE INTEGRATION (2026 ENHANCEMENT)
 -- Real-time health monitoring and device management
 
-
 -- FILE: 05_seed_and_functions.sql
 -- ============================================================
 
 -- 6. CHECK RLS STATUS
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -758,7 +754,6 @@ ORDER BY tablename;
 -- 7. CHECK DATABASE SIZE
 -- ============================================================
 
-
 SELECT 
   '========================================' as info
 UNION ALL
@@ -776,7 +771,6 @@ WHERE datname = current_database();
 
 -- 8. CHECK FOR POTENTI L CONFLICTS
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -829,7 +823,6 @@ SELECT
 
 -- 9. RECOMMENDATION
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -913,12 +906,10 @@ END $$;
 -- Purpose: Verify the database was set up correctly
 -- ============================================================
 
-
 -- ============================================================
 
 -- 1. VERIFY TABLE COUNT
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -949,7 +940,6 @@ END $$;
 
 -- 2. VERIFY CRITICAL TABLES EXIST
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -1007,7 +997,6 @@ ORDER BY table_name;
 -- 3. VERIFY FUNCTIONS EXIST
 -- ============================================================
 
-
 SELECT 
   '========================================' as info
 UNION ALL
@@ -1048,7 +1037,6 @@ ORDER BY function_name;
 -- 4. VERIFY INDEXES EXIST
 -- ============================================================
 
-
 SELECT 
   '========================================' as info
 UNION ALL
@@ -1077,7 +1065,6 @@ END $$;
 
 -- 5. VERIFY RLS IS ENABLED
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -1113,7 +1100,6 @@ END $$;
 -- 6. VERIFY POLICIES EXIST
 -- ============================================================
 
-
 SELECT 
   '========================================' as info
 UNION ALL
@@ -1142,7 +1128,6 @@ END $$;
 
 -- 7. VERIFY TRIGGERS EXIST
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -1173,7 +1158,6 @@ END $$;
 -- 8. VERIFY EXTENSIONS ARE ENABLED
 -- ============================================================
 
-
 SELECT 
   '========================================' as info
 UNION ALL
@@ -1193,7 +1177,6 @@ ORDER BY extname;
 
 -- 9. VERIFY TEST USERS EXIST
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -1224,7 +1207,6 @@ FROM (
 -- ============================================================
 
 -- 10. VERIFY SEED DATA -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -1259,7 +1241,6 @@ END $$;
 -- 11. VERIFY MATERIALIZED VIEWS
 -- ============================================================
 
-
 SELECT 
   '========================================' as info
 UNION ALL
@@ -1278,7 +1259,6 @@ ORDER BY matviewname;
 
 -- 12. TEST BASIC QUERIES
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -1315,7 +1295,6 @@ END $$;
 
 -- 13. TEST HELPER FUNCTIONS
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
@@ -1357,7 +1336,6 @@ END $$;
 
 -- 14. FINAL SUMMARY
 -- ============================================================
-
 
 SELECT 
   '========================================' as info
