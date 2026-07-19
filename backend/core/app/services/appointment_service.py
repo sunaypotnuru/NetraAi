@@ -289,13 +289,9 @@ class AppointmentService:
                     "Please choose a different time slot."
                 )
 
-            # Step 2: Validate doctor availability (working hours)
-            # TODO: Check against doctor's availability settings
-            hour = scheduled_at.hour
-            if hour < 9 or hour >= 17:
-                raise DoctorUnavailableError(
-                    "Doctor is not available outside working hours (9 AM - 5 PM)"
-                )
+            # Step 2: Validate doctor availability (flexible tele-health scheduling)
+            # Support 24/7 tele-health consultations across timezones
+            pass
 
             # Step 3: Insert appointment
             appointment_data = {
@@ -306,6 +302,7 @@ class AppointmentService:
                 "reason": reason,
                 "duration_minutes": duration_minutes,
                 "status": "booked",
+                "video_room_id": f"room-{patient_id[:8]}-{int(scheduled_at.timestamp())}",
                 "created_at": datetime.now(ZoneInfo(DEFAULT_TIMEZONE)).isoformat(),
             }
 

@@ -101,7 +101,7 @@ export default function AdminDashboardPage() {
     if (error) {
         console.error("[AdminDashboardPage] Error loading dashboard stats:", error);
         return (
-            <div className="min-h-screen pt-24 px-6 flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-[#0B0F1A] -mx-6 lg:-mx-8 -mt-16">
+            <div className="min-h-screen pt-24 px-6 flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-[#0B0F1A] -mx-6 lg:-mx-8">
                 <div className="w-16 h-16 bg-red-100/10 dark:bg-red-100/5 text-[#F43F5E] rounded-full flex items-center justify-center mb-4">
                     <AlertCircle className="w-8 h-8" />
                 </div>
@@ -135,7 +135,7 @@ export default function AdminDashboardPage() {
     const hasAppointmentsData = appointmentsData.length > 0;
 
     return (
-        <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent -mx-6 lg:-mx-8 -mt-16">
+        <div className="min-h-screen pt-4 pb-12 px-6 bg-transparent">
             <StaggerContainer stagger="normal" delayChildren={0.05} className="max-w-[1600px] mx-auto space-y-10">
                 <StaggerItem>
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

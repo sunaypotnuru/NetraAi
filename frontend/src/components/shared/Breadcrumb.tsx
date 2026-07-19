@@ -90,7 +90,7 @@ export default function Breadcrumb() {
   const isAdmin = location.pathname.startsWith('/admin');
 
   return (
-    <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isAdmin ? 'pt-2 pb-4' : 'pt-20 pb-2'}`}>
+    <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isAdmin ? 'pt-24 pb-2' : 'pt-20 pb-2'}`}>
       <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md px-4 py-2 rounded-xl border border-gray-200/60 dark:border-gray-700/60 shadow-xs">
         <Link
           to={homePath}

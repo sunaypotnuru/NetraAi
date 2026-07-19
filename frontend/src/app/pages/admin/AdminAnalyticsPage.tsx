@@ -114,7 +114,7 @@ export default function AdminAnalyticsPage() {
     };
 
     return (
-        <div className="min-h-screen pt-24 pb-12 px-6 bg-[#F8FAFC] dark:bg-[#0B0F1A] -mx-6 lg:-mx-8 -mt-16 space-y-10">
+        <div className="min-h-screen pt-4 pb-12 px-6 bg-[#F8FAFC] dark:bg-[#0B0F1A] space-y-10">
             <div className="max-w-[1600px] mx-auto">
 
                 {/* Header */}
