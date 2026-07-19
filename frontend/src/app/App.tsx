@@ -14,7 +14,7 @@ import { WebSocketProvider } from "./contexts/WebSocketContext";
 import { AnimationProvider } from "../animations";
 
 export default function App() {
-  const { highContrast, largeText, reducedMotion } = useAccessibilityStore();
+  const { highContrast, largeText, reducedMotion, fontSize } = useAccessibilityStore();
   const { user } = useAuthStore();
   const { fetchSettings } = useSettingsStore();
   const { theme, isSeniorMode } = useThemeStore();
@@ -31,13 +31,23 @@ export default function App() {
   useEffect(() => {
     const root = document.documentElement;
     root.classList.toggle("high-contrast", highContrast);
-    root.classList.toggle("large-text", largeText);
+    root.classList.toggle("large-text", largeText || fontSize === 'large' || fontSize === 'xlarge');
     root.classList.toggle("reduced-motion", reducedMotion);
     root.classList.toggle("senior-mode", isSeniorMode);
+
+    // Dynamic Font Size Scaling
+    const fontSizeMap: Record<string, string> = {
+      small: '90%',
+      medium: '100%',
+      large: '115%',
+      xlarge: '130%',
+    };
+    root.style.fontSize = fontSizeMap[fontSize] || '100%';
+
     if (user && import.meta.env.VITE_BYPASS_AUTH !== "true") {
       gamificationAPI.trackLogin().catch(console.error);
     }
-  }, [highContrast, largeText, reducedMotion, isSeniorMode, user]);
+  }, [highContrast, largeText, reducedMotion, isSeniorMode, fontSize, user]);
 
   useEffect(() => {
     const root = document.documentElement;

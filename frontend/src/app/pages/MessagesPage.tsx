@@ -166,6 +166,7 @@ export default function MessagesPage() {
       setConversations(convs);
     } catch (error) {
       console.error("Error loading conversations:", error);
+      setConversations([]);
     } finally {
       setLoading(false);
     }
@@ -176,12 +177,12 @@ export default function MessagesPage() {
       const response = await messagesAPI.getMessages(partnerId);
       const msgs = Array.isArray(response.data) ? response.data : (response.data?.messages || response.data?.data || []);
       setMessages(msgs);
-      // Mark received messages as read
       if (msgs.length > 0 && typeof messagesAPI.markRead === 'function') {
         messagesAPI.markRead(partnerId).catch(() => { });
       }
     } catch (_error) {
       if (!silent) console.error("Error loading messages:", _error);
+      setMessages([]);
     }
   };
 

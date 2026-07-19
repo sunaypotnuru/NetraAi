@@ -35,18 +35,31 @@ export default function Breadcrumb() {
       "admin": t("breadcrumb.admin", "Admin Portal"),
       "dashboard": t("breadcrumb.dashboard", "Dashboard"),
       "models": t("breadcrumb.models", "AI Models"),
-      "scan": t("breadcrumb.scan", "Anemia Detection"),
-      "cataract-scan": t("breadcrumb.cataract", "Cataract Scan"),
-      "dr-scan": t("breadcrumb.dr", "Retinopathy Scan"),
-      "mental-health": t("breadcrumb.mental_health", "Mental Health"),
-      "parkinsons-voice": t("breadcrumb.parkinsons", "Parkinson's Voice"),
+      "scans": t("breadcrumb.scans", "AI Screening"),
+      "anemia": t("breadcrumb.anemia", "Anemia Detection"),
+      "cataract": t("breadcrumb.cataract", "Cataract Detection"),
+      "dr": t("breadcrumb.dr", "Retinopathy Detection"),
+      "mental": t("breadcrumb.mental_health", "Mental Health Voice"),
+      "parkinsons": t("breadcrumb.parkinsons", "Parkinson's Voice"),
       "doctors": t("breadcrumb.doctors", "Find Doctors"),
       "hospitals": t("breadcrumb.hospitals", "Hospitals"),
       "appointments": t("breadcrumb.appointments", "Appointments"),
-      "history": t("breadcrumb.history", "Medical History"),
+      "documents": t("breadcrumb.documents", "Document Vault"),
+      "timeline": t("breadcrumb.timeline", "Health Timeline"),
+      "exercises": t("breadcrumb.exercises", "AR Eye Exercises"),
+      "achievements": t("breadcrumb.achievements", "Health Achievements"),
       "profile": t("breadcrumb.profile", "Profile"),
       "messages": t("breadcrumb.messages", "Messages"),
       "settings": t("breadcrumb.settings", "Settings"),
+      "video-call": t("breadcrumb.video_call", "Video Consultation"),
+      "about": t("breadcrumb.about", "About Us"),
+      "contact": t("breadcrumb.contact", "Contact Us"),
+      "services": t("breadcrumb.services", "Our Services"),
+      "how-it-works": t("breadcrumb.how_it_works", "How It Works"),
+      "pricing": t("breadcrumb.pricing", "Pricing"),
+      "faq": t("breadcrumb.faq", "FAQ"),
+      "help": t("breadcrumb.help", "Help Center"),
+      "careers": t("breadcrumb.careers", "Careers"),
     };
 
     name = nameMap[segment] || name;
@@ -54,32 +67,37 @@ export default function Breadcrumb() {
     return { name, path, isLast: index === pathSegments.length - 1 };
   });
 
-  return (
-    <nav className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-6 px-4 sm:px-6">
-      <Link
-        to="/"
-        className="flex items-center gap-1 hover:text-[#0D9488] transition-colors"
-      >
-        <Home className="w-4 h-4" />
-      </Link>
+  const isAdmin = location.pathname.startsWith('/admin');
 
-      {breadcrumbItems.map((item) => (
-        <div key={item.path} className="flex items-center gap-2">
-          <ChevronRight className="w-4 h-4 text-gray-400" />
-          {item.isLast ? (
-            <span className="font-medium text-[#0F172A] dark:text-white">
-              {item.name}
-            </span>
-          ) : (
-            <Link
-              to={item.path}
-              className="hover:text-[#0D9488] transition-colors"
-            >
-              {item.name}
-            </Link>
-          )}
-        </div>
-      ))}
-    </nav>
+  return (
+    <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isAdmin ? 'pt-2 pb-4' : 'pt-20 pb-2'}`}>
+      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md px-4 py-2 rounded-xl border border-gray-200/60 dark:border-gray-700/60 shadow-xs">
+        <Link
+          to="/"
+          className="flex items-center gap-1 hover:text-[#0D9488] transition-colors"
+          title="Home"
+        >
+          <Home className="w-3.5 h-3.5" />
+        </Link>
+
+        {breadcrumbItems.map((item) => (
+          <div key={item.path} className="flex items-center gap-2">
+            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+            {item.isLast ? (
+              <span className="font-semibold text-[#0F172A] dark:text-white">
+                {item.name}
+              </span>
+            ) : (
+              <Link
+                to={item.path}
+                className="hover:text-[#0D9488] transition-colors"
+              >
+                {item.name}
+              </Link>
+            )}
+          </div>
+        ))}
+      </nav>
+    </div>
   );
 }

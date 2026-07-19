@@ -17,13 +17,12 @@ import { ConnectionStatus } from "@/components/shared/ConnectionStatus";
 
 const patientNav = [
   { label: "Models", path: "/patient/models", icon: Eye },
+  { label: "AR Exercises", path: "/patient/exercises", icon: Dumbbell },
   { label: "Doctors", path: "/patient/doctors", icon: Video },
-  { label: "Hospitals", path: "/patient/hospitals", icon: MapPin },
   { label: "Appointments", path: "/patient/appointments", icon: Calendar },
 ];
 
 const patientExtraNav = [
-  { label: "AR Exercises", path: "/patient/exercises", icon: Dumbbell },
   { label: "Health Questionnaires", path: "/patient/pro-questionnaires", icon: ListChecks },
   { label: "Timeline", path: "/patient/timeline", icon: Activity },
   { label: "Messages", path: "/patient/messages", icon: MessageSquare },

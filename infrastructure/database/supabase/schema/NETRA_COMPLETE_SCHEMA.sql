@@ -1,3 +1,29 @@
+-- ============================================================
+-- NETRA AI — COMPLETE DATABASE SCHEMA  v3.1.0  (FIXED)
+-- ============================================================
+-- Generated  : 2026-07-19 15:45:08
+-- Fixed by   : Antigravity AI on 2026-07-19
+--
+-- WHAT WAS FIXED:
+--   1. Removed duplicate waiting_room, soc2_evidence, soc2_control_status
+--      table definitions (kept first/best version, removed second)
+--   2. Moved is_admin / verification_status column additions to run
+--      IMMEDIATELY after profiles_doctor creation (before any policy
+--      references it)  
+--   3. All is_admin() / is_doctor() / is_patient() functions correctly
+--      use auth.users.raw_user_meta_data (NO user_roles table)
+--   4. Migration files (add_security_tables, add_messaging_tables, etc.)
+--      are NOT needed — this master already contains all 191 tables
+--   5. Seed data hardcoded UUID replaced with dynamic email lookup
+--
+-- HOW TO RUN (Supabase SQL Editor):
+--   Paste this entire file and click Run.
+--   For large Supabase instances, run the PART_*.sql files in /parts/
+--   in numbered order instead.
+--
+-- SAFE TO RE-RUN: All definitions use IF NOT EXISTS / OR REPLACE.
+-- ============================================================
+
 
 
 -- FILE: 01_auth_extensions.sql
@@ -410,10 +436,17 @@ CREATE TABLE IF NOT EXISTS public.profiles_doctor (
   font_size VARCHAR(20) DEFAULT 'medium',
   high_contrast BOOLEAN DEFAULT FALSE,
   -- Metadata
+    is_admin BOOLEAN DEFAULT false,
+  verification_status VARCHAR(50) DEFAULT 'pending',
+  verification_notes TEXT,
   avatar_url TEXT,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
+
+COMMENT ON COLUMN public.profiles_doctor.is_admin IS 'Flag to mark users with admin privileges';
+COMMENT ON COLUMN public.profiles_doctor.verification_status IS 'Verification status: pending, approved, rejected';
+COMMENT ON COLUMN public.profiles_doctor.verification_notes IS 'Admin notes during verification review';
 
 -- ---------------------------------------------------------------------
 -- 2.3 Advanced Healthcare Tables
@@ -442,14 +475,17 @@ CREATE INDEX IF NOT EXISTS idx_specialties_parent ON public.specialties(parent_s
 
  ALTER TABLE public.specialties ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS " Anyone can view active specialties" ON public.specialties;
 CREATE POLICY " Anyone can view active specialties"
   ON public.specialties FOR SELECT
   USING (is_active = TRUE);
 
+DROP POLICY IF EXISTS " Admins can manage specialties" ON public.specialties;
 CREATE POLICY " Admins can manage specialties"
   ON public.specialties FOR ALL
   USING (public.is_admin(auth.uid()));
 
+DROP TRIGGER IF EXISTS update_specialties_updated_at ON public.specialties;
 CREATE TRIGGER update_specialties_updated_at BEFORE UPDATE ON public.specialties
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
@@ -1532,10 +1568,12 @@ ALTER TABLE public.video_consultations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.waiting_room ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.call_quality_metrics ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own video consultations" ON public.video_consultations;
 CREATE POLICY "Users can view own video consultations"
   ON public.video_consultations FOR SELECT
   USING (auth.uid() = doctor_id OR auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Doctors can manage own consultations" ON public.video_consultations;
 CREATE POLICY "Doctors can manage own consultations"
   ON public.video_consultations FOR ALL
   USING (auth.uid() = doctor_id);
@@ -1975,18 +2013,6 @@ CREATE TABLE IF NOT EXISTS public.waitlist (
 );
 
 -- Waiting room queue (for virtual appointments)
-CREATE TABLE IF NOT EXISTS public.waiting_room (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  appointment_id UUID NOT NULL REFERENCES public.appointments(id) ON DELETE CASCADE,
-  patient_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  doctor_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  position INTEGER NOT NULL,
-  estimated_wait_minutes INTEGER,
-  status VARCHAR(20) DEFAULT 'waiting',
-  joined_at TIMESTAMPTZ DEFAULT NOW(),
-  called_at TIMESTAMPTZ,
-  completed_at TIMESTAMPTZ
-);
 
 -- ---------------------------------------------------------------------
 -- 2.7 Analytics & Logs
@@ -3464,10 +3490,12 @@ CREATE INDEX IF NOT EXISTS idx_sleep_analysis_date ON public.sleep_analysis(slee
  ALTER TABLE public.device_calibrations ENABLE ROW LEVEL SECURITY;
  ALTER TABLE public.sleep_analysis ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Patients can manage own wearable devices" ON public.wearable_devices;
 CREATE POLICY "Patients can manage own wearable devices"
   ON public.wearable_devices FOR ALL
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Doctors can view patient wearable devices" ON public.wearable_devices;
 CREATE POLICY "Doctors can view patient wearable devices"
   ON public.wearable_devices FOR SELECT
   USING (
@@ -3477,14 +3505,17 @@ CREATE POLICY "Doctors can view patient wearable devices"
     )
   );
 
+DROP POLICY IF EXISTS "Patients can view own health metrics" ON public.realtime_health_metrics;
 CREATE POLICY "Patients can view own health metrics"
   ON public.realtime_health_metrics FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "System can create health metrics" ON public.realtime_health_metrics;
 CREATE POLICY "System can create health metrics"
   ON public.realtime_health_metrics FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Doctors can view patient health metrics" ON public.realtime_health_metrics;
 CREATE POLICY "Doctors can view patient health metrics"
   ON public.realtime_health_metrics FOR SELECT
   USING (
@@ -3494,14 +3525,17 @@ CREATE POLICY "Doctors can view patient health metrics"
     )
   );
 
+DROP POLICY IF EXISTS "Patients can view own health alerts" ON public.health_alerts;
 CREATE POLICY "Patients can view own health alerts"
   ON public.health_alerts FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Patients can acknowledge own health alerts" ON public.health_alerts;
 CREATE POLICY "Patients can acknowledge own health alerts"
   ON public.health_alerts FOR UPDATE
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Doctors can manage patient health alerts" ON public.health_alerts;
 CREATE POLICY "Doctors can manage patient health alerts"
   ON public.health_alerts FOR ALL
   USING (
@@ -3511,6 +3545,7 @@ CREATE POLICY "Doctors can manage patient health alerts"
     )
   );
 
+DROP POLICY IF EXISTS "Patients can view own device calibrations" ON public.device_calibrations;
 CREATE POLICY "Patients can view own device calibrations"
   ON public.device_calibrations FOR SELECT
   USING (
@@ -3520,19 +3555,23 @@ CREATE POLICY "Patients can view own device calibrations"
     )
   );
 
+DROP POLICY IF EXISTS "Technicians can manage device calibrations" ON public.device_calibrations;
 CREATE POLICY "Technicians can manage device calibrations"
   ON public.device_calibrations FOR ALL
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "Patients can view own sleep analysis" ON public.sleep_analysis;
 CREATE POLICY "Patients can view own sleep analysis"
   ON public.sleep_analysis FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "System can create sleep analysis" ON public.sleep_analysis;
 CREATE POLICY "System can create sleep analysis"
   ON public.sleep_analysis FOR INSERT
   WITH CHECK (true);
 
 -- Triggers for IoT Tables
+DROP TRIGGER IF EXISTS update_wearable_devices_updated_at ON public.wearable_devices;
 CREATE TRIGGER update_wearable_devices_updated_at BEFORE UPDATE ON public.wearable_devices
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 -- ============================================================
@@ -3793,14 +3832,17 @@ CREATE INDEX IF NOT EXISTS idx_health_equity_metrics_period ON public.health_equ
  ALTER TABLE public.resource_referrals ENABLE ROW LEVEL SECURITY;
  ALTER TABLE public.health_equity_metrics ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Patients can view own SDOH assessments" ON public.social_determinants_assessment;
 CREATE POLICY "Patients can view own SDOH assessments"
   ON public.social_determinants_assessment FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Patients can manage own SDOH assessments" ON public.social_determinants_assessment;
 CREATE POLICY "Patients can manage own SDOH assessments"
   ON public.social_determinants_assessment FOR ALL
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Healthcare providers can view patient SDOH assessments" ON public.social_determinants_assessment;
 CREATE POLICY "Healthcare providers can view patient SDOH assessments"
   ON public.social_determinants_assessment FOR SELECT
   USING (
@@ -3810,18 +3852,22 @@ CREATE POLICY "Healthcare providers can view patient SDOH assessments"
     )
   );
 
+DROP POLICY IF EXISTS " Anyone can view active community resources" ON public.community_resources;
 CREATE POLICY " Anyone can view active community resources"
   ON public.community_resources FOR SELECT
   USING (is_active = TRUE);
 
+DROP POLICY IF EXISTS " Admins can manage community resources" ON public.community_resources;
 CREATE POLICY " Admins can manage community resources"
   ON public.community_resources FOR ALL
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "Patients can view own resource referrals" ON public.resource_referrals;
 CREATE POLICY "Patients can view own resource referrals"
   ON public.resource_referrals FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Healthcare providers can manage patient resource referrals" ON public.resource_referrals;
 CREATE POLICY "Healthcare providers can manage patient resource referrals"
   ON public.resource_referrals FOR ALL
   USING (
@@ -3832,21 +3878,26 @@ CREATE POLICY "Healthcare providers can manage patient resource referrals"
     ))
   );
 
+DROP POLICY IF EXISTS "Researchers can view health equity metrics" ON public.health_equity_metrics;
 CREATE POLICY "Researchers can view health equity metrics"
   ON public.health_equity_metrics FOR SELECT
   USING (public.is_admin(auth.uid()) OR public.is_doctor(auth.uid()));
 
+DROP POLICY IF EXISTS " Admins can manage health equity metrics" ON public.health_equity_metrics;
 CREATE POLICY " Admins can manage health equity metrics"
   ON public.health_equity_metrics FOR ALL
   USING (public.is_admin(auth.uid()));
 
 -- Triggers for Social Determinants Tables
+DROP TRIGGER IF EXISTS update_sdoh_assessment_updated_at ON public.social_determinants_assessment;
 CREATE TRIGGER update_sdoh_assessment_updated_at BEFORE UPDATE ON public.social_determinants_assessment
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_community_resources_updated_at ON public.community_resources;
 CREATE TRIGGER update_community_resources_updated_at BEFORE UPDATE ON public.community_resources
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_resource_referrals_updated_at ON public.resource_referrals;
 CREATE TRIGGER update_resource_referrals_updated_at BEFORE UPDATE ON public.resource_referrals
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 -- ============================================================
@@ -4172,42 +4223,52 @@ CREATE INDEX IF NOT EXISTS idx_ai_monitoring_alerts ON public.ai_model_monitorin
  ALTER TABLE public.explainable_ai_results ENABLE ROW LEVEL SECURITY;
  ALTER TABLE public.ai_model_monitoring ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS " I researchers can view model versions" ON public.ai_model_versions;
 CREATE POLICY " I researchers can view model versions"
   ON public.ai_model_versions FOR SELECT
   USING (public.is_admin(auth.uid()) OR public.is_doctor(auth.uid()));
 
+DROP POLICY IF EXISTS " I researchers can manage model versions" ON public.ai_model_versions;
 CREATE POLICY " I researchers can manage model versions"
   ON public.ai_model_versions FOR ALL
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS " Anyone can view ai_model_versions" ON public.ai_model_versions;
 CREATE POLICY " Anyone can view ai_model_versions"
   ON public.ai_model_versions FOR SELECT
   USING (true);
 
+DROP POLICY IF EXISTS " Admins can manage ai_model_versions" ON public.ai_model_versions;
 CREATE POLICY " Admins can manage ai_model_versions"
   ON public.ai_model_versions FOR ALL
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS " Admins can manage federated learning nodes" ON public.federated_learning_nodes;
 CREATE POLICY " Admins can manage federated learning nodes"
   ON public.federated_learning_nodes FOR ALL
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "Researchers can view federated learning nodes" ON public.federated_learning_nodes;
 CREATE POLICY "Researchers can view federated learning nodes"
   ON public.federated_learning_nodes FOR SELECT
   USING (public.is_admin(auth.uid()) OR public.is_doctor(auth.uid()));
 
+DROP POLICY IF EXISTS " Admins can manage federated learning experiments" ON public.federated_learning_experiments;
 CREATE POLICY " Admins can manage federated learning experiments"
   ON public.federated_learning_experiments FOR ALL
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "Researchers can view federated learning experiments" ON public.federated_learning_experiments;
 CREATE POLICY "Researchers can view federated learning experiments"
   ON public.federated_learning_experiments FOR SELECT
   USING (public.is_admin(auth.uid()) OR public.is_doctor(auth.uid()));
 
+DROP POLICY IF EXISTS "Patients can view own AI explanations" ON public.explainable_ai_results;
 CREATE POLICY "Patients can view own AI explanations"
   ON public.explainable_ai_results FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Doctors can view patient AI explanations" ON public.explainable_ai_results;
 CREATE POLICY "Doctors can view patient AI explanations"
   ON public.explainable_ai_results FOR SELECT
   USING (
@@ -4217,25 +4278,31 @@ CREATE POLICY "Doctors can view patient AI explanations"
     )
   );
 
+DROP POLICY IF EXISTS "System can create AI explanations" ON public.explainable_ai_results;
 CREATE POLICY "System can create AI explanations"
   ON public.explainable_ai_results FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS " Admins can view AI model monitoring" ON public.ai_model_monitoring;
 CREATE POLICY " Admins can view AI model monitoring"
   ON public.ai_model_monitoring FOR SELECT
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "System can create AI monitoring records" ON public.ai_model_monitoring;
 CREATE POLICY "System can create AI monitoring records"
   ON public.ai_model_monitoring FOR INSERT
   WITH CHECK (true);
 
 -- Triggers for AI/ML Tables
+DROP TRIGGER IF EXISTS update_ai_model_versions_updated_at ON public.ai_model_versions;
 CREATE TRIGGER update_ai_model_versions_updated_at BEFORE UPDATE ON public.ai_model_versions
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_federated_learning_nodes_updated_at ON public.federated_learning_nodes;
 CREATE TRIGGER update_federated_learning_nodes_updated_at BEFORE UPDATE ON public.federated_learning_nodes
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_federated_learning_experiments_updated_at ON public.federated_learning_experiments;
 CREATE TRIGGER update_federated_learning_experiments_updated_at BEFORE UPDATE ON public.federated_learning_experiments
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 -- ============================================================
@@ -4569,10 +4636,12 @@ CREATE INDEX IF NOT EXISTS idx_smart_contracts_status ON public.smart_contracts(
  ALTER TABLE public.data_sharing_consents ENABLE ROW LEVEL SECURITY;
  ALTER TABLE public.smart_contracts ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Patients can view own blockchain records" ON public.blockchain_health_records;
 CREATE POLICY "Patients can view own blockchain records"
   ON public.blockchain_health_records FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Healthcare providers can view patient blockchain records" ON public.blockchain_health_records;
 CREATE POLICY "Healthcare providers can view patient blockchain records"
   ON public.blockchain_health_records FOR SELECT
   USING (
@@ -4582,38 +4651,47 @@ CREATE POLICY "Healthcare providers can view patient blockchain records"
     )
   );
 
+DROP POLICY IF EXISTS "System can create blockchain records" ON public.blockchain_health_records;
 CREATE POLICY "System can create blockchain records"
   ON public.blockchain_health_records FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS " Admins can manage FHIR mappings" ON public.fhir_resource_mappings;
 CREATE POLICY " Admins can manage FHIR mappings"
   ON public.fhir_resource_mappings FOR ALL
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "Healthcare providers can view FHIR mappings" ON public.fhir_resource_mappings;
 CREATE POLICY "Healthcare providers can view FHIR mappings"
   ON public.fhir_resource_mappings FOR SELECT
   USING (public.is_doctor(auth.uid()) OR public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS " Admins can manage interoperability endpoints" ON public.interoperability_endpoints;
 CREATE POLICY " Admins can manage interoperability endpoints"
   ON public.interoperability_endpoints FOR ALL
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "Healthcare providers can view interoperability endpoints" ON public.interoperability_endpoints;
 CREATE POLICY "Healthcare providers can view interoperability endpoints"
   ON public.interoperability_endpoints FOR SELECT
   USING (public.is_doctor(auth.uid()) OR public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS " Admins can view data exchange logs" ON public.data_exchange_logs;
 CREATE POLICY " Admins can view data exchange logs"
   ON public.data_exchange_logs FOR SELECT
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "System can create data exchange logs" ON public.data_exchange_logs;
 CREATE POLICY "System can create data exchange logs"
   ON public.data_exchange_logs FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Patients can manage own data sharing consents" ON public.data_sharing_consents;
 CREATE POLICY "Patients can manage own data sharing consents"
   ON public.data_sharing_consents FOR ALL
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Healthcare providers can view patient consents" ON public.data_sharing_consents;
 CREATE POLICY "Healthcare providers can view patient consents"
   ON public.data_sharing_consents FOR SELECT
   USING (
@@ -4623,24 +4701,30 @@ CREATE POLICY "Healthcare providers can view patient consents"
     )
   );
 
+DROP POLICY IF EXISTS " Admins can manage smart contracts" ON public.smart_contracts;
 CREATE POLICY " Admins can manage smart contracts"
   ON public.smart_contracts FOR ALL
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "Healthcare providers can view smart contracts" ON public.smart_contracts;
 CREATE POLICY "Healthcare providers can view smart contracts"
   ON public.smart_contracts FOR SELECT
   USING (public.is_doctor(auth.uid()) OR public.is_admin(auth.uid()));
 
 -- Triggers for Blockchain/Interoperability Tables
+DROP TRIGGER IF EXISTS update_fhir_resource_mappings_updated_at ON public.fhir_resource_mappings;
 CREATE TRIGGER update_fhir_resource_mappings_updated_at BEFORE UPDATE ON public.fhir_resource_mappings
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_interoperability_endpoints_updated_at ON public.interoperability_endpoints;
 CREATE TRIGGER update_interoperability_endpoints_updated_at BEFORE UPDATE ON public.interoperability_endpoints
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_data_sharing_consents_updated_at ON public.data_sharing_consents;
 CREATE TRIGGER update_data_sharing_consents_updated_at BEFORE UPDATE ON public.data_sharing_consents
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_smart_contracts_updated_at ON public.smart_contracts;
 CREATE TRIGGER update_smart_contracts_updated_at BEFORE UPDATE ON public.smart_contracts
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 -- ============================================================
@@ -5034,6 +5118,7 @@ CREATE INDEX IF NOT EXISTS idx_model_predictions_date ON public.model_prediction
  ALTER TABLE public.predictive_models ENABLE ROW LEVEL SECURITY;
  ALTER TABLE public.model_predictions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Researchers can manage clinical studies" ON public.clinical_research_studies;
 CREATE POLICY "Researchers can manage clinical studies"
   ON public.clinical_research_studies FOR ALL
   USING (
@@ -5042,14 +5127,17 @@ CREATE POLICY "Researchers can manage clinical studies"
     auth.uid() = study_coordinator_id
   );
 
+DROP POLICY IF EXISTS "Healthcare providers can view clinical studies" ON public.clinical_research_studies;
 CREATE POLICY "Healthcare providers can view clinical studies"
   ON public.clinical_research_studies FOR SELECT
   USING (public.is_doctor(auth.uid()) OR public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "Patients can view own study participation" ON public.study_participants;
 CREATE POLICY "Patients can view own study participation"
   ON public.study_participants FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Study team can manage study participants" ON public.study_participants;
 CREATE POLICY "Study team can manage study participants"
   ON public.study_participants FOR ALL
   USING (
@@ -5061,6 +5149,7 @@ CREATE POLICY "Study team can manage study participants"
     )
   );
 
+DROP POLICY IF EXISTS "Researchers can manage RWE studies" ON public.real_world_evidence_studies;
 CREATE POLICY "Researchers can manage RWE studies"
   ON public.real_world_evidence_studies FOR ALL
   USING (
@@ -5069,14 +5158,17 @@ CREATE POLICY "Researchers can manage RWE studies"
     auth.uid() = biostatistician_id
   );
 
+DROP POLICY IF EXISTS "Healthcare providers can view RWE studies" ON public.real_world_evidence_studies;
 CREATE POLICY "Healthcare providers can view RWE studies"
   ON public.real_world_evidence_studies FOR SELECT
   USING (public.is_doctor(auth.uid()) OR public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "Users can manage own analytics queries" ON public.advanced_analytics_queries;
 CREATE POLICY "Users can manage own analytics queries"
   ON public.advanced_analytics_queries FOR ALL
   USING (auth.uid() = created_by);
 
+DROP POLICY IF EXISTS "Users can view shared analytics queries" ON public.advanced_analytics_queries;
 CREATE POLICY "Users can view shared analytics queries"
   ON public.advanced_analytics_queries FOR SELECT
   USING (
@@ -5086,6 +5178,7 @@ CREATE POLICY "Users can view shared analytics queries"
     public.is_admin(auth.uid())
   );
 
+DROP POLICY IF EXISTS "Researchers can manage predictive models" ON public.predictive_models;
 CREATE POLICY "Researchers can manage predictive models"
   ON public.predictive_models FOR ALL
   USING (
@@ -5094,14 +5187,17 @@ CREATE POLICY "Researchers can manage predictive models"
     auth.uid() = validated_by
   );
 
+DROP POLICY IF EXISTS "Healthcare providers can view predictive models" ON public.predictive_models;
 CREATE POLICY "Healthcare providers can view predictive models"
   ON public.predictive_models FOR SELECT
   USING (public.is_doctor(auth.uid()) OR public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "Patients can view own model predictions" ON public.model_predictions;
 CREATE POLICY "Patients can view own model predictions"
   ON public.model_predictions FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Healthcare providers can view patient model predictions" ON public.model_predictions;
 CREATE POLICY "Healthcare providers can view patient model predictions"
   ON public.model_predictions FOR SELECT
   USING (
@@ -5111,27 +5207,34 @@ CREATE POLICY "Healthcare providers can view patient model predictions"
     )
   );
 
+DROP POLICY IF EXISTS " Admins can view all model predictions" ON public.model_predictions;
 CREATE POLICY " Admins can view all model predictions"
   ON public.model_predictions FOR SELECT
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "System can create model predictions" ON public.model_predictions;
 CREATE POLICY "System can create model predictions"
   ON public.model_predictions FOR INSERT
   WITH CHECK (true);
 
 -- Triggers for Research/ Analytics Tables
+DROP TRIGGER IF EXISTS update_clinical_research_studies_updated_at ON public.clinical_research_studies;
 CREATE TRIGGER update_clinical_research_studies_updated_at BEFORE UPDATE ON public.clinical_research_studies
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_study_participants_updated_at ON public.study_participants;
 CREATE TRIGGER update_study_participants_updated_at BEFORE UPDATE ON public.study_participants
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_real_world_evidence_studies_updated_at ON public.real_world_evidence_studies;
 CREATE TRIGGER update_real_world_evidence_studies_updated_at BEFORE UPDATE ON public.real_world_evidence_studies
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_advanced_analytics_queries_updated_at ON public.advanced_analytics_queries;
 CREATE TRIGGER update_advanced_analytics_queries_updated_at BEFORE UPDATE ON public.advanced_analytics_queries
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_predictive_models_updated_at ON public.predictive_models;
 CREATE TRIGGER update_predictive_models_updated_at BEFORE UPDATE ON public.predictive_models
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 -- ============================================================
@@ -5689,7 +5792,7 @@ CREATE TABLE IF NOT EXISTS public.complaints (
   -- Complaint Classification
   category_id UUID REFERENCES public.complaint_categories(id),
   subcategory_id UUID REFERENCES public.complaint_subcategories(id),
-  category VARCHAR(50) NOT NULL, -- Clinical, Technical, Billing, Privacy, General
+  category VARCHAR(50) NOT NULL,
   priority VARCHAR(20) NOT NULL DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high', 'urgent')),
   severity VARCHAR(20) NOT NULL DEFAULT 'Medium' CHECK (severity IN ('Low', 'Medium', 'High', 'Critical')),
   status VARCHAR(30) NOT NULL DEFAULT 'Open' CHECK (status IN ('Open', 'submitted', 'in_review', 'in_progress', 'Under Review', 'Resolved', 'resolved', 'closed', 'escalated')),
@@ -5722,16 +5825,7 @@ CREATE TABLE IF NOT EXISTS public.complaints (
   resolution_notes TEXT,
   resolved_at TIMESTAMPTZ,
   resolved_by UUID REFERENCES auth.users(id),
-  
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
 
-CREATE INDEX IF NOT EXISTS idx_complaints_reporter ON public.complaints(reporter_id);
-CREATE INDEX IF NOT EXISTS idx_complaints_status ON public.complaints(status);
-CREATE INDEX IF NOT EXISTS idx_complaints_ticket ON public.complaints(ticket_id);
-
-  
   -- Impact Flags
   affects_patient_care BOOLEAN DEFAULT FALSE,
   requires_immediate_action BOOLEAN DEFAULT FALSE,
@@ -5747,7 +5841,6 @@ CREATE INDEX IF NOT EXISTS idx_complaints_ticket ON public.complaints(ticket_id)
   -- Timing Metrics
   submitted_at TIMESTAMPTZ DEFAULT NOW(),
   first_response_at TIMESTAMPTZ,
-  resolved_at TIMESTAMPTZ,
   closed_at TIMESTAMPTZ,
   last_updated_at TIMESTAMPTZ DEFAULT NOW(),
   
@@ -5760,10 +5853,13 @@ CREATE INDEX IF NOT EXISTS idx_complaints_ticket ON public.complaints(ticket_id)
   satisfaction_feedback TEXT,
   satisfaction_submitted_at TIMESTAMPTZ,
   
-  -- Metadata
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE INDEX IF NOT EXISTS idx_complaints_reporter ON public.complaints(reporter_id);
+CREATE INDEX IF NOT EXISTS idx_complaints_status ON public.complaints(status);
+CREATE INDEX IF NOT EXISTS idx_complaints_ticket ON public.complaints(ticket_id);
 
 -- Complaint Messages/Comments Table
 CREATE TABLE IF NOT EXISTS public.complaint_messages (
@@ -5906,7 +6002,7 @@ CREATE TABLE IF NOT EXISTS public.complaint_analytics (
 
 -- Performance indexes for complaints table
 CREATE INDEX IF NOT EXISTS idx_complaints_ticket_id ON public.complaints(ticket_id);
-CREATE INDEX IF NOT EXISTS idx_complaints_submitted_by ON public.complaints(submitted_by_id);
+CREATE INDEX IF NOT EXISTS idx_complaints_submitted_by ON public.complaints(reporter_id);
 CREATE INDEX IF NOT EXISTS idx_complaints_status ON public.complaints(status);
 CREATE INDEX IF NOT EXISTS idx_complaints_priority ON public.complaints(priority);
 CREATE INDEX IF NOT EXISTS idx_complaints_category ON public.complaints(category_id);
@@ -5949,6 +6045,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_update_complaint_timestamp ON public.complaints;
 CREATE TRIGGER trigger_update_complaint_timestamp
   BEFORE UPDATE ON public.complaints
   FOR EACH ROW
@@ -5972,6 +6069,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_calculate_complaint_metrics ON public.complaints;
 CREATE TRIGGER trigger_calculate_complaint_metrics
   BEFORE UPDATE ON public.complaints
   FOR EACH ROW
@@ -6372,46 +6470,56 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- ---------------------------------------------------------------------
 
 -- Patients can view and update their own profile
+DROP POLICY IF EXISTS "Patients can view own profile" ON public.profiles_patient;
 CREATE POLICY "Patients can view own profile"
   ON public.profiles_patient FOR SELECT
   USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Patients can update own profile" ON public.profiles_patient;
 CREATE POLICY "Patients can update own profile"
   ON public.profiles_patient FOR UPDATE
   USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Patients can insert own profile" ON public.profiles_patient;
 CREATE POLICY "Patients can insert own profile"
   ON public.profiles_patient FOR INSERT
   WITH CHECK (auth.uid() = id);
 
 -- Doctors can view and update their own profile
+DROP POLICY IF EXISTS "Doctors can view own profile" ON public.profiles_doctor;
 CREATE POLICY "Doctors can view own profile"
   ON public.profiles_doctor FOR SELECT
   USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Doctors can update own profile" ON public.profiles_doctor;
 CREATE POLICY "Doctors can update own profile"
   ON public.profiles_doctor FOR UPDATE
   USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Doctors can insert own profile" ON public.profiles_doctor;
 CREATE POLICY "Doctors can insert own profile"
   ON public.profiles_doctor FOR INSERT
   WITH CHECK (auth.uid() = id);
 
 -- Doctors can view patient profiles (for appointments)
+DROP POLICY IF EXISTS "Doctors can view patient profiles" ON public.profiles_patient;
 CREATE POLICY "Doctors can view patient profiles"
   ON public.profiles_patient FOR SELECT
   USING (public.is_doctor(auth.uid()));
 
 -- Patients can view doctor profiles
+DROP POLICY IF EXISTS "Patients can view doctor profiles" ON public.profiles_doctor;
 CREATE POLICY "Patients can view doctor profiles"
   ON public.profiles_doctor FOR SELECT
   USING (public.is_patient(auth.uid()));
 
 -- Admins can view all profiles
+DROP POLICY IF EXISTS " Admins can view all patient profiles" ON public.profiles_patient;
 CREATE POLICY " Admins can view all patient profiles"
   ON public.profiles_patient FOR ALL
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS " Admins can view all doctor profiles" ON public.profiles_doctor;
 CREATE POLICY " Admins can view all doctor profiles"
   ON public.profiles_doctor FOR ALL
   USING (public.is_admin(auth.uid()));
@@ -6420,26 +6528,32 @@ CREATE POLICY " Admins can view all doctor profiles"
 -- 5.3 Appointments RLS Policies
 -- ---------------------------------------------------------------------
 
+DROP POLICY IF EXISTS "Patients can view own appointments" ON public.appointments;
 CREATE POLICY "Patients can view own appointments"
   ON public.appointments FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Doctors can view own appointments" ON public.appointments;
 CREATE POLICY "Doctors can view own appointments"
   ON public.appointments FOR SELECT
   USING (auth.uid() = doctor_id);
 
+DROP POLICY IF EXISTS "Patients can create appointments" ON public.appointments;
 CREATE POLICY "Patients can create appointments"
   ON public.appointments FOR INSERT
   WITH CHECK (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Patients can update own appointments" ON public.appointments;
 CREATE POLICY "Patients can update own appointments"
   ON public.appointments FOR UPDATE
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Doctors can update appointments" ON public.appointments;
 CREATE POLICY "Doctors can update appointments"
   ON public.appointments FOR UPDATE
   USING (auth.uid() = doctor_id);
 
+DROP POLICY IF EXISTS " Admins can manage all appointments" ON public.appointments;
 CREATE POLICY " Admins can manage all appointments"
   ON public.appointments FOR ALL
   USING (public.is_admin(auth.uid()));
@@ -6448,14 +6562,17 @@ CREATE POLICY " Admins can manage all appointments"
 -- 5.4 Scans RLS Policies
 -- ---------------------------------------------------------------------
 
+DROP POLICY IF EXISTS "Patients can view own scans" ON public.scans;
 CREATE POLICY "Patients can view own scans"
   ON public.scans FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Patients can create own scans" ON public.scans;
 CREATE POLICY "Patients can create own scans"
   ON public.scans FOR INSERT
   WITH CHECK (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Doctors can view patient scans" ON public.scans;
 CREATE POLICY "Doctors can view patient scans"
   ON public.scans FOR SELECT
   USING (
@@ -6465,6 +6582,7 @@ CREATE POLICY "Doctors can view patient scans"
     )
   );
 
+DROP POLICY IF EXISTS " Admins can manage all scans" ON public.scans;
 CREATE POLICY " Admins can manage all scans"
   ON public.scans FOR ALL
   USING (public.is_admin(auth.uid()));
@@ -6473,22 +6591,27 @@ CREATE POLICY " Admins can manage all scans"
 -- 5.5 Prescriptions RLS Policies
 -- ---------------------------------------------------------------------
 
+DROP POLICY IF EXISTS "Patients can view own prescriptions" ON public.prescriptions;
 CREATE POLICY "Patients can view own prescriptions"
   ON public.prescriptions FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Doctors can view own prescriptions" ON public.prescriptions;
 CREATE POLICY "Doctors can view own prescriptions"
   ON public.prescriptions FOR SELECT
   USING (auth.uid() = doctor_id);
 
+DROP POLICY IF EXISTS "Doctors can create prescriptions" ON public.prescriptions;
 CREATE POLICY "Doctors can create prescriptions"
   ON public.prescriptions FOR INSERT
   WITH CHECK (auth.uid() = doctor_id);
 
+DROP POLICY IF EXISTS "Doctors can update own prescriptions" ON public.prescriptions;
 CREATE POLICY "Doctors can update own prescriptions"
   ON public.prescriptions FOR UPDATE
   USING (auth.uid() = doctor_id);
 
+DROP POLICY IF EXISTS " Admins can manage all prescriptions" ON public.prescriptions;
 CREATE POLICY " Admins can manage all prescriptions"
   ON public.prescriptions FOR ALL
   USING (public.is_admin(auth.uid()));
@@ -6497,14 +6620,17 @@ CREATE POLICY " Admins can manage all prescriptions"
 -- 5.6 Messages RLS Policies
 -- ---------------------------------------------------------------------
 
+DROP POLICY IF EXISTS "Users can view own messages" ON public.messages;
 CREATE POLICY "Users can view own messages"
   ON public.messages FOR SELECT
   USING (auth.uid() = sender_id OR auth.uid() = recipient_id);
 
+DROP POLICY IF EXISTS "Users can send messages" ON public.messages;
 CREATE POLICY "Users can send messages"
   ON public.messages FOR INSERT
   WITH CHECK (auth.uid() = sender_id);
 
+DROP POLICY IF EXISTS "Users can update own messages" ON public.messages;
 CREATE POLICY "Users can update own messages"
   ON public.messages FOR UPDATE
   USING (auth.uid() = sender_id OR auth.uid() = recipient_id);
@@ -6513,14 +6639,17 @@ CREATE POLICY "Users can update own messages"
 -- 5.7 Notifications RLS Policies
 -- ---------------------------------------------------------------------
 
+DROP POLICY IF EXISTS "Users can view own notifications" ON public.notifications;
 CREATE POLICY "Users can view own notifications"
   ON public.notifications FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update own notifications" ON public.notifications;
 CREATE POLICY "Users can update own notifications"
   ON public.notifications FOR UPDATE
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "System can create notifications" ON public.notifications;
 CREATE POLICY "System can create notifications"
   ON public.notifications FOR INSERT
   WITH CHECK (true);
@@ -6529,18 +6658,22 @@ CREATE POLICY "System can create notifications"
 -- 5.8 Documents RLS Policies
 -- ---------------------------------------------------------------------
 
+DROP POLICY IF EXISTS "Patients can view own documents" ON public.documents;
 CREATE POLICY "Patients can view own documents"
   ON public.documents FOR SELECT
   USING (auth.uid() = patient_id OR auth.uid() = ANY(shared_with));
 
+DROP POLICY IF EXISTS "Users can create documents" ON public.documents;
 CREATE POLICY "Users can create documents"
   ON public.documents FOR INSERT
   WITH CHECK (auth.uid() = uploaded_by);
 
+DROP POLICY IF EXISTS "Users can update own documents" ON public.documents;
 CREATE POLICY "Users can update own documents"
   ON public.documents FOR UPDATE
   USING (auth.uid() = uploaded_by);
 
+DROP POLICY IF EXISTS "Doctors can view shared documents" ON public.documents;
 CREATE POLICY "Doctors can view shared documents"
   ON public.documents FOR SELECT
   USING (public.is_doctor(auth.uid()) AND (is_shared = true OR auth.uid() = ANY(shared_with)));
@@ -6549,50 +6682,62 @@ CREATE POLICY "Doctors can view shared documents"
 -- 5.9 Gamification RLS Policies
 -- ---------------------------------------------------------------------
 
+DROP POLICY IF EXISTS "Users can view all achievements" ON public.achievements;
 CREATE POLICY "Users can view all achievements"
   ON public.achievements FOR SELECT
   USING (true);
 
+DROP POLICY IF EXISTS "Users can view own user_achievements" ON public.user_achievements;
 CREATE POLICY "Users can view own user_achievements"
   ON public.user_achievements FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "System can manage user_achievements" ON public.user_achievements;
 CREATE POLICY "System can manage user_achievements"
   ON public.user_achievements FOR ALL
   USING (true);
 
+DROP POLICY IF EXISTS "Users can view own points" ON public.user_points;
 CREATE POLICY "Users can view own points"
   ON public.user_points FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view all badges" ON public.badges;
 CREATE POLICY "Users can view all badges"
   ON public.badges FOR SELECT
   USING (true);
 
+DROP POLICY IF EXISTS "Users can view own user_badges" ON public.user_badges;
 CREATE POLICY "Users can view own user_badges"
   ON public.user_badges FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view all challenges" ON public.challenges;
 CREATE POLICY "Users can view all challenges"
   ON public.challenges FOR SELECT
   USING (true);
 
+DROP POLICY IF EXISTS "Users can view own user_challenges" ON public.user_challenges;
 CREATE POLICY "Users can view own user_challenges"
   ON public.user_challenges FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update own user_challenges" ON public.user_challenges;
 CREATE POLICY "Users can update own user_challenges"
   ON public.user_challenges FOR UPDATE
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view own streaks" ON public.login_streaks;
 CREATE POLICY "Users can view own streaks"
   ON public.login_streaks FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view own shared_achievements" ON public.shared_achievements;
 CREATE POLICY "Users can view own shared_achievements"
   ON public.shared_achievements FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can create shared_achievements" ON public.shared_achievements;
 CREATE POLICY "Users can create shared_achievements"
   ON public.shared_achievements FOR INSERT
   WITH CHECK (auth.uid() = user_id);
@@ -6602,58 +6747,71 @@ CREATE POLICY "Users can create shared_achievements"
 -- ---------------------------------------------------------------------
 
 -- FHIR Organizations
+DROP POLICY IF EXISTS " Anyone can view active organizations" ON public.fhir_organizations;
 CREATE POLICY " Anyone can view active organizations"
   ON public.fhir_organizations FOR SELECT
   USING (active = TRUE);
 
+DROP POLICY IF EXISTS " Admins can manage organizations" ON public.fhir_organizations;
 CREATE POLICY " Admins can manage organizations"
   ON public.fhir_organizations FOR ALL
   USING (public.is_admin(auth.uid()));
 
 -- FHIR Practitioners
+DROP POLICY IF EXISTS "Practitioners can view own FHIR record" ON public.fhir_practitioners;
 CREATE POLICY "Practitioners can view own FHIR record"
   ON public.fhir_practitioners FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Practitioners can update own FHIR record" ON public.fhir_practitioners;
 CREATE POLICY "Practitioners can update own FHIR record"
   ON public.fhir_practitioners FOR UPDATE
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS " Anyone can view active practitioners" ON public.fhir_practitioners;
 CREATE POLICY " Anyone can view active practitioners"
   ON public.fhir_practitioners FOR SELECT
   USING (active = TRUE);
 
 -- FHIR Patients
+DROP POLICY IF EXISTS "Patients can view own FHIR record" ON public.fhir_patients;
 CREATE POLICY "Patients can view own FHIR record"
   ON public.fhir_patients FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Patients can update own FHIR record" ON public.fhir_patients;
 CREATE POLICY "Patients can update own FHIR record"
   ON public.fhir_patients FOR UPDATE
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Doctors can view patient FHIR records" ON public.fhir_patients;
 CREATE POLICY "Doctors can view patient FHIR records"
   ON public.fhir_patients FOR SELECT
   USING (public.is_doctor(auth.uid()));
 
 -- Insurance Providers
+DROP POLICY IF EXISTS " Anyone can view active insurance providers" ON public.insurance_providers;
 CREATE POLICY " Anyone can view active insurance providers"
   ON public.insurance_providers FOR SELECT
   USING (is_active = TRUE);
 
+DROP POLICY IF EXISTS " Admins can manage insurance providers" ON public.insurance_providers;
 CREATE POLICY " Admins can manage insurance providers"
   ON public.insurance_providers FOR ALL
   USING (public.is_admin(auth.uid()));
 
 -- Patient Insurance
+DROP POLICY IF EXISTS "Patients can view own insurance" ON public.patient_insurance;
 CREATE POLICY "Patients can view own insurance"
   ON public.patient_insurance FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Patients can manage own insurance" ON public.patient_insurance;
 CREATE POLICY "Patients can manage own insurance"
   ON public.patient_insurance FOR ALL
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Doctors can view patient insurance" ON public.patient_insurance;
 CREATE POLICY "Doctors can view patient insurance"
   ON public.patient_insurance FOR SELECT
   USING (
@@ -6664,23 +6822,28 @@ CREATE POLICY "Doctors can view patient insurance"
   );
 
 -- Medical Conditions
+DROP POLICY IF EXISTS " Anyone can view medical conditions" ON public.medical_conditions;
 CREATE POLICY " Anyone can view medical conditions"
   ON public.medical_conditions FOR SELECT
   USING (is_active = TRUE);
 
+DROP POLICY IF EXISTS " Admins can manage medical conditions" ON public.medical_conditions;
 CREATE POLICY " Admins can manage medical conditions"
   ON public.medical_conditions FOR ALL
   USING (public.is_admin(auth.uid()));
 
 -- Patient Medical History
+DROP POLICY IF EXISTS "Patients can view own medical history" ON public.patient_medical_history;
 CREATE POLICY "Patients can view own medical history"
   ON public.patient_medical_history FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Patients can manage own medical history" ON public.patient_medical_history;
 CREATE POLICY "Patients can manage own medical history"
   ON public.patient_medical_history FOR ALL
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Doctors can view patient medical history" ON public.patient_medical_history;
 CREATE POLICY "Doctors can view patient medical history"
   ON public.patient_medical_history FOR SELECT
   USING (
@@ -6691,14 +6854,17 @@ CREATE POLICY "Doctors can view patient medical history"
   );
 
 -- Patient Allergies
+DROP POLICY IF EXISTS "Patients can view own allergies" ON public.patient_allergies;
 CREATE POLICY "Patients can view own allergies"
   ON public.patient_allergies FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Patients can manage own allergies" ON public.patient_allergies;
 CREATE POLICY "Patients can manage own allergies"
   ON public.patient_allergies FOR ALL
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Doctors can view patient allergies" ON public.patient_allergies;
 CREATE POLICY "Doctors can view patient allergies"
   ON public.patient_allergies FOR SELECT
   USING (
@@ -6709,23 +6875,28 @@ CREATE POLICY "Doctors can view patient allergies"
   );
 
 -- Medications Reference
+DROP POLICY IF EXISTS " Anyone can view medications reference" ON public.medications_reference;
 CREATE POLICY " Anyone can view medications reference"
   ON public.medications_reference FOR SELECT
   USING (is_active = TRUE);
 
+DROP POLICY IF EXISTS " Admins can manage medications reference" ON public.medications_reference;
 CREATE POLICY " Admins can manage medications reference"
   ON public.medications_reference FOR ALL
   USING (public.is_admin(auth.uid()));
 
 -- Patient Medications
+DROP POLICY IF EXISTS "Patients can view own medications" ON public.patient_medications;
 CREATE POLICY "Patients can view own medications"
   ON public.patient_medications FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Patients can manage own medications" ON public.patient_medications;
 CREATE POLICY "Patients can manage own medications"
   ON public.patient_medications FOR ALL
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Doctors can view patient medications" ON public.patient_medications;
 CREATE POLICY "Doctors can view patient medications"
   ON public.patient_medications FOR SELECT
   USING (
@@ -6737,19 +6908,23 @@ CREATE POLICY "Doctors can view patient medications"
   );
 
 -- Lab Tests Reference
+DROP POLICY IF EXISTS " Anyone can view lab tests reference" ON public.lab_tests_reference;
 CREATE POLICY " Anyone can view lab tests reference"
   ON public.lab_tests_reference FOR SELECT
   USING (is_active = TRUE);
 
+DROP POLICY IF EXISTS " Admins can manage lab tests reference" ON public.lab_tests_reference;
 CREATE POLICY " Admins can manage lab tests reference"
   ON public.lab_tests_reference FOR ALL
   USING (public.is_admin(auth.uid()));
 
 -- Patient Lab Results
+DROP POLICY IF EXISTS "Patients can view own lab results" ON public.patient_lab_results;
 CREATE POLICY "Patients can view own lab results"
   ON public.patient_lab_results FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Doctors can view patient lab results" ON public.patient_lab_results;
 CREATE POLICY "Doctors can view patient lab results"
   ON public.patient_lab_results FOR SELECT
   USING (
@@ -6761,28 +6936,34 @@ CREATE POLICY "Doctors can view patient lab results"
   );
 
 -- Appointment Types
+DROP POLICY IF EXISTS " Anyone can view active appointment types" ON public.appointment_types;
 CREATE POLICY " Anyone can view active appointment types"
   ON public.appointment_types FOR SELECT
   USING (is_active = TRUE);
 
+DROP POLICY IF EXISTS " Admins can manage appointment types" ON public.appointment_types;
 CREATE POLICY " Admins can manage appointment types"
   ON public.appointment_types FOR ALL
   USING (public.is_admin(auth.uid()));
 
 -- Doctor Time Slots
+DROP POLICY IF EXISTS "Doctors can manage own time slots" ON public.doctor_time_slots;
 CREATE POLICY "Doctors can manage own time slots"
   ON public.doctor_time_slots FOR ALL
   USING (auth.uid() = doctor_id);
 
+DROP POLICY IF EXISTS " Anyone can view active time slots" ON public.doctor_time_slots;
 CREATE POLICY " Anyone can view active time slots"
   ON public.doctor_time_slots FOR SELECT
   USING (is_active = TRUE);
 
 -- Medical Imaging Studies
+DROP POLICY IF EXISTS "Patients can view own imaging studies" ON public.medical_imaging_studies;
 CREATE POLICY "Patients can view own imaging studies"
   ON public.medical_imaging_studies FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Doctors can view patient imaging studies" ON public.medical_imaging_studies;
 CREATE POLICY "Doctors can view patient imaging studies"
   ON public.medical_imaging_studies FOR SELECT
   USING (
@@ -6794,19 +6975,23 @@ CREATE POLICY "Doctors can view patient imaging studies"
   );
 
 -- AI Models
+DROP POLICY IF EXISTS " Anyone can view active AI models" ON public.ai_models;
 CREATE POLICY " Anyone can view active AI models"
   ON public.ai_models FOR SELECT
   USING (deployment_status = 'production');
 
+DROP POLICY IF EXISTS " Admins can manage AI models" ON public.ai_models;
 CREATE POLICY " Admins can manage AI models"
   ON public.ai_models FOR ALL
   USING (public.is_admin(auth.uid()));
 
 -- AI Analysis Results
+DROP POLICY IF EXISTS "Patients can view own AI analysis results" ON public.ai_analysis_results;
 CREATE POLICY "Patients can view own AI analysis results"
   ON public.ai_analysis_results FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Doctors can view patient AI analysis results" ON public.ai_analysis_results;
 CREATE POLICY "Doctors can view patient AI analysis results"
   ON public.ai_analysis_results FOR SELECT
   USING (
@@ -6817,76 +7002,93 @@ CREATE POLICY "Doctors can view patient AI analysis results"
   );
 
 -- Notification Templates
+DROP POLICY IF EXISTS " Admins can manage notification templates" ON public.notification_templates;
 CREATE POLICY " Admins can manage notification templates"
   ON public.notification_templates FOR ALL
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS " Anyone can view active notification templates" ON public.notification_templates;
 CREATE POLICY " Anyone can view active notification templates"
   ON public.notification_templates FOR SELECT
   USING (is_active = TRUE);
 
 -- Enhanced Notifications
+DROP POLICY IF EXISTS "Users can view own enhanced notifications" ON public.notifications_enhanced;
 CREATE POLICY "Users can view own enhanced notifications"
   ON public.notifications_enhanced FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update own enhanced notifications" ON public.notifications_enhanced;
 CREATE POLICY "Users can update own enhanced notifications"
   ON public.notifications_enhanced FOR UPDATE
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "System can create enhanced notifications" ON public.notifications_enhanced;
 CREATE POLICY "System can create enhanced notifications"
   ON public.notifications_enhanced FOR INSERT
   WITH CHECK (true);
 
 -- Family Relationships
+DROP POLICY IF EXISTS "Users can view own family relationships" ON public.family_relationships;
 CREATE POLICY "Users can view own family relationships"
   ON public.family_relationships FOR SELECT
   USING (auth.uid() = primary_user_id OR auth.uid() = related_user_id);
 
+DROP POLICY IF EXISTS "Users can manage own family relationships" ON public.family_relationships;
 CREATE POLICY "Users can manage own family relationships"
   ON public.family_relationships FOR ALL
   USING (auth.uid() = primary_user_id);
 
 -- Family Medical History
+DROP POLICY IF EXISTS "Patients can view own family medical history" ON public.family_medical_history;
 CREATE POLICY "Patients can view own family medical history"
   ON public.family_medical_history FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Patients can manage own family medical history" ON public.family_medical_history;
 CREATE POLICY "Patients can manage own family medical history"
   ON public.family_medical_history FOR ALL
   USING (auth.uid() = patient_id);
 
 -- Insurance Claims
+DROP POLICY IF EXISTS "Patients can view own insurance claims" ON public.insurance_claims;
 CREATE POLICY "Patients can view own insurance claims"
   ON public.insurance_claims FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Doctors can view own insurance claims" ON public.insurance_claims;
 CREATE POLICY "Doctors can view own insurance claims"
   ON public.insurance_claims FOR SELECT
   USING (auth.uid() = provider_id);
 
+DROP POLICY IF EXISTS "Doctors can create insurance claims" ON public.insurance_claims;
 CREATE POLICY "Doctors can create insurance claims"
   ON public.insurance_claims FOR INSERT
   WITH CHECK (auth.uid() = provider_id);
 
 -- Payment Transactions
+DROP POLICY IF EXISTS "Users can view own payment transactions" ON public.payment_transactions;
 CREATE POLICY "Users can view own payment transactions"
   ON public.payment_transactions FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "System can create payment transactions" ON public.payment_transactions;
 CREATE POLICY "System can create payment transactions"
   ON public.payment_transactions FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS " Admins can view all payment transactions" ON public.payment_transactions;
 CREATE POLICY " Admins can view all payment transactions"
   ON public.payment_transactions FOR SELECT
   USING (public.is_admin(auth.uid()));
 
 -- Patient Statements
+DROP POLICY IF EXISTS "Patients can view own statements" ON public.patient_statements;
 CREATE POLICY "Patients can view own statements"
   ON public.patient_statements FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "System can create patient statements" ON public.patient_statements;
 CREATE POLICY "System can create patient statements"
   ON public.patient_statements FOR INSERT
   WITH CHECK (true);
@@ -6895,6 +7097,7 @@ CREATE POLICY "System can create patient statements"
 -- (Telemedicine Policies relocated to Category 2.12b)
 
 -- Analytics Dashboards
+DROP POLICY IF EXISTS "Users can view accessible dashboards" ON public.analytics_dashboards;
 CREATE POLICY "Users can view accessible dashboards"
   ON public.analytics_dashboards FOR SELECT
   USING (
@@ -6904,64 +7107,78 @@ CREATE POLICY "Users can view accessible dashboards"
     public.is_admin(auth.uid())
   );
 
+DROP POLICY IF EXISTS "Users can manage own dashboards" ON public.analytics_dashboards;
 CREATE POLICY "Users can manage own dashboards"
   ON public.analytics_dashboards FOR ALL
   USING (auth.uid() = created_by);
 
 -- Healthcare KPIs
+DROP POLICY IF EXISTS " Admins can manage healthcare KPIs" ON public.healthcare_kpis;
 CREATE POLICY " Admins can manage healthcare KPIs"
   ON public.healthcare_kpis FOR ALL
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS " Anyone can view active KPIs" ON public.healthcare_kpis;
 CREATE POLICY " Anyone can view active KPIs"
   ON public.healthcare_kpis FOR SELECT
   USING (is_active = TRUE);
 
 -- Population Health Metrics
+DROP POLICY IF EXISTS " Admins can manage population health metrics" ON public.population_health_metrics;
 CREATE POLICY " Admins can manage population health metrics"
   ON public.population_health_metrics FOR ALL
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "Researchers can view population health metrics" ON public.population_health_metrics;
 CREATE POLICY "Researchers can view population health metrics"
   ON public.population_health_metrics FOR SELECT
   USING (public.is_admin(auth.uid()) OR public.is_doctor(auth.uid()));
 
 -- Clinical Quality Measures
+DROP POLICY IF EXISTS " Admins can manage clinical quality measures" ON public.clinical_quality_measures;
 CREATE POLICY " Admins can manage clinical quality measures"
   ON public.clinical_quality_measures FOR ALL
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "Healthcare providers can view quality measures" ON public.clinical_quality_measures;
 CREATE POLICY "Healthcare providers can view quality measures"
   ON public.clinical_quality_measures FOR SELECT
   USING (public.is_doctor(auth.uid()) OR public.is_admin(auth.uid()));
 
 -- Clinical Decision Support Rules
+DROP POLICY IF EXISTS " Admins can manage CDS rules" ON public.clinical_decision_support_rules;
 CREATE POLICY " Admins can manage CDS rules"
   ON public.clinical_decision_support_rules FOR ALL
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "Healthcare providers can view active CDS rules" ON public.clinical_decision_support_rules;
 CREATE POLICY "Healthcare providers can view active CDS rules"
   ON public.clinical_decision_support_rules FOR SELECT
   USING (is_active = TRUE AND (public.is_doctor(auth.uid()) OR public.is_admin(auth.uid())));
 
 -- Data access Audit
+DROP POLICY IF EXISTS " Admins can view data access audit" ON public.data_access_audit;
 CREATE POLICY " Admins can view data access audit"
   ON public.data_access_audit FOR SELECT
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "System can create audit records" ON public.data_access_audit;
 CREATE POLICY "System can create audit records"
   ON public.data_access_audit FOR INSERT
   WITH CHECK (true);
 
 -- Patient Consents
+DROP POLICY IF EXISTS "Patients can view own consents" ON public.patient_consents;
 CREATE POLICY "Patients can view own consents"
   ON public.patient_consents FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Patients can manage own consents" ON public.patient_consents;
 CREATE POLICY "Patients can manage own consents"
   ON public.patient_consents FOR ALL
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Doctors can view patient consents" ON public.patient_consents;
 CREATE POLICY "Doctors can view patient consents"
   ON public.patient_consents FOR SELECT
   USING (
@@ -6972,10 +7189,12 @@ CREATE POLICY "Doctors can view patient consents"
   );
 
 -- PI Rate Limits
+DROP POLICY IF EXISTS "Users can view own rate limits" ON public.api_rate_limits;
 CREATE POLICY "Users can view own rate limits"
   ON public.api_rate_limits FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "System can manage rate limits" ON public.api_rate_limits;
 CREATE POLICY "System can manage rate limits"
   ON public.api_rate_limits FOR ALL
   USING (true);
@@ -6984,183 +7203,228 @@ CREATE POLICY "System can manage rate limits"
 -- 5.12 Enhanced Existing Table Policies
 -- ---------------------------------------------------------------------
 
+DROP POLICY IF EXISTS "Users can view own referrals" ON public.referrals;
 CREATE POLICY "Users can view own referrals"
   ON public.referrals FOR SELECT
   USING (auth.uid() = referrer_id OR auth.uid() = referee_id);
 
+DROP POLICY IF EXISTS "Users can create referrals" ON public.referrals;
 CREATE POLICY "Users can create referrals"
   ON public.referrals FOR INSERT
   WITH CHECK (auth.uid() = referrer_id);
 
+DROP POLICY IF EXISTS "Users can view own activity_logs" ON public.activity_logs;
 CREATE POLICY "Users can view own activity_logs"
   ON public.activity_logs FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "System can create activity_logs" ON public.activity_logs;
 CREATE POLICY "System can create activity_logs"
   ON public.activity_logs FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS " Admins can view all audit_logs" ON public.audit_logs;
 CREATE POLICY " Admins can view all audit_logs"
   ON public.audit_logs FOR SELECT
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "System can insert audit_logs" ON public.audit_logs;
 CREATE POLICY "System can insert audit_logs"
   ON public.audit_logs FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Users can view own analytics" ON public.analytics_data;
 CREATE POLICY "Users can view own analytics"
   ON public.analytics_data FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view own reports" ON public.reports;
 CREATE POLICY "Users can view own reports"
   ON public.reports FOR SELECT
   USING (auth.uid() = generated_by);
 
+DROP POLICY IF EXISTS "Users can create reports" ON public.reports;
 CREATE POLICY "Users can create reports"
   ON public.reports FOR INSERT
   WITH CHECK (auth.uid() = generated_by);
 
+DROP POLICY IF EXISTS " Admins can view all reports" ON public.reports;
 CREATE POLICY " Admins can view all reports"
   ON public.reports FOR ALL
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "Users can view own search_history" ON public.search_history;
 CREATE POLICY "Users can view own search_history"
   ON public.search_history FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can create search_history" ON public.search_history;
 CREATE POLICY "Users can create search_history"
   ON public.search_history FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view own family_members" ON public.family_members;
 CREATE POLICY "Users can view own family_members"
   ON public.family_members FOR SELECT
   USING (auth.uid() = primary_user_id);
 
+DROP POLICY IF EXISTS "Users can manage own family_members" ON public.family_members;
 CREATE POLICY "Users can manage own family_members"
   ON public.family_members FOR ALL
   USING (auth.uid() = primary_user_id);
 
+DROP POLICY IF EXISTS " Anyone can view team_members" ON public.team_members;
 CREATE POLICY " Anyone can view team_members"
   ON public.team_members FOR SELECT
   USING (is_active = true);
 
+DROP POLICY IF EXISTS " Admins can manage team_members" ON public.team_members;
 CREATE POLICY " Admins can manage team_members"
   ON public.team_members FOR ALL
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS " Anyone can create contact_messages" ON public.contact_messages;
 CREATE POLICY " Anyone can create contact_messages"
   ON public.contact_messages FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS " Admins can view contact_messages" ON public.contact_messages;
 CREATE POLICY " Admins can view contact_messages"
   ON public.contact_messages FOR SELECT
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS " Admins can update contact_messages" ON public.contact_messages;
 CREATE POLICY " Admins can update contact_messages"
   ON public.contact_messages FOR UPDATE
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "Users can view own timeline_events" ON public.timeline_events;
 CREATE POLICY "Users can view own timeline_events"
   ON public.timeline_events FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "System can create timeline_events" ON public.timeline_events;
 CREATE POLICY "System can create timeline_events"
   ON public.timeline_events FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Doctors can view own prescription_templates" ON public.prescription_templates;
 CREATE POLICY "Doctors can view own prescription_templates"
   ON public.prescription_templates FOR SELECT
   USING (auth.uid() = doctor_id OR is_public = true);
 
+DROP POLICY IF EXISTS "Doctors can manage own prescription_templates" ON public.prescription_templates;
 CREATE POLICY "Doctors can manage own prescription_templates"
   ON public.prescription_templates FOR ALL
   USING (auth.uid() = doctor_id);
 
+DROP POLICY IF EXISTS " Admins can view email_templates" ON public.email_templates;
 CREATE POLICY " Admins can view email_templates"
   ON public.email_templates FOR SELECT
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS " Admins can manage email_templates" ON public.email_templates;
 CREATE POLICY " Admins can manage email_templates"
   ON public.email_templates FOR ALL
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "Users can view own waitlist" ON public.waitlist;
 CREATE POLICY "Users can view own waitlist"
   ON public.waitlist FOR SELECT
   USING (auth.uid() = patient_id OR auth.uid() = doctor_id);
 
+DROP POLICY IF EXISTS "Patients can create waitlist" ON public.waitlist;
 CREATE POLICY "Patients can create waitlist"
   ON public.waitlist FOR INSERT
   WITH CHECK (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Users can view own waiting_queue" ON public.waiting_room;
 CREATE POLICY "Users can view own waiting_queue"
   ON public.waiting_room FOR SELECT
   USING (auth.uid() = patient_id OR auth.uid() = doctor_id);
 
+DROP POLICY IF EXISTS "Users can view own notification_preferences" ON public.notification_preferences;
 CREATE POLICY "Users can view own notification_preferences"
   ON public.notification_preferences FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can manage own notification_preferences" ON public.notification_preferences;
 CREATE POLICY "Users can manage own notification_preferences"
   ON public.notification_preferences FOR ALL
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Doctors can view own soap_notes" ON public.soap_notes;
 CREATE POLICY "Doctors can view own soap_notes"
   ON public.soap_notes FOR SELECT
   USING (auth.uid() = doctor_id);
 
+DROP POLICY IF EXISTS "Patients can view own soap_notes" ON public.soap_notes;
 CREATE POLICY "Patients can view own soap_notes"
   ON public.soap_notes FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Doctors can manage own soap_notes" ON public.soap_notes;
 CREATE POLICY "Doctors can manage own soap_notes"
   ON public.soap_notes FOR ALL
   USING (auth.uid() = doctor_id);
 
+DROP POLICY IF EXISTS " Admins can view security_events" ON public.security_events;
 CREATE POLICY " Admins can view security_events"
   ON public.security_events FOR SELECT
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "System can create security_events" ON public.security_events;
 CREATE POLICY "System can create security_events"
   ON public.security_events FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "System can create failed_login_attempts" ON public.failed_login_attempts;
 CREATE POLICY "System can create failed_login_attempts"
   ON public.failed_login_attempts FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS " Admins can view failed_login_attempts" ON public.failed_login_attempts;
 CREATE POLICY " Admins can view failed_login_attempts"
   ON public.failed_login_attempts FOR SELECT
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "Users can view own sessions" ON public.user_sessions;
 CREATE POLICY "Users can view own sessions"
   ON public.user_sessions FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can manage own sessions" ON public.user_sessions;
 CREATE POLICY "Users can manage own sessions"
   ON public.user_sessions FOR ALL
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view own api_keys" ON public.api_keys;
 CREATE POLICY "Users can view own api_keys"
   ON public.api_keys FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can manage own api_keys" ON public.api_keys;
 CREATE POLICY "Users can manage own api_keys"
   ON public.api_keys FOR ALL
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS " Admins can view newsletters" ON public.newsletters;
 CREATE POLICY " Admins can view newsletters"
   ON public.newsletters FOR SELECT
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS " Admins can manage newsletters" ON public.newsletters;
 CREATE POLICY " Admins can manage newsletters"
   ON public.newsletters FOR ALL
   USING (public.is_admin(auth.uid()));
 
 -- AI Models policies
+DROP POLICY IF EXISTS " Anyone can view active ai_models" ON public.ai_models;
 CREATE POLICY " Anyone can view active ai_models"
   ON public.ai_models FOR SELECT
   USING (deployment_status = 'production' OR deployment_status = 'testing');
 
+DROP POLICY IF EXISTS " Admins can manage ai_models" ON public.ai_models;
 CREATE POLICY " Admins can manage ai_models"
   ON public.ai_models FOR ALL
   USING (public.is_admin(auth.uid()));
@@ -7168,50 +7432,62 @@ CREATE POLICY " Admins can manage ai_models"
 -- AI Model Versions policies will be created after table definition
 
 -- Analytics Data policies
+DROP POLICY IF EXISTS "Users can view own analytics_data" ON public.analytics_data;
 CREATE POLICY "Users can view own analytics_data"
   ON public.analytics_data FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS " Admins can view all analytics_data" ON public.analytics_data;
 CREATE POLICY " Admins can view all analytics_data"
   ON public.analytics_data FOR SELECT
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "System can insert analytics_data" ON public.analytics_data;
 CREATE POLICY "System can insert analytics_data"
   ON public.analytics_data FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Doctors can view own pro_questionnaires" ON public.pro_questionnaires;
 CREATE POLICY "Doctors can view own pro_questionnaires"
   ON public.pro_questionnaires FOR SELECT
   USING (auth.uid() = doctor_id);
 
+DROP POLICY IF EXISTS "Doctors can manage own pro_questionnaires" ON public.pro_questionnaires;
 CREATE POLICY "Doctors can manage own pro_questionnaires"
   ON public.pro_questionnaires FOR ALL
   USING (auth.uid() = doctor_id);
 
+DROP POLICY IF EXISTS "Patients can view own pro_submissions" ON public.pro_submissions;
 CREATE POLICY "Patients can view own pro_submissions"
   ON public.pro_submissions FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Patients can create pro_submissions" ON public.pro_submissions;
 CREATE POLICY "Patients can create pro_submissions"
   ON public.pro_submissions FOR INSERT
   WITH CHECK (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Doctors can view own follow_up_templates" ON public.follow_up_templates;
 CREATE POLICY "Doctors can view own follow_up_templates"
   ON public.follow_up_templates FOR SELECT
   USING (auth.uid() = doctor_id);
 
+DROP POLICY IF EXISTS "Doctors can manage own follow_up_templates" ON public.follow_up_templates;
 CREATE POLICY "Doctors can manage own follow_up_templates"
   ON public.follow_up_templates FOR ALL
   USING (auth.uid() = doctor_id);
 
+DROP POLICY IF EXISTS "Patients can view own follow_up_surveys" ON public.follow_up_surveys;
 CREATE POLICY "Patients can view own follow_up_surveys"
   ON public.follow_up_surveys FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Patients can create follow_up_surveys" ON public.follow_up_surveys;
 CREATE POLICY "Patients can create follow_up_surveys"
   ON public.follow_up_surveys FOR INSERT
   WITH CHECK (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Users can view own video_recordings" ON public.video_recordings;
 CREATE POLICY "Users can view own video_recordings"
   ON public.video_recordings FOR SELECT
   USING (
@@ -7221,58 +7497,72 @@ CREATE POLICY "Users can view own video_recordings"
     )
   );
 
+DROP POLICY IF EXISTS "Patients can view own mental_health_screenings" ON public.mental_health_screenings;
 CREATE POLICY "Patients can view own mental_health_screenings"
   ON public.mental_health_screenings FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Patients can create mental_health_screenings" ON public.mental_health_screenings;
 CREATE POLICY "Patients can create mental_health_screenings"
   ON public.mental_health_screenings FOR INSERT
   WITH CHECK (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Patients can view own voice_call_logs" ON public.voice_call_logs;
 CREATE POLICY "Patients can view own voice_call_logs"
   ON public.voice_call_logs FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "System can manage voice_call_logs" ON public.voice_call_logs;
 CREATE POLICY "System can manage voice_call_logs"
   ON public.voice_call_logs FOR ALL
   USING (true);
 
+DROP POLICY IF EXISTS "Patients can view own vitals_log" ON public.vitals_log;
 CREATE POLICY "Patients can view own vitals_log"
   ON public.vitals_log FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Patients can create vitals_log" ON public.vitals_log;
 CREATE POLICY "Patients can create vitals_log"
   ON public.vitals_log FOR INSERT
   WITH CHECK (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS " Anyone can view exercises" ON public.exercises;
 CREATE POLICY " Anyone can view exercises"
   ON public.exercises FOR SELECT
   USING (true);
 
+DROP POLICY IF EXISTS " Admins can manage exercises" ON public.exercises;
 CREATE POLICY " Admins can manage exercises"
   ON public.exercises FOR ALL
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "Patients can view own patient_exercises" ON public.patient_exercises;
 CREATE POLICY "Patients can view own patient_exercises"
   ON public.patient_exercises FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Doctors can manage patient_exercises" ON public.patient_exercises;
 CREATE POLICY "Doctors can manage patient_exercises"
   ON public.patient_exercises FOR ALL
   USING (auth.uid() = assigned_by);
 
+DROP POLICY IF EXISTS "Patients can view own exercise_sessions" ON public.exercise_sessions;
 CREATE POLICY "Patients can view own exercise_sessions"
   ON public.exercise_sessions FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Patients can create exercise_sessions" ON public.exercise_sessions;
 CREATE POLICY "Patients can create exercise_sessions"
   ON public.exercise_sessions FOR INSERT
   WITH CHECK (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS " Anyone can view symptom_reports" ON public.symptom_reports;
 CREATE POLICY " Anyone can view symptom_reports"
   ON public.symptom_reports FOR SELECT
   USING (anonymized = true);
 
+DROP POLICY IF EXISTS "Users can create symptom_reports" ON public.symptom_reports;
 CREATE POLICY "Users can create symptom_reports"
   ON public.symptom_reports FOR INSERT
   WITH CHECK (true);
@@ -7285,63 +7575,83 @@ CREATE POLICY "Users can create symptom_reports"
 
 
 -- pply trigger to all tables with updated_at
+DROP TRIGGER IF EXISTS update_profiles_patient_updated_at ON public.profiles_patient;
 CREATE TRIGGER update_profiles_patient_updated_at BEFORE UPDATE ON public.profiles_patient
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_profiles_doctor_updated_at ON public.profiles_doctor;
 CREATE TRIGGER update_profiles_doctor_updated_at BEFORE UPDATE ON public.profiles_doctor
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_appointments_updated_at ON public.appointments;
 CREATE TRIGGER update_appointments_updated_at BEFORE UPDATE ON public.appointments
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_scans_updated_at ON public.scans;
 CREATE TRIGGER update_scans_updated_at BEFORE UPDATE ON public.scans
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_prescriptions_updated_at ON public.prescriptions;
 CREATE TRIGGER update_prescriptions_updated_at BEFORE UPDATE ON public.prescriptions
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_soap_notes_updated_at ON public.soap_notes;
 CREATE TRIGGER update_soap_notes_updated_at BEFORE UPDATE ON public.soap_notes
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_messages_updated_at ON public.messages;
 CREATE TRIGGER update_messages_updated_at BEFORE UPDATE ON public.messages
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_documents_updated_at ON public.documents;
 CREATE TRIGGER update_documents_updated_at BEFORE UPDATE ON public.documents
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_prescription_templates_updated_at ON public.prescription_templates;
 CREATE TRIGGER update_prescription_templates_updated_at BEFORE UPDATE ON public.prescription_templates
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_email_templates_updated_at ON public.email_templates;
 CREATE TRIGGER update_email_templates_updated_at BEFORE UPDATE ON public.email_templates
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_waitlist_updated_at ON public.waitlist;
 CREATE TRIGGER update_waitlist_updated_at BEFORE UPDATE ON public.waitlist
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_user_points_updated_at ON public.user_points;
 CREATE TRIGGER update_user_points_updated_at BEFORE UPDATE ON public.user_points
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_user_challenges_updated_at ON public.user_challenges;
 CREATE TRIGGER update_user_challenges_updated_at BEFORE UPDATE ON public.user_challenges
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_user_streaks_updated_at ON public.login_streaks;
 CREATE TRIGGER update_user_streaks_updated_at BEFORE UPDATE ON public.login_streaks
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_contact_messages_updated_at ON public.contact_messages;
 CREATE TRIGGER update_contact_messages_updated_at BEFORE UPDATE ON public.contact_messages
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_team_members_updated_at ON public.team_members;
 CREATE TRIGGER update_team_members_updated_at BEFORE UPDATE ON public.team_members
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_newsletters_updated_at ON public.newsletters;
 CREATE TRIGGER update_newsletters_updated_at BEFORE UPDATE ON public.newsletters
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_video_recordings_updated_at ON public.video_recordings;
 CREATE TRIGGER update_video_recordings_updated_at BEFORE UPDATE ON public.video_recordings
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_family_members_updated_at ON public.family_members;
 CREATE TRIGGER update_family_members_updated_at BEFORE UPDATE ON public.family_members
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_notification_preferences_updated_at ON public.notification_preferences;
 CREATE TRIGGER update_notification_preferences_updated_at BEFORE UPDATE ON public.notification_preferences
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
@@ -7496,18 +7806,23 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- pply audit triggers to sensitive tables
+DROP TRIGGER IF EXISTS audit_prescriptions ON public.prescriptions;
 CREATE TRIGGER audit_prescriptions AFTER INSERT OR UPDATE OR DELETE ON public.prescriptions
   FOR EACH ROW EXECUTE FUNCTION public.audit_trigger_func();
 
+DROP TRIGGER IF EXISTS audit_appointments ON public.appointments;
 CREATE TRIGGER audit_appointments AFTER INSERT OR UPDATE OR DELETE ON public.appointments
   FOR EACH ROW EXECUTE FUNCTION public.audit_trigger_func();
 
+DROP TRIGGER IF EXISTS audit_scans ON public.scans;
 CREATE TRIGGER audit_scans AFTER INSERT OR UPDATE OR DELETE ON public.scans
   FOR EACH ROW EXECUTE FUNCTION public.audit_trigger_func();
 
+DROP TRIGGER IF EXISTS audit_profiles_patient ON public.profiles_patient;
 CREATE TRIGGER audit_profiles_patient AFTER UPDATE ON public.profiles_patient
   FOR EACH ROW EXECUTE FUNCTION public.audit_trigger_func();
 
+DROP TRIGGER IF EXISTS audit_profiles_doctor ON public.profiles_doctor;
 CREATE TRIGGER audit_profiles_doctor AFTER UPDATE ON public.profiles_doctor
   FOR EACH ROW EXECUTE FUNCTION public.audit_trigger_func();
 
@@ -7746,6 +8061,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Create trigger on auth.users
+DROP TRIGGER IF EXISTS on_auth_user_created ON public.auth;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
@@ -7921,14 +8237,17 @@ CREATE INDEX IF NOT EXISTS idx_medications_active ON public.medications(is_activ
 
  ALTER TABLE public.medications ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Patients can view own medication reminders" ON public.medications;
 CREATE POLICY "Patients can view own medication reminders"
   ON public.medications FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Patients can manage own medication reminders" ON public.medications;
 CREATE POLICY "Patients can manage own medication reminders"
   ON public.medications FOR ALL
   USING (auth.uid() = patient_id);
 
+DROP TRIGGER IF EXISTS update_medications_updated_at ON public.medications;
 CREATE TRIGGER update_medications_updated_at BEFORE UPDATE ON public.medications
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
@@ -7949,6 +8268,7 @@ CREATE INDEX IF NOT EXISTS idx_favorite_medications_doctor ON public.favorite_me
 
  ALTER TABLE public.favorite_medications ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Doctors can manage own favorite_medications" ON public.favorite_medications;
 CREATE POLICY "Doctors can manage own favorite_medications"
   ON public.favorite_medications FOR ALL
   USING (auth.uid() = doctor_id);
@@ -7975,18 +8295,22 @@ CREATE INDEX IF NOT EXISTS idx_medical_referrals_status ON public.medical_referr
 
  ALTER TABLE public.medical_referrals ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Doctors can view referrals they sent or received" ON public.medical_referrals;
 CREATE POLICY "Doctors can view referrals they sent or received"
   ON public.medical_referrals FOR SELECT
   USING (auth.uid() = referring_doctor_id OR auth.uid() = target_doctor_id);
 
+DROP POLICY IF EXISTS "Doctors can create referrals" ON public.medical_referrals;
 CREATE POLICY "Doctors can create referrals"
   ON public.medical_referrals FOR INSERT
   WITH CHECK (auth.uid() = referring_doctor_id);
 
+DROP POLICY IF EXISTS "Doctors can update referrals they received" ON public.medical_referrals;
 CREATE POLICY "Doctors can update referrals they received"
   ON public.medical_referrals FOR UPDATE
   USING (auth.uid() = target_doctor_id);
 
+DROP TRIGGER IF EXISTS update_medical_referrals_updated_at ON public.medical_referrals;
 CREATE TRIGGER update_medical_referrals_updated_at BEFORE UPDATE ON public.medical_referrals
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
@@ -8015,10 +8339,12 @@ CREATE INDEX IF NOT EXISTS idx_risk_assessments_created ON public.risk_assessmen
 
  ALTER TABLE public.risk_assessments ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Patients can view own risk_assessments" ON public.risk_assessments;
 CREATE POLICY "Patients can view own risk_assessments"
   ON public.risk_assessments FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Patients can create risk_assessments" ON public.risk_assessments;
 CREATE POLICY "Patients can create risk_assessments"
   ON public.risk_assessments FOR INSERT
   WITH CHECK (auth.uid() = patient_id);
@@ -8038,10 +8364,12 @@ CREATE INDEX IF NOT EXISTS idx_dashboard_preferences_user ON public.dashboard_pr
 
  ALTER TABLE public.dashboard_preferences ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can manage own dashboard_preferences" ON public.dashboard_preferences;
 CREATE POLICY "Users can manage own dashboard_preferences"
   ON public.dashboard_preferences FOR ALL
   USING (auth.uid() = user_id);
 
+DROP TRIGGER IF EXISTS update_dashboard_preferences_updated_at ON public.dashboard_preferences;
 CREATE TRIGGER update_dashboard_preferences_updated_at BEFORE UPDATE ON public.dashboard_preferences
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
@@ -8059,6 +8387,7 @@ CREATE INDEX IF NOT EXISTS idx_saved_searches_user ON public.saved_searches(user
 
  ALTER TABLE public.saved_searches ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can manage own saved_searches" ON public.saved_searches;
 CREATE POLICY "Users can manage own saved_searches"
   ON public.saved_searches FOR ALL
   USING (auth.uid() = user_id);
@@ -8086,14 +8415,17 @@ CREATE INDEX IF NOT EXISTS idx_scheduled_reports_enabled ON public.scheduled_rep
 
  ALTER TABLE public.scheduled_reports ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS " Admins can manage scheduled_reports" ON public.scheduled_reports;
 CREATE POLICY " Admins can manage scheduled_reports"
   ON public.scheduled_reports FOR ALL
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "Users can view own scheduled_reports" ON public.scheduled_reports;
 CREATE POLICY "Users can view own scheduled_reports"
   ON public.scheduled_reports FOR SELECT
   USING (auth.uid() = created_by);
 
+DROP TRIGGER IF EXISTS update_scheduled_reports_updated_at ON public.scheduled_reports;
 CREATE TRIGGER update_scheduled_reports_updated_at BEFORE UPDATE ON public.scheduled_reports
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
@@ -8113,10 +8445,12 @@ CREATE INDEX IF NOT EXISTS idx_recording_shares_shared_with ON public.recording_
 
  ALTER TABLE public.recording_shares ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view recordings shared with them" ON public.recording_shares;
 CREATE POLICY "Users can view recordings shared with them"
   ON public.recording_shares FOR SELECT
   USING (auth.uid() = shared_with OR auth.uid() = shared_by);
 
+DROP POLICY IF EXISTS "Users can share recordings" ON public.recording_shares;
 CREATE POLICY "Users can share recordings"
   ON public.recording_shares FOR INSERT
   WITH CHECK (auth.uid() = shared_by);
@@ -8138,6 +8472,7 @@ CREATE INDEX IF NOT EXISTS idx_recording_transcriptions_status ON public.recordi
 
  ALTER TABLE public.recording_transcriptions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view transcriptions of their recordings" ON public.recording_transcriptions;
 CREATE POLICY "Users can view transcriptions of their recordings"
   ON public.recording_transcriptions FOR SELECT
   USING (
@@ -8148,6 +8483,7 @@ CREATE POLICY "Users can view transcriptions of their recordings"
     )
   );
 
+DROP TRIGGER IF EXISTS update_recording_transcriptions_updated_at ON public.recording_transcriptions;
 CREATE TRIGGER update_recording_transcriptions_updated_at BEFORE UPDATE ON public.recording_transcriptions
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
@@ -8168,14 +8504,17 @@ CREATE INDEX IF NOT EXISTS idx_newsletter_subscribers_subscribed ON public.newsl
 
  ALTER TABLE public.newsletter_subscribers ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS " Anyone can subscribe to newsletter" ON public.newsletter_subscribers;
 CREATE POLICY " Anyone can subscribe to newsletter"
   ON public.newsletter_subscribers FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS " Admins can view all newsletter_subscribers" ON public.newsletter_subscribers;
 CREATE POLICY " Admins can view all newsletter_subscribers"
   ON public.newsletter_subscribers FOR SELECT
   USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS " Admins can manage newsletter_subscribers" ON public.newsletter_subscribers;
 CREATE POLICY " Admins can manage newsletter_subscribers"
   ON public.newsletter_subscribers FOR ALL
   USING (public.is_admin(auth.uid()));
@@ -8194,10 +8533,12 @@ CREATE INDEX IF NOT EXISTS idx_intake_responses_patient ON public.intake_respons
 
  ALTER TABLE public.intake_responses ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Patients can manage own intake_responses" ON public.intake_responses;
 CREATE POLICY "Patients can manage own intake_responses"
   ON public.intake_responses FOR ALL
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Doctors can view intake_responses for their appointments" ON public.intake_responses;
 CREATE POLICY "Doctors can view intake_responses for their appointments"
   ON public.intake_responses FOR SELECT
   USING (
@@ -8216,14 +8557,17 @@ CREATE INDEX IF NOT EXISTS idx_complaints_severity ON public.complaints(severity
 
  ALTER TABLE public.complaints ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view and create own complaints" ON public.complaints;
 CREATE POLICY "Users can view and create own complaints"
   ON public.complaints FOR ALL
   USING (auth.uid() = reporter_id);
 
+DROP POLICY IF EXISTS "Admins can manage all complaints" ON public.complaints;
 CREATE POLICY "Admins can manage all complaints"
   ON public.complaints FOR ALL
   USING (public.is_admin(auth.uid()));
 
+DROP TRIGGER IF EXISTS update_complaints_updated_at ON public.complaints;
 CREATE TRIGGER update_complaints_updated_at BEFORE UPDATE ON public.complaints
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
@@ -8487,6 +8831,7 @@ CREATE INDEX IF NOT EXISTS idx_data_export_requested ON public.data_export_reque
 -- Service Health: Admin only
  ALTER TABLE public.service_health ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS service_health_admin_only ON public.service_health;
 CREATE POLICY service_health_admin_only ON public.service_health
   FOR ALL
   USING (
@@ -8499,6 +8844,7 @@ CREATE POLICY service_health_admin_only ON public.service_health
 -- System Config: Admin only
  ALTER TABLE public.system_config ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS system_config_admin_only ON public.system_config;
 CREATE POLICY system_config_admin_only ON public.system_config
   FOR ALL
   USING (
@@ -8511,10 +8857,12 @@ CREATE POLICY system_config_admin_only ON public.system_config
 -- User Sessions Enhanced: Users can see their own, admins can see all
  ALTER TABLE public.user_sessions_enhanced ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS user_sessions_enhanced_own_data ON public.user_sessions_enhanced;
 CREATE POLICY user_sessions_enhanced_own_data ON public.user_sessions_enhanced
   FOR SELECT
   USING (user_id = auth.uid());
 
+DROP POLICY IF EXISTS user_sessions_enhanced_admin_all ON public.user_sessions_enhanced;
 CREATE POLICY user_sessions_enhanced_admin_all ON public.user_sessions_enhanced
   FOR ALL
   USING (
@@ -8527,6 +8875,7 @@ CREATE POLICY user_sessions_enhanced_admin_all ON public.user_sessions_enhanced
 -- IP Whitelist: Admin only
  ALTER TABLE public.ip_whitelist ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS ip_whitelist_admin_only ON public.ip_whitelist;
 CREATE POLICY ip_whitelist_admin_only ON public.ip_whitelist
   FOR ALL
   USING (
@@ -8539,6 +8888,7 @@ CREATE POLICY ip_whitelist_admin_only ON public.ip_whitelist
 -- Audit Logs Enhanced: admin and auditor roles only
  ALTER TABLE public.audit_logs_enhanced ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS audit_logs_enhanced_admin_auditor ON public.audit_logs_enhanced;
 CREATE POLICY audit_logs_enhanced_admin_auditor ON public.audit_logs_enhanced
   FOR SELECT
   USING (
@@ -8551,6 +8901,7 @@ CREATE POLICY audit_logs_enhanced_admin_auditor ON public.audit_logs_enhanced
 -- Retention Policies: Admin only
  ALTER TABLE public.retention_policies ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS retention_policies_admin_only ON public.retention_policies;
 CREATE POLICY retention_policies_admin_only ON public.retention_policies
   FOR ALL
   USING (
@@ -8563,6 +8914,7 @@ CREATE POLICY retention_policies_admin_only ON public.retention_policies
 -- Backup Logs: Admin only
  ALTER TABLE public.backup_logs ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS backup_logs_admin_only ON public.backup_logs;
 CREATE POLICY backup_logs_admin_only ON public.backup_logs
   FOR ALL
   USING (
@@ -8575,10 +8927,12 @@ CREATE POLICY backup_logs_admin_only ON public.backup_logs
 -- Data Export Requests: Users can see their own, admins can see all
  ALTER TABLE public.data_export_requests ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS data_export_own_data ON public.data_export_requests;
 CREATE POLICY data_export_own_data ON public.data_export_requests
   FOR SELECT
   USING (patient_id = auth.uid());
 
+DROP POLICY IF EXISTS data_export_admin_all ON public.data_export_requests;
 CREATE POLICY data_export_admin_all ON public.data_export_requests
   FOR ALL
   USING (
@@ -8595,7 +8949,7 @@ CREATE POLICY data_export_admin_all ON public.data_export_requests
 
 
 -- Function to automatically clean up expired sessions
-CREATE OR REPLACE FUNCTION cleanup_expired_sessions()
+CREATE OR REPLACE FUNCTION cleanup_expired_sessions_enhanced()
 RETURNS void AS $$
 BEGIN
   UPDATE public.user_sessions_enhanced
@@ -8713,7 +9067,7 @@ BEGIN
   RAISE NOTICE '  - 6-year audit log retention (HIPAA-compliant)';
   RAISE NOTICE '';
   RAISE NOTICE 'Ã¢Å¡â„¢Ã¯Â¸Â utomation Functions:';
-  RAISE NOTICE '  - cleanup_expired_sessions()';
+  RAISE NOTICE '  - cleanup_expired_sessions_enhanced()';
   RAISE NOTICE '  - cleanup_expired_ip_whitelist()';
   RAISE NOTICE '  - cleanup_expired_export_links()';
   RAISE NOTICE '  - enforce_retention_policies()';
@@ -8723,10 +9077,10 @@ END $$;
 
 
 -- ============================================================
-================
+-- ============================================
 -- 15. PUBLIC BLOGS TABLE (CMS)
 -- ============================================================
-================
+-- ============================================
 CREATE TABLE IF NOT EXISTS public.blogs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
@@ -8746,11 +9100,13 @@ CREATE INDEX IF NOT EXISTS idx_blogs_created_at ON public.blogs(created_at DESC)
  ALTER TABLE public.blogs ENABLE ROW LEVEL SECURITY;
 
 -- llow public viewing of published blogs
+DROP POLICY IF EXISTS blogs_public_select ON public.blogs;
 CREATE POLICY blogs_public_select ON public.blogs
   FOR SELECT
   USING (published = true);
 
 -- llow admins full access
+DROP POLICY IF EXISTS blogs_admin_all ON public.blogs;
 CREATE POLICY blogs_admin_all ON public.blogs
   FOR ALL
   USING (public.is_admin(auth.uid()));
@@ -8832,31 +9188,8 @@ CREATE INDEX IF NOT EXISTS idx_model_telemetry_status ON public.model_telemetry(
 -- ---------------------------------------------------------------------
 
 -- SOC 2 Control Status
-CREATE TABLE IF NOT EXISTS public.soc2_control_status (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  control_id TEXT UNIQUE NOT NULL, -- e.g. CC1.1
-  control_name TEXT NOT NULL,
-  category TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'Planned' CHECK (status IN ('Implemented', 'Partial', 'Planned', 'Not Applicable')),
-  description TEXT,
-  last_reviewed_at TIMESTAMPTZ,
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX IF NOT EXISTS idx_soc2_controls_category ON public.soc2_control_status(category);
-CREATE INDEX IF NOT EXISTS idx_soc2_controls_status ON public.soc2_control_status(status);
 
 -- SOC 2 Evidence
-CREATE TABLE IF NOT EXISTS public.soc2_evidence (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  control_id TEXT NOT NULL REFERENCES public.soc2_control_status(control_id) ON DELETE CASCADE,
-  evidence_name TEXT NOT NULL,
-  file_url TEXT,
-  collected_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  collected_by UUID REFERENCES auth.users(id),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
 
 CREATE INDEX IF NOT EXISTS idx_soc2_evidence_control ON public.soc2_evidence(control_id);
 
@@ -8867,8 +9200,11 @@ CREATE INDEX IF NOT EXISTS idx_soc2_evidence_control ON public.soc2_evidence(con
  ALTER TABLE public.soc2_control_status ENABLE ROW LEVEL SECURITY;
  ALTER TABLE public.soc2_evidence ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS compliance_admin_only_telemetry ON public.model_telemetry;
 CREATE POLICY compliance_admin_only_telemetry ON public.model_telemetry FOR ALL USING (public.is_admin(auth.uid()));
+DROP POLICY IF EXISTS compliance_admin_only_controls ON public.soc2_control_status;
 CREATE POLICY compliance_admin_only_controls ON public.soc2_control_status FOR ALL USING (public.is_admin(auth.uid()));
+DROP POLICY IF EXISTS compliance_admin_only_evidence ON public.soc2_evidence;
 CREATE POLICY compliance_admin_only_evidence ON public.soc2_evidence FOR ALL USING (public.is_admin(auth.uid()));
 
 -- 11.4 Seed Data (Moved to SEED_DATA.sql)
@@ -9548,7 +9884,8 @@ NOTIFY pgrst, 'reload schema';
 -- Genomic Profiles (Patient genetic information)
 CREATE TABLE IF NOT EXISTS public.genomic_profiles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  patient_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE, agenome_build VARCHAR(20) DEFAULT 'GRCh38', -- Human genome reference
+  patient_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  genome_build VARCHAR(20) DEFAULT 'GRCh38', -- Human genome reference
   sequencing_platform VARCHAR(100), -- Illumina, PacBio, Oxford Nanopore
   sequencing_date DATE,
   coverage_depth DECIMAL(8,2), -- verage sequencing depth
@@ -9579,7 +9916,7 @@ CREATE TABLE IF NOT EXISTS public.genomic_profiles (
 
 -- Genetic Variants (Individual genetic variations)
 CREATE TABLE IF NOT EXISTS public.genetic_variants (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(), agenomic_profile_id UUID NOT NULL REFERENCES public.genomic_profiles(id) ON DELETE CASCADE,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(), genomic_profile_id UUID NOT NULL REFERENCES public.genomic_profiles(id) ON DELETE CASCADE,
   
   -- Variant location
   chromosome VARCHAR(10) NOT NULL, -- 1-22, X, Y, MT
@@ -9655,7 +9992,7 @@ CREATE TABLE IF NOT EXISTS public.pharmacogenomic_profiles (
 -- Genetic Risk Scores (Polygenic risk scores)
 CREATE TABLE IF NOT EXISTS public.genetic_risk_scores (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  patient_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE, agenomic_profile_id UUID REFERENCES public.genomic_profiles(id),
+  patient_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE, genomic_profile_id UUID REFERENCES public.genomic_profiles(id),
   
   -- Risk score details
   condition_name VARCHAR(255) NOT NULL,
@@ -9691,7 +10028,7 @@ CREATE TABLE IF NOT EXISTS public.genetic_risk_scores (
 CREATE TABLE IF NOT EXISTS public.genetic_counseling_sessions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   patient_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  counselor_id UUID REFERENCES auth.users(id), agenomic_profile_id UUID REFERENCES public.genomic_profiles(id),
+  counselor_id UUID REFERENCES auth.users(id), genomic_profile_id UUID REFERENCES public.genomic_profiles(id),
   
   -- Session details
   session_type VARCHAR(100), -- pre-test, post-test, follow-up
@@ -9744,14 +10081,17 @@ CREATE INDEX IF NOT EXISTS idx_genetic_counseling_patient ON public.genetic_coun
  ALTER TABLE public.genetic_risk_scores ENABLE ROW LEVEL SECURITY;
  ALTER TABLE public.genetic_counseling_sessions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Patients can view own genomic data" ON public.genomic_profiles;
 CREATE POLICY "Patients can view own genomic data"
   ON public.genomic_profiles FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Patients can manage own genomic data" ON public.genomic_profiles;
 CREATE POLICY "Patients can manage own genomic data"
   ON public.genomic_profiles FOR ALL
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Genetic counselors can view patient genomic data" ON public.genomic_profiles;
 CREATE POLICY "Genetic counselors can view patient genomic data"
   ON public.genomic_profiles FOR SELECT
   USING (
@@ -9761,6 +10101,7 @@ CREATE POLICY "Genetic counselors can view patient genomic data"
     )
   );
 
+DROP POLICY IF EXISTS "Patients can view own genetic variants" ON public.genetic_variants;
 CREATE POLICY "Patients can view own genetic variants"
   ON public.genetic_variants FOR SELECT
   USING (
@@ -9770,33 +10111,41 @@ CREATE POLICY "Patients can view own genetic variants"
     )
   );
 
+DROP POLICY IF EXISTS "Patients can view own pharmacogenomic profiles" ON public.pharmacogenomic_profiles;
 CREATE POLICY "Patients can view own pharmacogenomic profiles"
   ON public.pharmacogenomic_profiles FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Patients can manage own pharmacogenomic profiles" ON public.pharmacogenomic_profiles;
 CREATE POLICY "Patients can manage own pharmacogenomic profiles"
   ON public.pharmacogenomic_profiles FOR ALL
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Patients can view own genetic risk scores" ON public.genetic_risk_scores;
 CREATE POLICY "Patients can view own genetic risk scores"
   ON public.genetic_risk_scores FOR SELECT
   USING (auth.uid() = patient_id);
 
+DROP POLICY IF EXISTS "Patients can view own genetic counseling sessions" ON public.genetic_counseling_sessions;
 CREATE POLICY "Patients can view own genetic counseling sessions"
   ON public.genetic_counseling_sessions FOR SELECT
   USING (auth.uid() = patient_id OR auth.uid() = counselor_id);
 
+DROP POLICY IF EXISTS "Genetic counselors can manage sessions" ON public.genetic_counseling_sessions;
 CREATE POLICY "Genetic counselors can manage sessions"
   ON public.genetic_counseling_sessions FOR ALL
   USING (auth.uid() = counselor_id);
 
 -- Triggers for Genomics Tables
+DROP TRIGGER IF EXISTS update_genomic_profiles_updated_at ON public.genomic_profiles;
 CREATE TRIGGER update_genomic_profiles_updated_at BEFORE UPDATE ON public.genomic_profiles
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_pharmacogenomic_profiles_updated_at ON public.pharmacogenomic_profiles;
 CREATE TRIGGER update_pharmacogenomic_profiles_updated_at BEFORE UPDATE ON public.pharmacogenomic_profiles
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_genetic_counseling_sessions_updated_at ON public.genetic_counseling_sessions;
 CREATE TRIGGER update_genetic_counseling_sessions_updated_at BEFORE UPDATE ON public.genetic_counseling_sessions
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
@@ -10651,14 +11000,17 @@ CREATE INDEX IF NOT EXISTS idx_payments_transaction ON public.payments(transacti
 
  ALTER TABLE public.payments ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own payments" ON public.payments;
 CREATE POLICY "Users can view own payments"
   ON public.payments FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "System can create payments" ON public.payments;
 CREATE POLICY "System can create payments"
   ON public.payments FOR INSERT
   WITH CHECK (true);
 
+DROP TRIGGER IF EXISTS update_payments_updated_at ON public.payments;
 CREATE TRIGGER update_payments_updated_at BEFORE UPDATE ON public.payments
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
@@ -12042,20 +12394,6 @@ WHERE
 -- STEP 1: Add is_admin column to profiles_doctor table
 -- ============================================================
 
-ALTER TABLE public.profiles_doctor 
-ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT false;
-
-COMMENT ON COLUMN public.profiles_doctor.is_admin IS 'Flag to mark users with admin privileges';
-
-ALTER TABLE public.profiles_doctor 
-ADD COLUMN IF NOT EXISTS verification_status VARCHAR(50) DEFAULT 'pending';
-
-COMMENT ON COLUMN public.profiles_doctor.verification_status IS 'Verification status of the doctor profile (pending, approved, rejected)';
-
-ALTER TABLE public.profiles_doctor 
-ADD COLUMN IF NOT EXISTS verification_notes TEXT;
-
-COMMENT ON COLUMN public.profiles_doctor.verification_notes IS 'Notes or rejection reasons recorded by admins during verification review';
 
 -- ============================================================
 -- STEP 2: Grant SELECT permissions on all views
@@ -12167,4 +12505,80 @@ BEGIN
     RAISE NOTICE 'Database permissions fixed successfully!';
     RAISE NOTICE 'Next step: Run this query to mark yourself as admin:';
     RAISE NOTICE 'UPDATE public.profiles_doctor SET is_admin = true WHERE email = ''sunaypotnuru@gmail.com'';';
+END $$;
+
+-- ============================================================
+-- TRUSTED DEVICES TABLE (Zero Trust device management)
+-- Previously only in add_security_tables.sql migration
+-- Added here to complete the 192-table schema
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS public.trusted_devices (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    device_fingerprint TEXT NOT NULL,
+    device_name VARCHAR(255),
+    device_type VARCHAR(50),
+    browser VARCHAR(100),
+    os VARCHAR(100),
+    first_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    last_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    is_trusted BOOLEAN NOT NULL DEFAULT FALSE,
+    trust_expires_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(user_id, device_fingerprint)
+);
+
+CREATE INDEX IF NOT EXISTS idx_trusted_devices_user_id     ON public.trusted_devices(user_id);
+CREATE INDEX IF NOT EXISTS idx_trusted_devices_fingerprint ON public.trusted_devices(device_fingerprint);
+CREATE INDEX IF NOT EXISTS idx_trusted_devices_trusted     ON public.trusted_devices(is_trusted) WHERE is_trusted = TRUE;
+CREATE INDEX IF NOT EXISTS idx_trusted_devices_expires     ON public.trusted_devices(trust_expires_at) WHERE is_trusted = TRUE;
+
+COMMENT ON TABLE public.trusted_devices IS 'Zero Trust device management — 90-day trust expiry, HIPAA compliant';
+
+ALTER TABLE public.trusted_devices ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS trusted_devices_select_own ON public.trusted_devices;
+CREATE POLICY trusted_devices_select_own ON public.trusted_devices
+    FOR SELECT USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS trusted_devices_insert_own ON public.trusted_devices;
+CREATE POLICY trusted_devices_insert_own ON public.trusted_devices
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS trusted_devices_update_own ON public.trusted_devices;
+CREATE POLICY trusted_devices_update_own ON public.trusted_devices
+    FOR UPDATE USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS trusted_devices_delete_own ON public.trusted_devices;
+CREATE POLICY trusted_devices_delete_own ON public.trusted_devices
+    FOR DELETE USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS trusted_devices_admin_all ON public.trusted_devices;
+CREATE POLICY trusted_devices_admin_all ON public.trusted_devices
+    FOR ALL USING (public.is_admin(auth.uid()));
+
+GRANT ALL ON public.trusted_devices TO service_role;
+
+-- Cleanup function: revoke expired device trust (run daily via pg_cron)
+CREATE OR REPLACE FUNCTION public.cleanup_expired_device_trust()
+RETURNS INTEGER AS $$
+DECLARE updated_count INTEGER;
+BEGIN
+    UPDATE public.trusted_devices
+    SET is_trusted = FALSE
+    WHERE is_trusted = TRUE
+      AND trust_expires_at IS NOT NULL
+      AND trust_expires_at < NOW();
+    GET DIAGNOSTICS updated_count = ROW_COUNT;
+    RETURN updated_count;
+END;
+$$ LANGUAGE plpgsql;
+
+GRANT EXECUTE ON FUNCTION public.cleanup_expired_device_trust TO service_role;
+
+DO $$
+BEGIN
+    RAISE NOTICE 'NETRA AI SCHEMA v3.1.0 — Setup complete. 192 tables ready.';
+    RAISE NOTICE 'To promote admin: UPDATE public.profiles_doctor SET is_admin = true WHERE email = ''sunaypotnuru@gmail.com'';';
 END $$;

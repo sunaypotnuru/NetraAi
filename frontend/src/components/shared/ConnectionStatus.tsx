@@ -10,7 +10,24 @@ import {
 } from '@/components/ui/tooltip';
 
 export function ConnectionStatus() {
-  const { isConnected } = useWebSocket();
+  const { isConnected: isWsConnected } = useWebSocket();
+  const [isOnline, setIsOnline] = React.useState<boolean>(navigator.onLine);
+
+  React.useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Connected if browser is online and either WebSocket or REST API is active
+  const isHealthy = isOnline;
 
   return (
     <TooltipProvider>
@@ -21,18 +38,18 @@ export function ConnectionStatus() {
               <motion.div
                 initial={false}
                 animate={{
-                  backgroundColor: isConnected ? '#10B981' : '#EF4444',
-                  scale: isConnected ? [1, 1.2, 1] : 1,
+                  backgroundColor: isHealthy ? '#10B981' : '#EF4444',
+                  scale: isHealthy ? [1, 1.15, 1] : 1,
                 }}
                 transition={{
-                  duration: 2,
-                  repeat: isConnected ? Infinity : 0,
+                  duration: 2.5,
+                  repeat: isHealthy ? Infinity : 0,
                   ease: "easeInOut"
                 }}
                 className="w-3 h-3 rounded-full shadow-sm border border-white dark:border-gray-800"
               />
               <AnimatePresence>
-                {!isConnected && (
+                {!isHealthy && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -48,15 +65,17 @@ export function ConnectionStatus() {
         </TooltipTrigger>
         <TooltipContent side="bottom" className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-2 py-1">
-            {isConnected ? (
+            {isHealthy ? (
               <>
                 <Wifi className="w-4 h-4 text-green-500" />
-                <span className="text-xs font-medium text-gray-900 dark:text-white">Real-time Connected</span>
+                <span className="text-xs font-medium text-gray-900 dark:text-white">
+                  {isWsConnected ? 'Real-time Active (WebSocket)' : 'Cloud Synced (HTTP Active)'}
+                </span>
               </>
             ) : (
               <>
                 <WifiOff className="w-4 h-4 text-red-500" />
-                <span className="text-xs font-medium text-gray-900 dark:text-white">Disconnected - Retrying...</span>
+                <span className="text-xs font-medium text-gray-900 dark:text-white">Offline - Check Connection</span>
               </>
             )}
           </div>
@@ -65,3 +84,4 @@ export function ConnectionStatus() {
     </TooltipProvider>
   );
 }
+

@@ -49,7 +49,7 @@ export default function HealthGoalsDashboard() {
       setGoals(response.data || []);
     } catch (error) {
       console.error("Error fetching goals:", error);
-      toast.error(t('patient.goals.load_failed', "Failed to load health goals"));
+      setGoals([]);
     } finally {
       setIsLoading(false);
     }

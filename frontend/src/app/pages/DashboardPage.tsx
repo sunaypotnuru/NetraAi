@@ -28,12 +28,12 @@ export default function DashboardPage() {
   const { t } = useTranslation();
 
   const quickActions = [
+    { label: t("patient.dashboard.qa_ar", "AR Vision Therapy"), desc: t("patient.dashboard.qa_ar_desc", "AI pose & eye tracking"), icon: Eye, path: "/patient/exercises", color: "#0D9488", bg: "#F0FDFA" },
     { label: t("patient.dashboard.qa_lab", "Analyze Lab Report"), desc: t("patient.dashboard.qa_lab_desc", "AI-based OCR vitals"), icon: Activity, path: "/patient/lab-analyzer", color: "#6366F1", bg: "#EEF2FF" },
     { label: t("patient.dashboard.qa_insurance", "Verify Insurance"), desc: t("patient.dashboard.qa_insurance_desc", "Check policy limits"), icon: ShieldCheck, path: "/patient/insurance", color: "#10B981", bg: "#ECFDF5" },
     { label: t("patient.dashboard.qa_risk", "Risk Assessment"), desc: t("patient.dashboard.qa_risk_desc", "Clinical scoring"), icon: Heart, path: "/patient/risk-assessment", color: "#E11D48", bg: "#FFF1F2" },
     { label: t("patient.dashboard.qa_meds", "Medications"), desc: t("patient.dashboard.qa_meds_desc", "Pill trackers & alerts"), icon: Pill, path: "/patient/medications", color: "#6366F1", bg: "#EEF2FF" },
     { label: t("patient.dashboard.qa_vitals", "Track Vitals"), desc: t("patient.dashboard.qa_vitals_desc", "Chronic disease monitoring"), icon: Activity, path: "/patient/tracker", color: "#E11D48", bg: "#FFF1F2" },
-    { label: t("patient.dashboard.qa_nurse", "Nurse Settings"), desc: t("patient.dashboard.qa_nurse_desc", "Manage AI call routines"), icon: PhoneCall, path: "/patient/medication-schedule", color: "#0D9488", bg: "#F0FDFA" },
   ];
   const [showFamilyDropdown, setShowFamilyDropdown] = useState(false);
   const [showCustomize, setShowCustomize] = useState(false);

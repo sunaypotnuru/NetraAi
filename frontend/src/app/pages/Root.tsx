@@ -5,6 +5,7 @@ import { ArrowUp } from "lucide-react";
 import NavbarMain from "@/components/layout/NavbarMain";
 import Footer from "@/components/layout/Footer";
 import SOSButton from "@/components/shared/SOSButton";
+import Breadcrumb from "@/components/shared/Breadcrumb";
 import { VoiceAccessibility } from "@/components/features/accessibility/VoiceAccessibility";
 import ChatbotWidget from "@/components/features/ai/ChatbotWidget";
 import { useAuthStore } from "../../lib/store";
@@ -88,6 +89,9 @@ export default function Root() {
       {!isAdminPage && <NavbarMain />}
 
       <main className="flex-1 overflow-x-hidden">
+        {/* Global Location Breadcrumbs */}
+        <Breadcrumb />
+
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={location.pathname}

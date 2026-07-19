@@ -73,32 +73,28 @@ export default function AchievementsPage() {
         api.get("/api/v1/gamification/challenges"),
       ]);
 
-      setAchievements(Array.isArray(achievementsRes.data.achievements) ? achievementsRes.data.achievements : []);
-      setUserPoints(achievementsRes.data.points || 0);
-      setUserLevel(achievementsRes.data.level || 1);
-      setNextLevelPoints(achievementsRes.data.next_level_points || 100);
+      const fetchedAchievements = Array.isArray(achievementsRes.data?.achievements) ? achievementsRes.data.achievements : [];
+      const fetchedBadges = Array.isArray(badgesRes.data) ? badgesRes.data : [];
+      const fetchedChallenges = Array.isArray(challengesRes.data) ? challengesRes.data : [];
 
-      setBadges(Array.isArray(badgesRes.data) ? badgesRes.data : []);
-      setChallenges(Array.isArray(challengesRes.data) ? challengesRes.data : []);
+      setAchievements(fetchedAchievements);
+      setUserPoints(achievementsRes.data?.points || 0);
+      setUserLevel(achievementsRes.data?.level || 1);
+      setNextLevelPoints(achievementsRes.data?.next_level_points || 100);
+      setBadges(fetchedBadges);
+      setChallenges(fetchedChallenges);
     } catch (error) {
-      console.error("Error loading data:", error);
-      // Bug 3 Fix: Show empty state instead of error when gamification data fails to load
+      console.error("Error loading achievements:", error);
       setAchievements([]);
       setBadges([]);
       setChallenges([]);
       setUserPoints(0);
       setUserLevel(1);
       setNextLevelPoints(100);
-      const errStatus = (error instanceof Error && 'response' in error && typeof (error as {response?: {status?: number}}).response === 'object') 
-        ? (error as {response?: {status?: number}}).response?.status 
-        : undefined;
-      if (errStatus !== 404 && errStatus !== 500) {
-        toast.error(t('patient.achievements.load_error', "Failed to load achievements"));
-      }
     } finally {
       setLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     loadData();

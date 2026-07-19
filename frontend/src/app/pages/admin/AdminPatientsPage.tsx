@@ -62,8 +62,10 @@ export default function AdminPatientsPage() {
         );
     }
 
-    const filteredPatients = (patients?.patients || []).filter((p: Patient) =>
-        (p.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const patientList: Patient[] = patients?.patients || [];
+
+    const filteredPatients = patientList.filter((p: Patient) =>
+        (p.name || p.full_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         (p.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         (p.id || '').toLowerCase().includes(searchTerm.toLowerCase())
     );

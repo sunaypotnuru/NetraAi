@@ -20,7 +20,8 @@ eggs/
 # lib/  # Commented out - was catching frontend/src/lib
 backend/**/lib/  # Only ignore Python lib directories in backend
 lib64/
-parts/
+# backend/**/parts/  # Only ignore build parts if any
+!infrastructure/database/supabase/schema/parts/
 sdist/
 var/
 wheels/

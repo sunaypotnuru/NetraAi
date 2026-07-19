@@ -129,6 +129,13 @@ export function AccessibilityWidget() {
         value: AccessibilitySettings[K]
     ) => {
         setSettings(prev => ({ ...prev, [key]: value }));
+        if (key === 'fontSize') {
+            const num = Number(value);
+            if (num > 115) setFontSize('xlarge');
+            else if (num > 105) setFontSize('large');
+            else if (num < 95) setFontSize('small');
+            else setFontSize('medium');
+        }
     };
 
     const { 
@@ -139,7 +146,8 @@ export function AccessibilityWidget() {
         largeText,
         toggleLargeText,
         reducedMotion,
-        toggleReducedMotion
+        toggleReducedMotion,
+        setFontSize
     } = useAccessibilityStore();
 
     const resetSettings = () => {

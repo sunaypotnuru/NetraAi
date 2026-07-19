@@ -99,8 +99,9 @@ export default function AdminDoctorsPage() {
         );
     }
 
-    const filteredDoctors = (doctors?.doctors || [])
-        .filter((d: Doctor) => d.email !== 'sunaypotnuru@gmail.com')
+    const doctorList: Doctor[] = doctors?.doctors || [];
+
+    const filteredDoctors = doctorList
         .filter((d: Doctor) => {
             const matchesSearch = (d.full_name || d.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                 (d.email || '').toLowerCase().includes(searchTerm.toLowerCase());

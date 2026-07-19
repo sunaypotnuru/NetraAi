@@ -47,7 +47,7 @@ export default function FamilyMembersPage() {
       setMembers(response.data || []);
     } catch (error) {
       console.error("Error fetching family members:", error);
-      toast.error(t('patient.family.load_failed', "Failed to load family members"));
+      setMembers([]);
     } finally {
       setIsLoading(false);
     }

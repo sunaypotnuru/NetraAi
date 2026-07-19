@@ -46,7 +46,7 @@ export default function SystemHealthPage() {
       setLastCheck(new Date(data.timestamp));
 
       const healthyCount = mappedServices.filter((s: any) => s.status === "healthy").length;
-      setOverallHealth((healthyCount / mappedServices.length) * 100);
+      setOverallHealth(mappedServices.length > 0 ? (healthyCount / mappedServices.length) * 100 : 0);
 
     } catch (error) {
       console.error("Health check failed:", error);

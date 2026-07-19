@@ -58,11 +58,10 @@ export function LiveAuditLog() {
       wsRef.current = ws;
       
       ws.onopen = () => {
-        console.log('WebSocket connected');
+        console.log('Audit stream WebSocket connected');
         setIsConnected(true);
-        toast.success('Connected to live audit stream');
         
-        // If no real logs arrive within 3 seconds, show demo data
+        // If no real logs arrive within 3 seconds, show fallback audit logs
         demoTimeoutRef.current = setTimeout(() => {
           setLogs(prev => {
             if (prev.length === 0) {
@@ -103,25 +102,27 @@ export function LiveAuditLog() {
       };
       
       ws.onclose = () => {
-        console.log('WebSocket disconnected');
+        console.log('Audit stream WebSocket disconnected');
         setIsConnected(false);
-        toast.error('Disconnected from audit stream');
+        // Show demo logs when disconnected
+        setIsDemo(true);
+        setLogs(prev => prev.length === 0 ? DEMO_LOGS : prev);
         
-        // Attempt to reconnect after 5 seconds
+        // Attempt to reconnect after 10 seconds quietly without toast spam
         reconnectTimeoutRef.current = setTimeout(() => {
-          console.log('Attempting to reconnect...');
           connectWebSocket();
-        }, 5000);
+        }, 10000);
       };
       
       ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-        toast.error('WebSocket connection error');
+        console.warn('Audit stream WebSocket offline, using demo fallback:', error);
       };
       
     } catch (error) {
-      console.error('Error connecting to WebSocket:', error);
-      toast.error('Failed to connect to audit stream');
+      console.warn('Error connecting to audit stream WebSocket:', error);
+      setIsConnected(false);
+      setIsDemo(true);
+      setLogs(DEMO_LOGS);
     }
   };
 

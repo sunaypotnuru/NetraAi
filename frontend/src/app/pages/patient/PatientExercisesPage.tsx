@@ -33,49 +33,51 @@ export default function PatientExercisesPage() {
     }
   });
 
+  const exerciseList = assignments || [];
+
   return (
     <div className="min-h-screen bg-transparent pt-24 pb-12 px-6">
       <div className="max-w-5xl mx-auto space-y-8">
 
+        {/* Hero Header Banner */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
+          className="relative overflow-hidden p-8 rounded-[2.5rem] bg-gradient-to-br from-[#0D9488] via-[#0F766E] to-[#065F46] text-white shadow-2xl border border-teal-400/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
         >
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white flex items-center gap-3">
-            <div className="p-3 rounded-2xl bg-teal-500/10 dark:bg-teal-500/5 text-teal-600 dark:text-teal-400 border border-teal-500/20 shadow-[0_0_20px_rgba(20,184,166,0.15)] flex items-center justify-center">
-              <Dumbbell className="w-7 h-7" />
+          <div className="space-y-3 max-w-xl z-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold tracking-wide border border-white/20">
+              <Dumbbell className="w-3.5 h-3.5 text-teal-200" />
+              <span>AI-POWERED COMPUTER VISION</span>
             </div>
-            {t("patient.exercises.title", "My Physical Therapy")}
-          </h1>
-          <p className="text-slate-500 dark:text-slate-400 font-medium mt-3 ml-1">
-            {t("patient.exercises.subtitle", "Complete your prescribed AR tracking exercises below.")}
-          </p>
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
+              {t("patient.exercises.title", "Interactive AR Vision Therapy")}
+            </h1>
+            <p className="text-teal-100 text-sm sm:text-base leading-relaxed">
+              {t("patient.exercises.subtitle", "Track form, joint angles, and eye focus in real-time using your device camera.")}
+            </p>
+          </div>
+
+          <Button
+            onClick={() => navigate(`/patient/exercises/ar/${exerciseList[0]?.id || 'ex-1'}`)}
+            className="z-10 bg-white text-[#0D9488] hover:bg-teal-50 font-bold px-6 py-6 rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shrink-0"
+          >
+            <PlayCircle className="w-6 h-6 text-[#0D9488]" />
+            <span>{t("patient.exercises.launch_ar", "Launch Live AR Session")}</span>
+          </Button>
+
+          {/* Background Decorative Graphic */}
+          <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-teal-400/10 rounded-full blur-3xl pointer-events-none" />
         </motion.div>
 
         {isLoading ? (
           <div className="h-64 flex items-center justify-center">
             <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
-        ) : assignments.length === 0 ? (
-          <Card className="p-16 text-center flex flex-col items-center justify-center border border-white/20 dark:border-white/5 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md rounded-[2.5rem] shadow-2xl">
-            <Activity className="w-16 h-16 mb-4 text-slate-300 dark:text-slate-700 drop-shadow-[0_0_10px_rgba(20,184,166,0.1)]" />
-            <p className="text-xl font-bold text-slate-800 dark:text-white mb-2">
-              {t("patient.exercises.none", "No Exercises Prescribed")}
-            </p>
-            <p className="text-slate-500 dark:text-slate-400 font-medium max-w-sm">
-              {t("patient.exercises.none_desc", "Your doctor has not prescribed any physical therapy routines yet.")}
-            </p>
-            <Button
-              className="mt-6 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-2xl py-6 px-8 shadow-lg shadow-blue-500/10 transition-all duration-200"
-              onClick={() => navigate("/patient/doctors")}
-            >
-              Consult a Doctor
-            </Button>
-          </Card>
         ) : (
           <div className="grid md:grid-cols-2 gap-6">
-            {assignments.map((assignment, index) => {
+            {exerciseList.map((assignment, index) => {
               const ex = assignment.exercises;
               return (
                 <motion.div
@@ -98,33 +100,29 @@ export default function PatientExercisesPage() {
 
                       <div className="space-y-3.5 border-t border-slate-200/50 dark:border-white/5 pt-4">
                         <div className="flex items-center text-sm">
-                          <Target className="w-4.5 h-4.5 text-slate-400 dark:text-slate-500 mr-3 shrink-0" />
-                          <span className="text-slate-500 dark:text-slate-400 w-24 font-semibold">Goal:</span>
-                          <span className="font-extrabold text-slate-800 dark:text-slate-200">
-                            {assignment.prescribed_sets} sets of {assignment.prescribed_reps} reps
+                          <Target className="w-4 h-4 mr-2 text-teal-600 dark:text-teal-400" />
+                          <span className="text-slate-500 dark:text-slate-400 mr-2 font-medium">Target:</span>
+                          <span className="font-bold text-slate-800 dark:text-white">
+                            {assignment.prescribed_reps || 10} reps × {assignment.prescribed_sets || 3} sets
                           </span>
                         </div>
                         <div className="flex items-center text-sm">
-                          <Clock className="w-4.5 h-4.5 text-slate-400 dark:text-slate-500 mr-3 shrink-0" />
-                          <span className="text-slate-500 dark:text-slate-400 w-24 font-semibold">Duration:</span>
-                          <span className="font-extrabold text-slate-800 dark:text-slate-200">{ex.duration_seconds} sec</span>
-                        </div>
-                        <div className="flex items-center text-sm">
-                          <Bone className="w-4.5 h-4.5 text-slate-400 dark:text-slate-500 mr-3 shrink-0" />
-                          <span className="text-slate-500 dark:text-slate-400 w-24 font-semibold">Joints:</span>
-                          <span className="font-extrabold text-teal-600 dark:text-teal-400">
-                            {ex.target_joints?.length || 0} tracked points
+                          <Clock className="w-4 h-4 mr-2 text-teal-600 dark:text-teal-400" />
+                          <span className="text-slate-500 dark:text-slate-400 mr-2 font-medium">Est. Duration:</span>
+                          <span className="font-bold text-slate-800 dark:text-white">
+                            {Math.round((ex.duration_seconds || 180) / 60)} mins
                           </span>
                         </div>
                       </div>
                     </div>
-                    <div className="px-6 py-5 bg-white/20 dark:bg-slate-950/20 border-t border-slate-200/50 dark:border-white/5 mt-auto">
+
+                    <div className="p-6 pt-0 mt-auto">
                       <Button
-                        className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-semibold rounded-2xl py-6 shadow-lg shadow-teal-500/10 group-hover:shadow-teal-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 gap-2"
-                        onClick={() => navigate(`/patient/exercises/${assignment.id}/session`)}
+                        className="w-full bg-[#0D9488] hover:bg-[#0F766E] text-white font-bold rounded-2xl py-6 shadow-lg shadow-teal-500/20 flex items-center justify-center gap-2 group-hover:bg-[#0F766E] transition-all"
+                        onClick={() => navigate(`/patient/exercises/ar/${assignment.id}`)}
                       >
-                        <PlayCircle className="w-5 h-5 shrink-0" />
-                        {t("patient.exercises.start", "Start AR Session")}
+                        <PlayCircle className="w-5 h-5" />
+                        <span>Start AR Tracking Session</span>
                       </Button>
                     </div>
                   </Card>

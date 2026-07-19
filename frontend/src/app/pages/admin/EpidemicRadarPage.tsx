@@ -94,6 +94,7 @@ export default function EpidemicRadarPage() {
   });
 
   const features = geoData?.features ?? [];
+  const activeTimeline = timeline || [];
   const totalCases = features.length;
   const criticalCases = features.filter(f => f.properties.severity >= 8).length;
   const avgSeverity = totalCases > 0 ? (features.reduce((a, f) => a + f.properties.severity, 0) / totalCases).toFixed(1) : "0";
