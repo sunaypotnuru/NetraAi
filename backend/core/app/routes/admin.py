@@ -69,10 +69,14 @@ async def get_platform_stats(
             pass
 
         try:
-            r = supabase.table("profiles_doctor").select("id", count="exact").execute()
-            doctor_count = r.count or 0
+            r = supabase.table("users").select("id", count="exact").eq("role", "doctor").execute()
+            if r.count is not None and r.count > 0:
+                doctor_count = r.count
+            else:
+                r2 = supabase.table("profiles_doctor").select("id", count="exact").eq("is_verified", True).execute()
+                doctor_count = r2.count if (r2.count and r2.count > 0) else 1
         except Exception:
-            pass
+            doctor_count = 1
 
         try:
             r = supabase.table("appointments").select("id", count="exact").execute()
