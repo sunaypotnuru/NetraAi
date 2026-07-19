@@ -811,8 +811,20 @@ export default function SettingsPage() {
                       size="sm" 
                       className="flex items-center gap-2"
                       onClick={() => {
+                        // 1. Dispatch custom event to trigger VoiceAccessibility download modal
                         const event = new CustomEvent('voiceReaderToggle', { detail: { enabled: true, triggerAlert: true } });
                         window.dispatchEvent(event);
+
+                        // 2. Open Windows Speech Settings if on Windows
+                        const isWin = window.navigator.userAgent.toLowerCase().includes('win');
+                        if (isWin) {
+                          try {
+                            window.open('ms-settings:speech', '_blank');
+                          } catch (e) {
+                            // Fallback
+                          }
+                        }
+                        toast.info("Opening Voice Speech Settings...");
                       }}
                     >
                       <Download className="w-4 h-4" />

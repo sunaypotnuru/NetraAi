@@ -123,17 +123,33 @@ export function VoiceAccessibility() {
       window.speechSynthesis.getVoices();
     };
 
+    // Listen for custom download events from Settings page or header
+    const handleTrigger = (e: Event) => {
+      const customEvt = e as CustomEvent;
+      if (customEvt.detail?.lang) {
+        setMissingVoiceLang(customEvt.detail.lang);
+      } else {
+        setMissingVoiceLang(language);
+      }
+      setShowDownloadAlert(true);
+    };
+
+    window.addEventListener('voiceReaderToggle', handleTrigger);
+    window.addEventListener('downloadVoicesTrigger', handleTrigger);
+
     // Chrome requires this event to load voices
     window.speechSynthesis.onvoiceschanged = loadVoices;
     loadVoices(); // Initial check for Safari/Firefox
 
     return () => {
+      window.removeEventListener('voiceReaderToggle', handleTrigger);
+      window.removeEventListener('downloadVoicesTrigger', handleTrigger);
       if (window.speechSynthesis) {
         window.speechSynthesis.onvoiceschanged = null;
         window.speechSynthesis.cancel();
       }
     };
-  }, []);
+  }, [language]);
 
   const stopSpeaking = useCallback(() => {
     if (typeof window !== 'undefined' && window.speechSynthesis) {
