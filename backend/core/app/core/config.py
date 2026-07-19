@@ -64,6 +64,13 @@ class Settings(BaseSettings):
     SENDGRID_FROM_EMAIL: str = "noreply@netra-ai.com"
     SENDGRID_FROM_NAME: str = "Netra AI"
 
+    # SMTP Email Gateway (Fallback / Custom Mailer)
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_USE_TLS: bool = True
+
     # MCP (Model Context Protocol) Server
     MCP_SERVER_URL: str = "https://sunay-potnuru-netra-mcp-server.hf.space"
     MCP_API_KEY: Optional[str] = None
