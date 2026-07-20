@@ -9,14 +9,14 @@ import PatientLoginPage from "./pages/PatientLoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ErrorBoundary from "../components/shared/ErrorBoundary";
-import { PageLoadingSkeleton } from "../components/shared/PageLoadingSkeleton";
+import { ECGLoadingScreen } from "../components/shared/ECGLoadingScreen";
 import ProtectedRoute from "../components/features/domain/ProtectedRoute";
 
 // Helper to wrap lazy components with Suspense and auto-recovery for chunk errors
 const withSuspense = (Component: React.LazyExoticComponent<any>) => {
     return () => (
         <ErrorBoundary>
-            <Suspense fallback={<PageLoadingSkeleton />}>
+            <Suspense fallback={<ECGLoadingScreen />}>
                 <Component />
             </Suspense>
         </ErrorBoundary>

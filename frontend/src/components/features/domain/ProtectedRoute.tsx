@@ -1,7 +1,7 @@
 import { Navigate, useLocation, Outlet } from 'react-router';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { ReactNode } from 'react';
-import { PageLoadingSkeleton } from '@/components/shared/PageLoadingSkeleton';
+import { ECGLoadingScreen } from '@/components/shared/ECGLoadingScreen';
 
 interface ProtectedRouteProps {
     children?: ReactNode;
@@ -13,7 +13,7 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
     const location = useLocation();
 
     if (isLoading) {
-        return <PageLoadingSkeleton />;
+        return <ECGLoadingScreen />;
     }
 
     if (!user) {

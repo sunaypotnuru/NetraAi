@@ -4,6 +4,7 @@ export { default as ErrorBoundary } from './ErrorBoundary';
 export { ErrorMessage } from './ErrorMessage';
 export { default as LoadingSpinner } from './LoadingSpinner';
 export { PageLoadingSkeleton } from './PageLoadingSkeleton';
+export { ECGLoadingScreen } from './ECGLoadingScreen';
 export { default as PageTransition } from './PageTransition';
 export { ThemeToggle } from './ThemeToggle';
 export { default as LanguageSwitcher } from './LanguageSwitcher';
