@@ -1,9 +1,10 @@
-import { Outlet, NavLink, useLocation } from 'react-router';
+import { Outlet, NavLink, Link, useLocation } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
 import {
     LayoutDashboard, Users, UserRoundPlus, Calendar,
     Scan, LogOut, HeartPulse, Settings, Menu, X, Eye,
-    MessageSquare, Shield, BarChart2, Star, Mail, Activity, FileText
+    MessageSquare, Shield, BarChart2, Star, Mail, Activity, FileText,
+    ChevronRight, Home
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/store';
 import { useState, useEffect } from 'react';
@@ -35,6 +36,55 @@ export default function AdminLayout() {
         await signOut();
         navigate('/');
     };
+
+    // Build breadcrumb items for the current admin page location
+    const pathSegments = location.pathname.split('/').filter(Boolean);
+
+    const nameMap: Record<string, string> = {
+        "admin": t("breadcrumb.admin", "Admin Portal"),
+        "dashboard": t("breadcrumb.dashboard", "Dashboard"),
+        "patients": t("common.patients", "Patients"),
+        "doctors": t("common.doctors", "Doctors"),
+        "appointments": t("common.appointments", "Appointments"),
+        "scans": t("admin.nav.ai_scans", "AI Scans"),
+        "analytics": t("admin.nav.analytics", "Analytics"),
+        "compliance": t("admin.nav.compliance", "Compliance Dashboard"),
+        "fda-apm": t("admin.nav.fda_apm", "FDA APM Monitoring"),
+        "iec62304": t("admin.nav.iec62304", "IEC 62304 Trace"),
+        "soc2": t("admin.nav.soc2", "SOC 2 Evidence"),
+        "complaints": t("admin.nav.complaints", "Complaints"),
+        "system-health": t("admin.nav.system_health", "System Health"),
+        "mcp": t("admin.nav.mcp", "MCP Management"),
+        "fhir": t("admin.nav.fhir", "FHIR Manager"),
+        "audit-logs": t("admin.nav.audit_logs", "Audit Logs"),
+        "security": t("admin.nav.security", "Security"),
+        "configuration": t("admin.nav.configuration", "Configuration"),
+        "epidemic-radar": t("admin.nav.epidemic_radar", "Epidemic Radar"),
+        "reports": t("admin.nav.reports", "Reports"),
+        "newsletter": t("admin.nav.newsletter", "Newsletter"),
+        "blogs": t("admin.nav.blogs", "Manage Blogs"),
+        "reviews": t("admin.nav.reviews", "Reviews"),
+        "team": t("admin.nav.team", "Team Profiles"),
+        "contact-messages": t("admin.nav.contact_messages", "Contact Messages"),
+        "messages": t("common.messages", "Messages"),
+        "settings": t("common.settings", "Settings"),
+        "users": t("admin.nav.users", "User Management"),
+        "verification": t("admin.nav.verification", "Doctor Verification"),
+        "payments": t("admin.nav.payments", "Payment Management"),
+        "refunds": t("admin.nav.refunds", "Refund Management"),
+    };
+
+    const breadcrumbItems = pathSegments.map((segment, index) => {
+        const path = "/" + pathSegments.slice(0, index + 1).join("/");
+        let name = nameMap[segment];
+        if (!name) {
+            name = segment
+                .split("-")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ");
+        }
+        return { name, path, isLast: index === pathSegments.length - 1 };
+    });
 
     const navItems = [
         { group: "Core", items: [
@@ -155,16 +205,51 @@ export default function AdminLayout() {
 
             {/* Main Content */}
             <main className="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
-                {/* Top Header */}
-                <header className="h-16 bg-white/70 dark:bg-[#080b11]/70 backdrop-blur-md border-b border-gray-200/80 dark:border-white/5 shrink-0 z-30 px-6 flex items-center justify-between lg:justify-end">
-                    <div className="flex items-center gap-4 lg:hidden">
-                        <button onClick={() => setSidebarOpen(true)} className="p-2 -ml-2 text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5">
-                            <Menu className="w-6 h-6" />
-                        </button>
-                        <span className="font-bold text-[#0F172A] dark:text-white">{t("admin.layout.netra_admin", "Netra Admin")}</span>
+                {/* Unified Top Header Bar with Breadcrumbs on Left and Controls on Right */}
+                <header className="h-16 bg-white/70 dark:bg-[#080b11]/70 backdrop-blur-md border-b border-gray-200/80 dark:border-white/5 shrink-0 z-30 px-4 sm:px-6 flex items-center justify-between gap-4">
+                    {/* Left Side: Mobile Menu Button + Inline Breadcrumbs */}
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0 overflow-x-auto no-scrollbar py-1">
+                        {isMobile && (
+                            <button
+                                onClick={() => setSidebarOpen(true)}
+                                className="p-2 -ml-2 text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 shrink-0"
+                                aria-label="Toggle menu"
+                            >
+                                <Menu className="w-5 h-5" />
+                            </button>
+                        )}
+
+                        <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                            <Link
+                                to="/admin/dashboard"
+                                className="flex items-center gap-1 text-gray-500 hover:text-[#8B5CF6] dark:text-gray-400 dark:hover:text-[#8B5CF6] transition-colors"
+                                title="Admin Dashboard"
+                            >
+                                <Home className="w-3.5 h-3.5" />
+                            </Link>
+
+                            {breadcrumbItems.map((item) => (
+                                <div key={item.path} className="flex items-center gap-1.5 sm:gap-2">
+                                    <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                                    {item.isLast ? (
+                                        <span className="font-semibold text-[#0F172A] dark:text-white">
+                                            {item.name}
+                                        </span>
+                                    ) : (
+                                        <Link
+                                            to={item.path}
+                                            className="hover:text-[#8B5CF6] transition-colors"
+                                        >
+                                            {item.name}
+                                        </Link>
+                                    )}
+                                </div>
+                            ))}
+                        </nav>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    {/* Right Side: Connection Status, Theme Toggle, Super Admin Badge */}
+                    <div className="flex items-center gap-3 sm:gap-4 shrink-0">
                         <ConnectionStatus />
                         <ThemeToggle className="text-[#64748B] dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-[#0F172A] dark:hover:text-white w-9 h-9 border border-gray-200 dark:border-white/10" />
                         <div className="flex items-center gap-2">

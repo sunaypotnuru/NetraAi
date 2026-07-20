@@ -12,7 +12,8 @@ export default function Breadcrumb() {
   if (
     location.pathname === "/" ||
     location.pathname.startsWith("/login") ||
-    location.pathname.startsWith("/signup")
+    location.pathname.startsWith("/signup") ||
+    location.pathname.startsWith("/admin")
   ) {
     return null;
   }
