@@ -106,3 +106,49 @@ async def log_audit(
         ).execute()
     except Exception as e:
         logger.error(f"Error logging audit: {e}")
+
+
+# ─── Public endpoint for frontend production error reporting ───────────────────
+
+from fastapi import Request
+from pydantic import BaseModel
+from typing import Any
+
+
+class ClientErrorPayload(BaseModel):
+    level: str = "error"
+    message: str
+    detail: Any = None
+    url: str = ""
+    timestamp: str = ""
+    userAgent: str = ""
+
+
+@router.post("/client-error", tags=["Audit"])
+async def log_client_error(payload: ClientErrorPayload, request: Request):
+    """
+    Receive frontend production error reports.
+    Called by logger.ts via sendBeacon / fetch — no auth required.
+    Best-effort: always returns 200 so the client never breaks.
+    """
+    try:
+        ip = request.client.host if request.client else "unknown"
+        supabase.table("audit_logs").insert({
+            "action": f"client_{payload.level}",
+            "resource_type": "frontend",
+            "details": {
+                "message": payload.message,
+                "detail": payload.detail,
+                "url": payload.url,
+                "timestamp": payload.timestamp,
+            },
+            "ip_address": ip,
+            "user_agent": payload.userAgent,
+            "status": "logged",
+        }).execute()
+        logger.warning(f"[ClientError] {payload.level}: {payload.message} | url={payload.url}")
+    except Exception as exc:
+        logger.error(f"Failed to persist client error report: {exc}")
+    # Always 200 — never let error reporting break the app
+    return {"status": "received"}
+

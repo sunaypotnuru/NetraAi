@@ -1,10 +1,43 @@
 /**
  * Production-safe logging utility
  * Replaces console.log/error/warn with proper logging
+ * In production, errors are sent to the backend audit endpoint.
  */
 
 const isDevelopment = import.meta.env.DEV;
 const isProduction = import.meta.env.PROD;
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
+/** Fire-and-forget — report client error to backend audit log */
+function reportToBackend(level: 'error' | 'warn', message: string, detail?: unknown) {
+  if (!isProduction) return;
+  try {
+    const body = JSON.stringify({
+      level,
+      message,
+      detail: detail instanceof Error
+        ? { name: detail.name, message: detail.message, stack: detail.stack }
+        : String(detail ?? ''),
+      url: window.location.href,
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+    });
+    // Use sendBeacon for reliability (works during page unload), fallback to fetch
+    const endpoint = `${API_BASE}/api/v1/audit/client-error`;
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(endpoint, new Blob([body], { type: 'application/json' }));
+    } else {
+      fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body,
+        keepalive: true,
+      }).catch(() => { /* silent — never let logging break the app */ });
+    }
+  } catch {
+    /* silent — never let logging break the app */
+  }
+}
 
 export const logger = {
   /**
@@ -23,21 +56,17 @@ export const logger = {
     if (isDevelopment) {
       console.warn('[WARN]', ...args);
     }
-    // In production, could send to error tracking service
+    reportToBackend('warn', String(args[0] ?? ''), args[1]);
   },
 
   /**
-   * Log error messages
+   * Log error messages — always reported to backend in production
    */
   error: (...args: unknown[]) => {
     if (isDevelopment) {
       console.error('[ERROR]', ...args);
     }
-    // In production, send to error tracking service (Sentry, etc.)
-    if (isProduction) {
-      // TODO: Send to error tracking service
-      // Example: Sentry.captureException(args[0]);
-    }
+    reportToBackend('error', String(args[0] ?? ''), args[1] ?? args[0]);
   },
 
   /**

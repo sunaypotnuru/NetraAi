@@ -82,7 +82,7 @@ export default function AdminAnalyticsPage() {
     const fmtDate = (d: string) => new Date(d).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 
     const patTrend = trendData?.appt?.length
-        ? trendData.appt.map(a => ({ label: fmtDate(a.date), value: a.total + 2 }))
+        ? trendData.appt.map(a => ({ label: fmtDate(a.date), value: a.total }))
         : [];
     const apptTrend = trendData?.appt?.length
         ? trendData.appt.map(a => ({ label: fmtDate(a.date), value: a.total }))
@@ -90,6 +90,19 @@ export default function AdminAnalyticsPage() {
     const scanTrend = trendData?.scan?.length
         ? trendData.scan.map(s => ({ label: fmtDate(s.date), value: s.total }))
         : [];
+
+    // Compute growth % from first vs last data point in trend window
+    const calcTrend = (arr: { value: number }[]): string => {
+        if (!arr || arr.length < 2) return '--';
+        const first = arr[0].value || 1;
+        const last = arr[arr.length - 1].value;
+        const pct = Math.round(((last - first) / first) * 100);
+        return `${pct >= 0 ? '+' : ''}${pct}%`;
+    };
+    const patientTrendPct = calcTrend(patTrend);
+    const apptTrendPct = calcTrend(apptTrend);
+    const scanTrendPct = calcTrend(scanTrend);
+
 
     const pieData = [
         { name: t("common.patients", "Patients"), value: stats?.total_patients || 0 },
@@ -152,10 +165,10 @@ export default function AdminAnalyticsPage() {
                 {/* KPI Cards */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                     {[
-                        { label: t("admin.analytics.total_patients", "Total Patients"), value: stats?.total_patients ?? 0, icon: Users, color: '#3B82F6', trend: '+12%' },
-                        { label: t("admin.analytics.total_doctors", "Total Doctors"), value: stats?.total_doctors ?? 0, icon: Activity, color: '#0D9488', trend: '+5%' },
-                        { label: t("common.appointments", "Appointments"), value: stats?.total_appointments ?? 0, icon: Calendar, color: '#8B5CF6', trend: '+24%' },
-                        { label: t("admin.analytics.ai_scans", "AI Scans"), value: stats?.total_scans ?? 0, icon: Scan, color: '#F59E0B', trend: '+31%' },
+                        { label: t("admin.analytics.total_patients", "Total Patients"), value: stats?.total_patients ?? 0, icon: Users, color: '#3B82F6', trend: patientTrendPct },
+                        { label: t("admin.analytics.total_doctors", "Total Doctors"), value: stats?.total_doctors ?? 0, icon: Activity, color: '#0D9488', trend: '--' },
+                        { label: t("common.appointments", "Appointments"), value: stats?.total_appointments ?? 0, icon: Calendar, color: '#8B5CF6', trend: apptTrendPct },
+                        { label: t("admin.analytics.ai_scans", "AI Scans"), value: stats?.total_scans ?? 0, icon: Scan, color: '#F59E0B', trend: scanTrendPct },
                     ].map(({ label, value, icon: Icon, color, trend }) => (
                         <motion.div key={label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                             <Card className={`bg-white dark:bg-[#161B2B] border border-gray-100 dark:border-white/5 shadow-sm dark:shadow-xl rounded-3xl overflow-hidden ${isLoading ? 'animate-pulse' : ''}`}>
