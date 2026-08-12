@@ -109,7 +109,7 @@ export default function AdminComplianceDashboard() {
           <Card className="bg-card border-border shadow-xl flex flex-col justify-center">
              <CardContent className="p-8">
                 <Lock className="w-10 h-10 text-emerald-400 mb-4" />
-                <p className="text-3xl font-bold text-foreground">{(soc2Stats?.implemented_controls || 44)} / {(soc2Stats?.total_controls || 47)}</p>
+                <p className="text-3xl font-bold text-foreground">{(soc2Stats?.implemented_controls ?? '--')} / {(soc2Stats?.total_controls ?? '--')}</p>
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-2">SOC 2 Controls Active</p>
              </CardContent>
           </Card>

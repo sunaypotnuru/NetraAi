@@ -60,10 +60,57 @@ const CataractScanPage = () => {
   const historyItems = history.filter(s => s.id !== scanId);
   const previousScan = historyItems[0];
 
-  const checkImageQuality = async (_file: File) => {
+  const checkImageQuality = async (file: File) => {
     setQualityStatus('good');
-    setQualityMessage(t("patient.scan.quality_skipped", "Analyzing image..."));
+    setQualityMessage(t("patient.scan.quality_checking", "Checking image quality..."));
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    if (!validTypes.includes(file.type)) {
+      setQualityStatus('poor');
+      setQualityMessage(t("patient.scan.quality_wrong_type", "Please upload a JPEG or PNG image."));
+      return;
+    }
+
+    // Validate file size (max 10 MB)
+    const maxBytes = 10 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      setQualityStatus('poor');
+      setQualityMessage(t("patient.scan.quality_too_large", "Image exceeds 10 MB. Please use a smaller file."));
+      return;
+    }
+
+    // Validate image dimensions (min 100×100 for a useful scan)
+    try {
+      const objectUrl = URL.createObjectURL(file);
+      const img = new Image();
+      await new Promise<void>((resolve) => {
+        img.onload = () => {
+          URL.revokeObjectURL(objectUrl);
+          if (img.width < 100 || img.height < 100) {
+            setQualityStatus('poor');
+            setQualityMessage(t("patient.scan.quality_too_small", "Image resolution is too low. Minimum 100×100 px required."));
+          } else {
+            setQualityStatus('good');
+            setQualityMessage(t("patient.scan.quality_ok", "Image quality looks good. Ready to analyze."));
+          }
+          resolve();
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(objectUrl);
+          setQualityStatus('poor');
+          setQualityMessage(t("patient.scan.quality_unreadable", "Unable to read image. Please try a different file."));
+          resolve();
+        };
+        img.src = objectUrl;
+      });
+    } catch {
+      // On any unexpected error, fall back to good so the user isn't blocked
+      setQualityStatus('good');
+      setQualityMessage(t("patient.scan.quality_ok", "Image ready to analyze."));
+    }
   };
+
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];

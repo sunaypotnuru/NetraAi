@@ -39,6 +39,8 @@ import { WakeUpButton } from "@/components/shared/WakeUpButton";
 import { XAIVisualizationPanel } from "@/components/features/ai/XAIVisualizationPanel";
 import { AnalyticsDashboard } from "@/components/features/analytics/AnalyticsDashboard";
 import { LiveAuditLog } from "@/components/features/domain/LiveAuditLog";
+import { logger } from "@/lib/logger";
+
 
 interface MCPTool {
   name: string;
@@ -96,31 +98,34 @@ export default function MCPManagementPage() {
           return {
             overall_status: "healthy",
             metrics: {
-              total_invocations: data.total_invocations || 14,
-              success_rate: data.success_rate || 1.0,
-              avg_latency_ms: data.latency_ms || 142,
-              uptime_24h: "100.0%"
+              total_invocations: data.total_invocations ?? 0,
+              success_rate: data.success_rate ?? 0,
+              avg_latency_ms: data.latency_ms ?? 0,
+              uptime_24h: data.uptime_24h ?? "--"
             },
             tools: data.tools || []
           };
         }
+        // Non-OK HTTP response — server reachable but unhealthy
+        return {
+          overall_status: "degraded",
+          metrics: { total_invocations: 0, success_rate: 0, avg_latency_ms: 0, uptime_24h: "--" },
+          tools: []
+        };
       } catch (err) {
-        console.warn("Direct MCP health fallback check:", err);
+        logger.warn("MCP health check failed — server may be offline", err);
+        // Network error — server unreachable
+        return {
+          overall_status: "offline",
+          metrics: { total_invocations: 0, success_rate: 0, avg_latency_ms: 0, uptime_24h: "--" },
+          tools: []
+        };
       }
-      return {
-        overall_status: "healthy",
-        metrics: {
-          total_invocations: 14,
-          success_rate: 1.0,
-          avg_latency_ms: 142,
-          uptime_24h: "100.0%"
-        },
-        tools: []
-      };
     },
     retry: 2,
     refetchInterval: 30000,
   });
+
 
   // Enhanced MCP tools with real implementation status
   const [tools, setTools] = useState<MCPTool[]>([]);

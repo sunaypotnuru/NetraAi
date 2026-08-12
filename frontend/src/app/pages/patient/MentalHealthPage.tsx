@@ -10,6 +10,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { AIVoicePulse } from '../../../components/AIVoicePulse';
 import Breadcrumb from "@/components/shared/Breadcrumb";
+import { logger } from "@/lib/logger";
+
 
 const MentalHealthPage = () => {
   const { t } = useTranslation();
@@ -123,7 +125,7 @@ const MentalHealthPage = () => {
       setResult(response.data);
       await loadHistory();
     } catch (err) {
-      console.error('Analysis error:', err);
+      logger.apiError('mental-health/analyze', err);
       let errorMessage = 'Analysis failed. ';
 
       if (err instanceof Error && (err.message?.includes('Failed to fetch') || ('response' in err && (err as { response?: { status?: number } }).response?.status === 404))) {

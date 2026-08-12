@@ -24,9 +24,12 @@ interface DashboardStats {
     total_appointments?: number;
     total_scans?: number;
     total_doctors_pending?: number;
+    critical_tickets?: number;
+    pending_model_updates?: number;
     growth_data?: Array<{ name: string; users: number; scans: number }>;
     appointments_weekly?: DayData[];
 }
+
 
 function AnimatedCounter({ target, suffix = "" }: { target: number | string; suffix?: string }) {
     const [current, setCurrent] = useState(0);
@@ -298,8 +301,8 @@ export default function AdminDashboardPage() {
                 <StaggerContainer className="grid md:grid-cols-3 gap-8" stagger="normal">
                     {[
                         { title: t("admin.dashboard.action.pending_doctors", "Pending Approvals"), count: (statsData.total_doctors_pending || 0), action: t("admin.dashboard.action.review_profiles", "Review Profiles"), color: "#F59E0B", path: "/admin/doctors", icon: UserCheck, pulse: true },
-                        { title: t("admin.dashboard.action.reported_issues", "Critical Tickets"), count: 0, action: t("admin.dashboard.action.view_tickets", "Resolve Now"), color: "#F43F5E", path: "/admin/patients", icon: AlertTriangle, pulse: false },
-                        { title: t("admin.dashboard.action.system_updates", "Core Intelligence"), count: 1, action: t("admin.dashboard.action.view_logs", "View Engine Logs"), color: "#0EA5E9", path: "/admin/scans", icon: Zap, pulse: false }
+                        { title: t("admin.dashboard.action.reported_issues", "Critical Tickets"), count: (statsData.critical_tickets || 0), action: t("admin.dashboard.action.view_tickets", "Resolve Now"), color: "#F43F5E", path: "/admin/patients", icon: AlertTriangle, pulse: (statsData.critical_tickets || 0) > 0 },
+                        { title: t("admin.dashboard.action.system_updates", "Core Intelligence"), count: (statsData.pending_model_updates || 1), action: t("admin.dashboard.action.view_logs", "View Engine Logs"), color: "#0EA5E9", path: "/admin/scans", icon: Zap, pulse: false }
                     ].map((item) => (
                         <StaggerItem key={item.title}>
                             <motion.div
