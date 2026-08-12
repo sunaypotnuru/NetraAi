@@ -1,20 +1,21 @@
-# 👁️ Netra AI — Next-Generation Preventive Telemedicine Platform
+# 🏥 HealthSight AI — Next-Generation Preventive Telemedicine Platform
 
-> **Non-Invasive AI Diagnostics • Multi-Modal Telemedicine • Zero-Trust Clinical Infrastructure**
+> **Complete telemedicine ecosystem with 5 AI models, video consultations, EHR integration & clinical decision support. Healthcare redefined.**
 
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Models](https://img.shields.io/badge/AI%20Models-5%20Core%20ML%20Pipelines-purple.svg)]()
 [![i18n](https://img.shields.io/badge/Languages-6%20Supported-orange.svg)]()
 [![Supabase](https://img.shields.io/badge/Database-192%20Tables%20(Supabase)-emerald.svg)]()
+[![DevPost](https://img.shields.io/badge/DevPost-NEXORA%20Global%20Hackathon-orange.svg)](https://devpost.com/)
 
 ---
 
 ## 🌟 Executive Overview
 
-**Netra AI** is a comprehensive, production-grade telemedicine and diagnostic ecosystem engineered to eliminate barriers to preventive healthcare. By combining smartphone-accessible non-invasive diagnostic AI models with real-time video consultations, electronic health records (EHR), and automated clinical workflows, Netra AI enables instant disease screening from anywhere in the world.
+**HealthSight AI** is a comprehensive, production-grade telemedicine and diagnostic ecosystem engineered to eliminate barriers to preventive healthcare. By combining smartphone-accessible non-invasive diagnostic AI models with real-time video consultations, electronic health records (EHR), and automated clinical workflows, HealthSight AI enables instant disease screening from anywhere in the world.
 
-Whether estimating hemoglobin levels from a simple smartphone picture of the eye or analyzing voice acoustics for early neurodegenerative markers, Netra AI bridges the gap between patient self-screening and specialized physician care.
+Whether estimating hemoglobin levels from a simple smartphone picture of the eye or analyzing voice acoustics for early neurodegenerative markers, HealthSight AI bridges the gap between patient self-screening and specialized physician care.
 
 ---
 
@@ -24,7 +25,7 @@ Netra AI hosts 5 specialized, clinically validated machine learning models deplo
 
 ```
                                   ┌─────────────────────────────────────────┐
-                                  │           Netra AI ML Engine            │
+                                  │         HealthSight AI ML Engine       │
                                   └────────────────────┬────────────────────┘
                                                        │
          ┌──────────────────┬──────────────────┬───────┴──────────┬──────────────────┐
@@ -80,7 +81,7 @@ Netra AI hosts 5 specialized, clinically validated machine learning models deplo
 
 ## 🚀 Key Platform Features & Portals
 
-Netra AI is structured into three dedicated, role-tailored portals:
+HealthSight AI is structured into three dedicated, role-tailored portals:
 
 ### 🏥 1. Patient Portal
 - 📱 **Instant AI Scans:** Upload eye or retina photos and receive instant, easy-to-understand diagnostic reports.
@@ -104,7 +105,7 @@ Netra AI is structured into three dedicated, role-tailored portals:
 
 ## 🌐 Live Deployed Microservices Infrastructure
 
-Netra AI operates as a distributed microservices network hosted across Hugging Face Spaces and Vercel:
+HealthSight AI operates as a distributed microservices network hosted across Hugging Face Spaces and Vercel:
 
 | Service Name | Production Endpoint | Tech Stack | Status |
 |--------------|---------------------|------------|--------|
@@ -128,7 +129,7 @@ The core persistence layer is built on PostgreSQL hosted on **Supabase**:
 
 ## 🌍 Multilingual Support (i18n)
 
-Netra AI is natively localized into 6 major languages using native script translations:
+HealthSight AI is natively localized into 6 major languages using native script translations:
 - 🇬🇧 **English (`en`)**
 - 🇮🇳 **Hindi (`hi`)** — *हिंदी*
 - 🇮🇳 **Telugu (`te`)** — *తెలుగు*
@@ -142,8 +143,8 @@ Netra AI is natively localized into 6 major languages using native script transl
 
 ### 1. Clone the Monorepo
 ```bash
-git clone https://github.com/sunaypotnuru/NetraAi.git
-cd NetraAi
+git clone https://github.com/sunaypotnuru/HealthSightAI.git
+cd HealthSightAI
 ```
 
 ### 2. Run Frontend
