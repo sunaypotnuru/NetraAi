@@ -1,3 +1,14 @@
+---
+title: Netra Anemia
+emoji: 🩸
+colorFrom: red
+colorTo: pink
+sdk: docker
+pinned: false
+license: mit
+short_description: Non-invasive anemia detection via conjunctiva analysis
+---
+
 # Netra Anemia Detection AI Service
 
 🩸 **Non-invasive anemia detection via smartphone conjunctiva image analysis**

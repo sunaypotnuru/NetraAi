@@ -1,3 +1,14 @@
+---
+title: Netra Cataract
+emoji: 👁️
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+license: mit
+short_description: Cataract detection with explainable AI heatmaps
+---
+
 # Netra Cataract Detection AI Service
 
 👁️ **Advanced cataract detection with explainable AI heatmaps**

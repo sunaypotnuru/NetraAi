@@ -1,3 +1,14 @@
+---
+title: Netra Dr
+emoji: 🔍
+colorFrom: red
+colorTo: yellow
+sdk: docker
+pinned: false
+license: mit
+short_description: 5-stage diabetic retinopathy classification
+---
+
 # Netra Diabetic Retinopathy Detection AI Service
 
 🔍 **5-stage diabetic retinopathy classification with urgent case flagging**
