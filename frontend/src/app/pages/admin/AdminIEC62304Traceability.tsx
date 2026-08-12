@@ -28,15 +28,9 @@ export default function AdminIEC62304Traceability() {
 
   const { data: phasesData, isLoading: phasesLoading } = useQuery({
     queryKey: ["iecPhases"],
-    queryFn: async () => {
-      // Assuming a standard REST pattern for missing endpoint
-      const res = await fetch("/api/v1/admin/compliance/iec-phases", {
-        headers: { "Authorization": `Bearer ${localStorage.getItem('token')}` }
-      });
-      if (!res.ok) throw new Error("Failed to fetch phases");
-      return res.json();
-    },
+    queryFn: () => complianceAPI.getIECPhases().then(res => res.data),
   });
+
 
   if (statsLoading || reqsLoading || phasesLoading) {
     return (

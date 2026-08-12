@@ -334,6 +334,8 @@ export const complianceAPI = {
   // IEC 62304
   getIECCoverageStats: () => api.get("/api/v1/compliance/iec62304/coverage-stats"),
   getIECRequirements: () => api.get("/api/v1/compliance/iec62304/requirements"),
+  getIECPhases: () => api.get("/api/v1/compliance/iec62304/phases"),
+
 
   // Complaints
   getComplaints: (status?: string) => api.get("/api/v1/compliance/complaints", { params: { status } }),

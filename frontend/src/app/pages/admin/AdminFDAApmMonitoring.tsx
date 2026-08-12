@@ -18,12 +18,28 @@ export default function AdminFDAApmMonitoring() {
     queryFn: () => complianceAPI.getFDAMetrics("anemia-detection", 1).then(res => res.data[0]),
   });
 
+  const { data: complaints } = useQuery({
+    queryKey: ["fdaComplaints"],
+    queryFn: () => complianceAPI.getComplaints().then(res => res.data),
+  });
+
+  // Calculate dynamic FDA APM Score from latest telemetry metrics
+  const apmScore = latestMetrics
+    ? Math.round(((latestMetrics.sensitivity + latestMetrics.specificity + (latestMetrics.auc_roc || 0.94)) / 3) * 100)
+    : 94;
+
+  const mdrReportsCount = Array.isArray(complaints)
+    ? complaints.filter((c: any) => c.mdr_reportable).length
+    : 0;
+
+
   const displayMetrics = [
-    { label: "FDA APM Score", value: "94%", status: "good", icon: Shield, color: "text-emerald-500" },
+    { label: "FDA APM Score", value: `${apmScore}%`, status: apmScore >= 90 ? "good" : "warn", icon: Shield, color: "text-emerald-500" },
     { label: "Post-Market Issues", value: (alerts || []).length || "0", status: (alerts?.length || 0) > 0 ? "warn" : "good", icon: AlertCircle, color: (alerts?.length || 0) > 0 ? "text-rose-500" : "text-emerald-500" },
-    { label: "Reports Filed (YTD)", value: "12", status: "good", icon: FileText, color: "text-primary" },
+    { label: "MDR Reports Filed", value: mdrReportsCount.toString(), status: "good", icon: FileText, color: "text-primary" },
     { label: "Sensitivity (Latest)", value: latestMetrics ? `${(latestMetrics.sensitivity * 100).toFixed(1)}%` : "...", status: "good", icon: Activity, color: "text-violet-500" },
   ];
+
 
   if (metricsLoading || alertsLoading) {
     return (
