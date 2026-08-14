@@ -327,7 +327,7 @@ export function VoiceAccessibility() {
     const instructions = getDownloadInstructions(missingVoiceLang || language, os, t);
     
     if (instructions.link && os === 'Windows') {
-      window.open(instructions.link, '_blank');
+      window.location.href = instructions.link;
     } else {
       alert(instructions.steps.join('\n\n'));
     }

@@ -180,6 +180,7 @@ export function LiveAuditLog() {
       a.href = url;
       a.download = `audit-logs-${Date.now()}.${extension}`;
       a.click();
+      setTimeout(() => window.URL.revokeObjectURL(url), 100);
       
       toast.success(`Audit logs exported as ${format.toUpperCase()}!`);
     } catch (error) {

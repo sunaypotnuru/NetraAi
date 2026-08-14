@@ -9,7 +9,6 @@ import { anemiaAPI } from "../../lib/api";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "../../lib/i18n";
-import Breadcrumb from "@/components/shared/Breadcrumb";
 
 interface AnemiaResult {
   prediction: "anemic" | "normal";

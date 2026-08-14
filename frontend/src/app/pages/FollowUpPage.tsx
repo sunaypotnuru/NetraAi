@@ -51,7 +51,7 @@ export default function FollowUpPage() {
 
     if (submitted) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 pt-24">
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 pt-3">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -74,7 +74,7 @@ export default function FollowUpPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white flex flex-col items-center justify-center p-4 pt-24">
+        <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white flex flex-col items-center justify-center p-4 pt-3">
 
             <div className="text-center mb-8">
                 <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4">

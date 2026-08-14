@@ -200,7 +200,7 @@ export default function MCPManagementPage() {
   };
 
   return (
-    <div className="min-h-screen pt-28 pb-12 px-6 bg-[#F8FAFC] dark:bg-[#0B0F1A] -mx-6 lg:-mx-8">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-[#F8FAFC] dark:bg-[#0B0F1A]">
       <div className="max-w-[1600px] mx-auto">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">

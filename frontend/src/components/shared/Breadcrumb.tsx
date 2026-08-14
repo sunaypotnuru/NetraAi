@@ -11,14 +11,10 @@ export default function Breadcrumb() {
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
 
-  // Don't show breadcrumb on home or auth pages
-  if (
+  const isIgnoredPath = 
     location.pathname === "/" ||
     location.pathname.startsWith("/login") ||
-    location.pathname.startsWith("/signup")
-  ) {
-    return null;
-  }
+    location.pathname.startsWith("/signup");
 
   // Parse pathname into segments
   const pathSegments = location.pathname.split("/").filter(Boolean);
@@ -46,7 +42,7 @@ export default function Breadcrumb() {
   const { data: fetchedDoctor } = useQuery({
     queryKey: ["doctor", doctorIdToFetch],
     queryFn: () => doctorAPI.getDoctor(doctorIdToFetch!).then((res) => res.data),
-    enabled: !!doctorIdToFetch,
+    enabled: !isIgnoredPath && !!doctorIdToFetch,
     staleTime: 5 * 60 * 1000,
   });
 
@@ -54,7 +50,7 @@ export default function Breadcrumb() {
   const { data: fetchedPatient } = useQuery({
     queryKey: ["patient", patientIdToFetch],
     queryFn: () => doctorAPI.getPatientDetails(patientIdToFetch!).then((res) => res.data),
-    enabled: !!patientIdToFetch,
+    enabled: !isIgnoredPath && !!patientIdToFetch,
     staleTime: 5 * 60 * 1000,
   });
 
@@ -62,7 +58,7 @@ export default function Breadcrumb() {
   const { data: fetchedUser } = useQuery({
     queryKey: ["user", userIdToFetch],
     queryFn: () => adminAPI.getPatient(userIdToFetch!).then((res) => res.data),
-    enabled: !!userIdToFetch,
+    enabled: !isIgnoredPath && !!userIdToFetch,
     staleTime: 5 * 60 * 1000,
   });
 
@@ -173,10 +169,14 @@ export default function Breadcrumb() {
     return { name, path, isLast: index === pathSegments.length - 1 };
   });
 
+  if (isIgnoredPath) {
+    return null;
+  }
+
   const isAdmin = location.pathname.startsWith('/admin');
 
   return (
-    <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isAdmin ? 'pt-20 pb-1' : 'pt-20 pb-1'}`}>
+    <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isAdmin ? 'pt-3 pb-1' : 'pt-20 pb-1'}`}>
       <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md px-4 py-2 rounded-xl border border-gray-200/60 dark:border-gray-700/60 shadow-xs">
         <Link
           to={homePath}

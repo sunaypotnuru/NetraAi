@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Tldraw, createTLStore, defaultShapeUtils, TLRecord, Editor } from 'tldraw';
 import 'tldraw/tldraw.css';
 import { useDebouncedCallback } from 'use-debounce';
+import { getRequiredApiBaseUrl } from '@/services/authSession';
 
 interface WhiteboardProps {
     roomId: string;
@@ -17,8 +18,8 @@ export function Whiteboard({ roomId, onEndConsultation }: WhiteboardProps) {
     const handlingRemoteRef = useRef(false);
 
     useEffect(() => {
-        // Initialize WebSocket
-        const wsUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/^http/, 'ws');
+        // Initialize WebSocket using standard API base URL
+        const wsUrl = getRequiredApiBaseUrl().replace(/^http/, 'ws');
         const ws = new WebSocket(`${wsUrl}/api/v1/whiteboard/ws/${roomId}`);
         wsRef.current = ws;
 
