@@ -114,7 +114,7 @@ export default function MedicationRemindersPage() {
     };
 
     return (
-        <div className="min-h-screen pt-20 pb-10 bg-gray-50">
+        <div className="min-h-screen pt-3 pb-10 bg-gray-50">
             <div className="max-w-4xl mx-auto px-4">
                 <button
                     onClick={() => navigate("/patient/dashboard")}

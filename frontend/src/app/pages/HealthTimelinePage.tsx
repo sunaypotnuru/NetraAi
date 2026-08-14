@@ -113,7 +113,7 @@ export default function HealthTimelinePage() {
 
     if (error) {
         return (
-            <div className="min-h-screen pt-20 px-6 flex flex-col items-center justify-center text-center bg-gray-50">
+            <div className="min-h-screen pt-3 px-6 flex flex-col items-center justify-center text-center bg-gray-50">
                 <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
                 <h2 className="text-2xl font-bold text-[#0F172A] mb-2">{t('patient.timeline.unable_load', "Unable to load timeline")}</h2>
                 <p className="text-[#64748B] max-w-md mb-6">{(error as Error).message}</p>
@@ -125,7 +125,7 @@ export default function HealthTimelinePage() {
     const records: TimelineRecord[] = recordsData?.records || [];
 
     return (
-        <div className="min-h-screen pt-20 pb-12 px-6 bg-gradient-to-br from-[#F0FDFA] via-white to-[#F8FAFC]">
+        <div className="min-h-screen pt-3 pb-12 px-6 bg-gradient-to-br from-[#F0FDFA] via-white to-[#F8FAFC]">
             <div className="max-w-3xl mx-auto">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>

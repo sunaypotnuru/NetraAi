@@ -172,7 +172,7 @@ export default function AdminUsersPage() {
   };
   if (isLoading) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-background/50">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-background/50">
         <div className="max-w-7xl mx-auto space-y-8">
           <Skeleton className="w-[300px] h-[40px]" />
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
@@ -192,7 +192,7 @@ export default function AdminUsersPage() {
 
   if (!usersData) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-background/50">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-background/50">
         <div className="max-w-7xl mx-auto text-center py-12">
           <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-foreground mb-4">Unable to Load Users</h2>
@@ -208,7 +208,7 @@ export default function AdminUsersPage() {
   const { users, total } = usersData;
   const { patients: total_patients, doctors: total_doctors, admins: total_admins, active: active_users, new_this_month: new_users_this_month } = usersData.stats || {};
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 bg-background/50">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-background/50">
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* Header */}

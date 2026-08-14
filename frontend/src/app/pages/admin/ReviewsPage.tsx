@@ -117,7 +117,7 @@ export default function ReviewsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-[#F0FDFA] via-white to-[#F8FAFC] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-gradient-to-br from-[#F0FDFA] via-white to-[#F8FAFC] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-[#0D9488] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -129,7 +129,7 @@ export default function ReviewsPage() {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-[#F0FDFA] via-white to-[#F8FAFC] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-gradient-to-br from-[#F0FDFA] via-white to-[#F8FAFC] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

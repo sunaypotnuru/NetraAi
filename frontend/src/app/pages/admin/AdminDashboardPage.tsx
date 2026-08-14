@@ -104,7 +104,7 @@ export default function AdminDashboardPage() {
     if (error) {
         console.error("[AdminDashboardPage] Error loading dashboard stats:", error);
         return (
-            <div className="min-h-screen pt-24 px-6 flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-[#0B0F1A] -mx-6 lg:-mx-8">
+            <div className="min-h-screen pt-3 px-6 flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-[#0B0F1A] -mx-6 lg:-mx-8">
                 <div className="w-16 h-16 bg-red-100/10 dark:bg-red-100/5 text-[#F43F5E] rounded-full flex items-center justify-center mb-4">
                     <AlertCircle className="w-8 h-8" />
                 </div>

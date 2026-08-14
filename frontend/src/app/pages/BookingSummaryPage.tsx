@@ -81,7 +81,7 @@ export default function BookingSummaryPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen pt-24 flex items-center justify-center">
+            <div className="min-h-screen pt-3 flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-teal-600" />
             </div>
         );
@@ -89,7 +89,7 @@ export default function BookingSummaryPage() {
 
     if (!doctor) {
         return (
-            <div className="min-h-screen pt-24 flex flex-col items-center justify-center gap-4">
+            <div className="min-h-screen pt-3 flex flex-col items-center justify-center gap-4">
                 <AlertCircle className="w-12 h-12 text-red-500" />
                 <h2 className="text-xl font-bold">Doctor not found</h2>
                 <Button onClick={() => navigate("/patient/doctors")}>Back to Search</Button>
@@ -100,7 +100,7 @@ export default function BookingSummaryPage() {
     const scheduledDate = new Date(appointmentData.scheduled_at);
 
     return (
-        <div className="min-h-screen pt-20 pb-16 bg-gradient-to-br from-[#F0FDFA] via-white to-[#F8FAFC]">
+        <div className="min-h-screen pt-3 pb-16 bg-gradient-to-br from-[#F0FDFA] via-white to-[#F8FAFC]">
             <div className="max-w-2xl mx-auto px-4">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                     <Button 

@@ -39,7 +39,7 @@ export default function SemanticSearchPage() {
   };
 
   return (
-    <div className="min-h-screen pt-20 pb-12 px-6 bg-slate-50 relative overflow-hidden">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-slate-50 relative overflow-hidden">
       {/* Background decorations */}
       <div className="absolute top-20 left-10 w-72 h-72 bg-indigo-500/5 rounded-full blur-3xl" />
       <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />

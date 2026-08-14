@@ -152,7 +152,7 @@ export default function NearbyHospitalsPage() {
 
   if (isLoading && !isLoaded) {
     return (
-      <div className="min-h-screen pt-20 pb-12 px-6 flex items-center justify-center">
+      <div className="min-h-screen pt-3 pb-12 px-6 flex items-center justify-center">
         <div className="text-center">
           <Loader className="w-12 h-12 text-[#0D9488] animate-spin mx-auto mb-4" />
           <p className="text-[#0F172A]">{t('patient.hospitals.loading', "Loading nearby hospitals...")}</p>
@@ -163,7 +163,7 @@ export default function NearbyHospitalsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen pt-20 pb-12 px-6 flex items-center justify-center">
+      <div className="min-h-screen pt-3 pb-12 px-6 flex items-center justify-center">
         <div className="text-center max-w-md">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-[#0F172A] mb-2">
@@ -178,7 +178,7 @@ export default function NearbyHospitalsPage() {
   }
 
   return (
-    <div className="min-h-screen pt-20 pb-12 px-6 bg-gradient-to-br from-[#F0FDFA] via-white to-[#F8FAFC]">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-gradient-to-br from-[#F0FDFA] via-white to-[#F8FAFC]">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div

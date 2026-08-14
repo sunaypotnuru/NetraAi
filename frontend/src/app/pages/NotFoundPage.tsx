@@ -9,7 +9,7 @@ export default function NotFoundPage() {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 flex items-center justify-center bg-gradient-to-br from-[#F0FDFA] to-[#F0F9FF] relative overflow-hidden">
+    <div className="min-h-screen pt-3 pb-12 px-6 flex items-center justify-center bg-gradient-to-br from-[#F0FDFA] to-[#F0F9FF] relative overflow-hidden">
       {/* Decorative floating elements */}
       <motion.div
         animate={{

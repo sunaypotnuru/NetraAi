@@ -154,7 +154,7 @@ export default function PatientMedicalHistory() {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent text-slate-900 dark:text-white transition-colors duration-300">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent text-slate-900 dark:text-white transition-colors duration-300">
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* Header */}

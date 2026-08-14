@@ -196,7 +196,7 @@ export default function DoctorDashboardPage() {
         }
 
         return (
-            <div className="min-h-screen pt-24 px-6 flex flex-col items-center justify-center text-center bg-gray-50">
+            <div className="min-h-screen pt-3 px-6 flex flex-col items-center justify-center text-center bg-gray-50">
                 <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
                 <h2 className="text-2xl font-bold text-[#0F172A] mb-2">{t('doctor.dashboard.error', 'Dashboard Error')}</h2>
                 <p className="text-[#64748B] max-w-md mb-6">{(error as Error).message}</p>
@@ -220,7 +220,7 @@ export default function DoctorDashboardPage() {
     ];
 
     return (
-        <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent">
+        <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent">
             <StaggerContainer stagger="normal" delayChildren={0.05} className="max-w-7xl mx-auto space-y-8">
 
                 {/* Verification Notice */}

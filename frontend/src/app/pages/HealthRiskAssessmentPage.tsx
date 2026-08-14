@@ -97,7 +97,7 @@ export default function HealthRiskAssessmentPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="min-h-screen pt-20 pb-10 bg-gray-50 dark:bg-gray-900"
+            className="min-h-screen pt-3 pb-10 bg-gray-50 dark:bg-gray-900"
         >
             <div className="max-w-4xl mx-auto px-4">
                 <button

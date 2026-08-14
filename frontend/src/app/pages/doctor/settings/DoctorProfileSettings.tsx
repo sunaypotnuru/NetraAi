@@ -171,7 +171,7 @@ export default function DoctorProfileSettings() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent text-slate-900 dark:text-white">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent text-slate-900 dark:text-white">
         <div className="max-w-6xl mx-auto space-y-8">
           <Skeleton className="w-[300px] h-[40px] bg-slate-200 dark:bg-slate-800" />
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -188,7 +188,7 @@ export default function DoctorProfileSettings() {
 
   if (!profile) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent text-slate-900 dark:text-white">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent text-slate-900 dark:text-white">
         <div className="max-w-4xl mx-auto text-center py-12">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Profile Not Found</h2>
           <p className="text-slate-500 dark:text-slate-400 mb-6">Unable to load your profile information.</p>
@@ -203,7 +203,7 @@ export default function DoctorProfileSettings() {
   const currentData = isEditing ? { ...profile, ...formData } : profile;
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent text-slate-900 dark:text-white transition-colors duration-300">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent text-slate-900 dark:text-white transition-colors duration-300">
       <div className="max-w-6xl mx-auto space-y-8">
 
         {/* Header */}

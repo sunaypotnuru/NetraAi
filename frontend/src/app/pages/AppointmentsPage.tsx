@@ -91,7 +91,7 @@ export default function AppointmentsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen pt-24 px-6 flex flex-col items-center justify-center text-center">
+      <div className="min-h-screen pt-3 px-6 flex flex-col items-center justify-center text-center">
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
         <h2 className="text-2xl font-bold text-[#1F2D3D] mb-2">{t('patient.appointments.load_error', 'Failed to load appointments')}</h2>
         <p className="text-[#64748B] mb-6">{(error as Error).message}</p>
@@ -280,7 +280,7 @@ export default function AppointmentsPage() {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 bg-gray-50/50">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-gray-50/50">
       <div className="max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

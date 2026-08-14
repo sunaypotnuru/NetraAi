@@ -32,7 +32,7 @@ export default function AdminComplianceDashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-background">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-background">
         <div className="max-w-7xl mx-auto space-y-8">
           <Skeleton className="h-[200px] w-full bg-muted rounded-3xl" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -65,7 +65,7 @@ export default function AdminComplianceDashboard() {
   const overallScore = Math.round(complianceAreas.reduce((s, c) => s + c.score, 0) / complianceAreas.length);
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 bg-background">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-background">
       <div className="max-w-7xl mx-auto space-y-10">
         
         {/* Header */}

@@ -290,7 +290,7 @@ export default function PatientChatbotPage() {
     };
 
     return (
-        <div className="min-h-screen pt-20 pb-0 flex flex-col bg-gradient-to-br from-[#F0FDFA] via-white to-[#F5F3FF]">
+        <div className="min-h-screen pt-3 pb-0 flex flex-col bg-gradient-to-br from-[#F0FDFA] via-white to-[#F5F3FF]">
             {/* Header */}
             <div className="px-4 pt-4 pb-3 flex items-center gap-4 max-w-4xl mx-auto w-full">
                 <button

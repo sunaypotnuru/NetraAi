@@ -212,7 +212,7 @@ export default function AdminBlogsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-white dark:bg-[#0B0F1A]">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-white dark:bg-[#0B0F1A]">
         <div className="max-w-7xl mx-auto space-y-8">
           <Skeleton className="w-[300px] h-[40px] bg-white/5" />
           <div className="flex gap-4">
@@ -241,7 +241,7 @@ export default function AdminBlogsPage() {
 
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 bg-white dark:bg-[#0B0F1A]">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-white dark:bg-[#0B0F1A]">
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* Header */}

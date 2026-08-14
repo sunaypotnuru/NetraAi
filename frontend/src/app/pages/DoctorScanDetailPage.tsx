@@ -45,7 +45,7 @@ export default function DoctorScanDetailPage() {
 
     if (error) {
         return (
-            <div className="min-h-screen pt-20 px-6 flex flex-col items-center justify-center text-center bg-gray-50">
+            <div className="min-h-screen pt-3 px-6 flex flex-col items-center justify-center text-center bg-gray-50">
                 <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
                 <h3 className="text-lg font-bold text-red-900">{t("doctor.scan_detail.failed_load", "Failed to load scan")}</h3>
                 <p className="text-red-700">{(error as Error).message}</p>
@@ -69,7 +69,7 @@ export default function DoctorScanDetailPage() {
 
     if (!scan) {
         return (
-            <div className="min-h-screen pt-20 px-6 flex flex-col items-center justify-center text-center bg-gray-50">
+            <div className="min-h-screen pt-3 px-6 flex flex-col items-center justify-center text-center bg-gray-50">
                 <AlertCircle className="w-12 h-12 text-yellow-500 mb-4" />
                 <h3 className="text-lg font-bold text-yellow-900">{t("doctor.scan_detail.not_found", "Scan not found")}</h3>
                 <Button onClick={() => navigate('/doctor/scans')} className="mt-4">
@@ -99,7 +99,7 @@ export default function DoctorScanDetailPage() {
     };
 
     return (
-        <div className="min-h-screen pt-20 pb-12 px-6 bg-gradient-to-br from-[#F0F9FF] via-white to-[#F8FAFC]">
+        <div className="min-h-screen pt-3 pb-12 px-6 bg-gradient-to-br from-[#F0F9FF] via-white to-[#F8FAFC]">
             <div className="max-w-5xl mx-auto">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
                     <div className="flex items-center gap-4">

@@ -110,7 +110,7 @@ export default function LogGoalProgressPage() {
 
   if (isLoading || !goal) {
     return (
-      <div className="min-h-screen pt-24 pb-12 bg-transparent flex items-center justify-center">
+      <div className="min-h-screen pt-3 pb-12 bg-transparent flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-slate-500 dark:text-slate-400">{t('patient.goals.loading', "Loading...")}</p>
@@ -120,7 +120,7 @@ export default function LogGoalProgressPage() {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-12 bg-transparent text-slate-900 dark:text-white">
+    <div className="min-h-screen pt-3 pb-12 bg-transparent text-slate-900 dark:text-white">
       <div className="max-w-3xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <button

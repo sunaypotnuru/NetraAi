@@ -255,7 +255,7 @@ export default function SecurityPage() {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 bg-slate-50 dark:bg-[#0B0F1A]">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-slate-50 dark:bg-[#0B0F1A]">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">

@@ -203,7 +203,7 @@ export default function DocumentsPage() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br ${bgPage} flex items-center justify-center`}>
+      <div className={`min-h-screen pt-3 pb-12 px-6 bg-gradient-to-br ${bgPage} flex items-center justify-center`}>
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-t-transparent rounded-full animate-spin mx-auto mb-4" style={{ borderColor: primaryColor, borderTopColor: 'transparent' }}></div>
           <p className="text-[#64748B]">{t('patient.docs.loading', "Loading documents...")}</p>
@@ -213,7 +213,7 @@ export default function DocumentsPage() {
   }
 
   return (
-    <div className={`min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br ${bgPage}`}>
+    <div className={`min-h-screen pt-3 pb-12 px-6 bg-gradient-to-br ${bgPage}`}>
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

@@ -41,7 +41,7 @@ export default function PROAnalytics() {
 
   if (!proData || proData.length === 0) {
     return (
-      <div className="max-w-7xl mx-auto pt-24 pb-12 px-6 bg-transparent">
+      <div className="max-w-7xl mx-auto pt-3 pb-12 px-6 bg-transparent">
         <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6 text-slate-700 dark:text-slate-300 hover:bg-slate-100/50 dark:hover:bg-slate-800/50">
           <ArrowLeft className="w-4 h-4 mr-2" />
           {t("common.back", "Back")}
@@ -83,7 +83,7 @@ export default function PROAnalytics() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="max-w-7xl mx-auto pt-24 pb-12 px-6 space-y-8 bg-transparent text-slate-800 dark:text-slate-100"
+      className="max-w-7xl mx-auto pt-3 pb-12 px-6 space-y-8 bg-transparent text-slate-800 dark:text-slate-100"
     >
       {/* Header */}
       <div className="flex items-center justify-between">

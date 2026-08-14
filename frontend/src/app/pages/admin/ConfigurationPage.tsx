@@ -188,7 +188,7 @@ export default function ConfigurationPage() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-slate-50 to-gray-100"
+      className="min-h-screen pt-3 pb-12 px-6 bg-gradient-to-br from-slate-50 to-gray-100"
     >
       <div className="max-w-7xl mx-auto">
         {/* Header */}

@@ -75,7 +75,7 @@ export default function ReferralPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-[#F0FDFA] via-white to-[#F8FAFC] flex items-center justify-center">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-gradient-to-br from-[#F0FDFA] via-white to-[#F8FAFC] flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[#0D9488] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-[#64748B]">{t('patient.referral.loading', "Loading referral data...")}</p>
@@ -87,7 +87,7 @@ export default function ReferralPage() {
   const referralLink = `${window.location.origin}/register?ref=${referralCode}`;
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-[#F0FDFA] via-white to-[#F8FAFC]">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-gradient-to-br from-[#F0FDFA] via-white to-[#F8FAFC]">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

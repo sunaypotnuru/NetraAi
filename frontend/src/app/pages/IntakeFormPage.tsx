@@ -194,7 +194,7 @@ export default function IntakeFormPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen pt-24 flex items-center justify-center">
+            <div className="min-h-screen pt-3 flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-teal-600" />
             </div>
         );
@@ -202,7 +202,7 @@ export default function IntakeFormPage() {
 
     if (submitted) {
         return (
-            <div className="min-h-screen pt-24 flex items-center justify-center">
+            <div className="min-h-screen pt-3 flex items-center justify-center">
                 <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
                     <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                         <CheckCircle className="w-10 h-10 text-green-600" />
@@ -218,7 +218,7 @@ export default function IntakeFormPage() {
     }
 
     return (
-        <div className="min-h-screen pt-20 pb-12 bg-gradient-to-br from-[#F0FDFA] via-white to-[#F8FAFC]">
+        <div className="min-h-screen pt-3 pb-12 bg-gradient-to-br from-[#F0FDFA] via-white to-[#F8FAFC]">
             <div className="max-w-2xl mx-auto px-4">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                     <button

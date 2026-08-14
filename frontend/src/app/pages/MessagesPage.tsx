@@ -374,7 +374,7 @@ export default function MessagesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-24 flex items-center justify-center bg-gradient-to-br from-[#F0FDFA] via-white to-[#F8FAFC]">
+      <div className="min-h-screen pt-3 flex items-center justify-center bg-gradient-to-br from-[#F0FDFA] via-white to-[#F8FAFC]">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[#0D9488] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-[#64748B]">{t('patient.messages.loading_messages', "Loading messages...")}</p>
@@ -384,7 +384,7 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="min-h-screen pt-20 pb-12 px-6">
+    <div className="min-h-screen pt-3 pb-12 px-6">
       <div className="max-w-7xl mx-auto h-[750px] flex flex-col bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden">
       {/* Image lightbox */}
       <AnimatePresence>

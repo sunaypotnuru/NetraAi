@@ -71,14 +71,14 @@ export default function MedicationSchedulePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-transparent pt-24 pb-12 px-6 flex items-center justify-center">
+      <div className="min-h-screen bg-transparent pt-3 pb-12 px-6 flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

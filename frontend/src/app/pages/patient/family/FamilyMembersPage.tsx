@@ -105,7 +105,7 @@ export default function FamilyMembersPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen pt-20 pb-10 bg-transparent flex items-center justify-center">
+      <div className="min-h-screen pt-3 pb-10 bg-transparent flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-slate-500 dark:text-slate-400">{t('patient.family.loading', "Loading family members...")}</p>
@@ -115,7 +115,7 @@ export default function FamilyMembersPage() {
   }
 
   return (
-    <div className="min-h-screen pt-20 pb-10 bg-transparent">
+    <div className="min-h-screen pt-3 pb-10 bg-transparent">
       <div className="max-w-7xl mx-auto px-4 space-y-6">
         {/* Header */}
         <button

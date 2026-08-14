@@ -30,7 +30,7 @@ export default function AlertsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent flex flex-col justify-center items-center">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent flex flex-col justify-center items-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-rose-500 mb-4"></div>
         <p className="text-slate-650 dark:text-slate-400 font-medium">
           {t('doctor.alerts.loading', 'Loading AI Nurse alerts...')}
@@ -49,7 +49,7 @@ export default function AlertsPage() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="min-h-screen pt-24 pb-12 px-6 bg-transparent"
+      className="min-h-screen pt-3 pb-12 px-6 bg-transparent"
     >
       <div className="max-w-5xl mx-auto space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">

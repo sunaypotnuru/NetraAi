@@ -148,7 +148,7 @@ export default function NoteTemplatesList() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-4 md:px-6 bg-transparent">
+      <div className="min-h-screen pt-3 pb-12 px-4 md:px-6 bg-transparent">
         <div className="max-w-7xl mx-auto space-y-8">
           <Skeleton className="w-[300px] h-[40px] bg-slate-200/50 dark:bg-slate-800/50" />
           <div className="flex gap-4">
@@ -168,7 +168,7 @@ export default function NoteTemplatesList() {
 
   if (!templatesData) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-4 md:px-6 bg-transparent">
+      <div className="min-h-screen pt-3 pb-12 px-4 md:px-6 bg-transparent">
         <div className="max-w-7xl mx-auto text-center py-16 bg-white/70 dark:bg-slate-900/50 backdrop-blur-md border border-slate-200/50 dark:border-slate-800/50 shadow-xl rounded-2xl">
           <AlertTriangle className="w-12 h-12 text-rose-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Unable to Load Templates</h2>
@@ -184,7 +184,7 @@ export default function NoteTemplatesList() {
   const { templates, total, categories } = templatesData;
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4 md:px-6 bg-transparent">
+    <div className="min-h-screen pt-3 pb-12 px-4 md:px-6 bg-transparent">
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* Header */}

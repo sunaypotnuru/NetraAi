@@ -114,7 +114,7 @@ export default function DoctorFollowUpTemplates() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent flex flex-col justify-center items-center">
+            <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent flex flex-col justify-center items-center">
                 <Loader2 className="w-12 h-12 animate-spin text-sky-500 mb-4" />
                 <p className="text-slate-650 dark:text-slate-400 font-medium">Loading templates...</p>
             </div>
@@ -126,7 +126,7 @@ export default function DoctorFollowUpTemplates() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="min-h-screen pt-24 pb-12 px-6 bg-transparent max-w-6xl mx-auto space-y-8"
+            className="min-h-screen pt-3 pb-12 px-6 bg-transparent max-w-6xl mx-auto space-y-8"
         >
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 border border-gray-200/50 dark:border-white/10 bg-white/70 dark:bg-slate-900/50 backdrop-blur-md shadow-xl rounded-3xl gap-4">
                 <div>

@@ -90,7 +90,7 @@ export default function DoctorAnalyticsDashboard() {
 
   if (!analytics) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent">
         <div className="max-w-7xl mx-auto text-center py-20 border border-gray-200/50 dark:border-white/10 shadow-xl rounded-3xl bg-white/70 dark:bg-slate-900/50 backdrop-blur-md">
           <AlertCircle className="w-12 h-12 text-rose-500 mx-auto mb-4" />
           <h2 className="text-2xl font-black text-slate-800 dark:text-white mb-2">Unable to Load Analytics</h2>
@@ -108,7 +108,7 @@ export default function DoctorAnalyticsDashboard() {
   const COLORS = ['#0EA5E9', '#22C55E', '#8B5CF6', '#F59E0B', '#EF4444'];
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent">
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* Header */}

@@ -87,7 +87,7 @@ export default function AdminAuditLogsPage() {
     };
 
     return (
-        <div className="min-h-screen pt-24 pb-12 px-6 bg-white dark:bg-[#0B0F1A]">
+        <div className="min-h-screen pt-3 pb-12 px-6 bg-white dark:bg-[#0B0F1A]">
             <div className="max-w-7xl mx-auto space-y-8">
                 
                 {/* Header */}

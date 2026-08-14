@@ -93,7 +93,7 @@ export default function ReferralPage() {
     };
 
     return (
-        <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent">
+        <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent">
             <div className="max-w-6xl mx-auto space-y-8">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/70 dark:bg-slate-900/50 backdrop-blur-md p-6 rounded-3xl shadow-xl border border-gray-200/50 dark:border-white/10">
                     <div className="flex items-center gap-4">

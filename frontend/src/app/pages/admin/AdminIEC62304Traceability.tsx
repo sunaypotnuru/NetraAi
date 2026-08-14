@@ -34,7 +34,7 @@ export default function AdminIEC62304Traceability() {
 
   if (statsLoading || reqsLoading || phasesLoading) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-white dark:bg-[#0B0F1A]">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-white dark:bg-[#0B0F1A]">
         <div className="max-w-7xl mx-auto space-y-8">
           <Skeleton className="h-[200px] w-full bg-white/5 rounded-3xl" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -49,7 +49,7 @@ export default function AdminIEC62304Traceability() {
   const phases = phasesData?.phases || [];
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 bg-white dark:bg-[#0B0F1A]">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-white dark:bg-[#0B0F1A]">
       <div className="max-w-7xl mx-auto space-y-10">
         
         {/* Header */}

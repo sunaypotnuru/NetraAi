@@ -32,7 +32,7 @@ export default function DoctorPatientsPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen pt-20 pb-12 px-6 bg-transparent">
+            <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent">
                 <div className="max-w-7xl mx-auto space-y-6">
                     <div className="animate-pulse">
                         <div className="h-10 w-64 bg-gray-200/50 dark:bg-slate-700/50 rounded-lg mb-2"></div>
@@ -50,7 +50,7 @@ export default function DoctorPatientsPage() {
 
     if (error) {
         return (
-            <div className="min-h-screen pt-20 px-6 flex flex-col items-center justify-center text-center bg-transparent">
+            <div className="min-h-screen pt-3 px-6 flex flex-col items-center justify-center text-center bg-transparent">
                 <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{t("doctor.patients.failed_load", "Failed to load patients")}</h3>
                 <p className="text-slate-600 dark:text-slate-400 max-w-md">{(error as Error).message}</p>
@@ -65,7 +65,7 @@ export default function DoctorPatientsPage() {
     );
 
     return (
-        <div className="min-h-screen pt-20 pb-12 px-6 bg-transparent">
+        <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

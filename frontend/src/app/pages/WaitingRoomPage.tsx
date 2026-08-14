@@ -194,7 +194,7 @@ export default function WaitingRoomPage() {
     const dashOffset = circumference * (1 - progress);
 
     return (
-        <div className="min-h-screen pt-20 pb-12 px-4 bg-gradient-to-br from-[#F0FDFA] via-[#EFF6FF] to-[#F5F3FF] relative overflow-hidden">
+        <div className="min-h-screen pt-3 pb-12 px-4 bg-gradient-to-br from-[#F0FDFA] via-[#EFF6FF] to-[#F5F3FF] relative overflow-hidden">
             {/* Calming animated background pattern */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-10">
                 {[...Array(6)].map((_, i) => (

@@ -84,7 +84,7 @@ export default function LabAnalyzerPage() {
     };
 
     return (
-        <div className="min-h-screen pt-24 pb-12 px-6 bg-background">
+        <div className="min-h-screen pt-3 pb-12 px-6 bg-background">
             <div className="max-w-5xl mx-auto space-y-8">
                 <div className="text-center space-y-4 max-w-2xl mx-auto">
                     <div className="inline-flex w-16 h-16 rounded-2xl bg-[#0D9488]/10 items-center justify-center text-[#0D9488] mb-2 shadow-inner">

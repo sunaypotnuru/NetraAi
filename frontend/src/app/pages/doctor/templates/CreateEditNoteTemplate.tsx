@@ -227,7 +227,7 @@ export default function CreateEditNoteTemplate() {
 
   if (isLoading && isEditing) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-4 md:px-6 bg-transparent">
+      <div className="min-h-screen pt-3 pb-12 px-4 md:px-6 bg-transparent">
         <div className="max-w-7xl mx-auto space-y-8">
           <Skeleton className="w-[300px] h-[40px] bg-slate-200/50 dark:bg-slate-800/50" />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -245,7 +245,7 @@ export default function CreateEditNoteTemplate() {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4 md:px-6 bg-transparent">
+    <div className="min-h-screen pt-3 pb-12 px-4 md:px-6 bg-transparent">
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* Header */}

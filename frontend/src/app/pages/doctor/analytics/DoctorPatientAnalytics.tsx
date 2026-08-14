@@ -101,7 +101,7 @@ export default function DoctorPatientAnalytics() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent">
         <div className="max-w-7xl mx-auto space-y-8 animate-pulse">
           <Skeleton className="w-[300px] h-[40px] bg-slate-200/50 dark:bg-slate-800/50 rounded-2xl" />
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -117,7 +117,7 @@ export default function DoctorPatientAnalytics() {
 
   if (!analytics) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent">
         <div className="max-w-7xl mx-auto text-center py-20 border border-gray-200/50 dark:border-white/10 shadow-xl rounded-3xl bg-white/70 dark:bg-slate-900/50 backdrop-blur-md">
           <AlertTriangle className="w-12 h-12 text-rose-500 mx-auto mb-4" />
           <h2 className="text-2xl font-black text-[#0F172A] dark:text-white mb-2">Unable to Load Patient Analytics</h2>
@@ -134,7 +134,7 @@ export default function DoctorPatientAnalytics() {
   const COLORS = ['#0EA5E9', '#22C55E', '#8B5CF6', '#F59E0B', '#EF4444'];
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent">
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* Header */}

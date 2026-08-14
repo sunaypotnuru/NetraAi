@@ -74,7 +74,7 @@ export default function RefundManagementPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-[#F0F9FF] via-white to-[#F8FAFC]">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-gradient-to-br from-[#F0F9FF] via-white to-[#F8FAFC]">
         <div className="max-w-7xl mx-auto space-y-8">
           <Skeleton className="w-[300px] h-[40px]" />
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
@@ -94,7 +94,7 @@ export default function RefundManagementPage() {
 
   if (!refundsData) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-[#F0F9FF] via-white to-[#F8FAFC]">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-gradient-to-br from-[#F0F9FF] via-white to-[#F8FAFC]">
         <div className="max-w-7xl mx-auto text-center py-12">
           <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-[#0F172A] mb-4">Unable to Load Refunds</h2>
@@ -149,7 +149,7 @@ export default function RefundManagementPage() {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-br from-[#F0F9FF] via-white to-[#F8FAFC]">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-gradient-to-br from-[#F0F9FF] via-white to-[#F8FAFC]">
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* Header */}

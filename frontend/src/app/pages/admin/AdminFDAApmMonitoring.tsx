@@ -43,7 +43,7 @@ export default function AdminFDAApmMonitoring() {
 
   if (metricsLoading || alertsLoading) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-background">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-background">
         <div className="max-w-7xl mx-auto space-y-8">
           <Skeleton className="h-[200px] w-full bg-muted rounded-3xl" />
           <Skeleton className="h-[400px] w-full bg-muted rounded-3xl" />
@@ -62,7 +62,7 @@ export default function AdminFDAApmMonitoring() {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 bg-background">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-background">
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* Header */}

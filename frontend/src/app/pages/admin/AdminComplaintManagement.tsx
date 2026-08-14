@@ -43,7 +43,7 @@ export default function AdminComplaintManagement() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-background">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-background">
         <div className="max-w-7xl mx-auto space-y-8">
           <Skeleton className="h-[200px] w-full bg-muted rounded-3xl" />
           <Skeleton className="h-[500px] w-full bg-muted rounded-3xl" />
@@ -82,7 +82,7 @@ export default function AdminComplaintManagement() {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 bg-background">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-background">
       <div className="max-w-7xl mx-auto space-y-10">
         
         {/* Header */}

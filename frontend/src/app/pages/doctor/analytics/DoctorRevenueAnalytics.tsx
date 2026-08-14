@@ -96,7 +96,7 @@ export default function DoctorRevenueAnalytics() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent">
         <div className="max-w-7xl mx-auto space-y-8">
           <Skeleton className="w-[300px] h-[40px] bg-slate-200 dark:bg-slate-800" />
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -112,7 +112,7 @@ export default function DoctorRevenueAnalytics() {
 
   if (!analytics) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent">
         <div className="max-w-7xl mx-auto text-center py-12 bg-white/70 dark:bg-slate-900/50 backdrop-blur-md border border-gray-200/50 dark:border-white/10 p-8 rounded-3xl shadow-xl">
           <AlertTriangle className="w-12 h-12 text-rose-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Unable to Load Revenue Analytics</h2>
@@ -129,7 +129,7 @@ export default function DoctorRevenueAnalytics() {
   const COLORS = ['#0ea5e9', '#22c55e', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4', '#84cc16'];
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent text-slate-800 dark:text-slate-100">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent text-slate-800 dark:text-slate-100">
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* Header */}

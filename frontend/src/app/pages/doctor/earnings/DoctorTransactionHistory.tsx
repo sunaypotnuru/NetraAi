@@ -123,7 +123,7 @@ export default function DoctorTransactionHistory() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent text-slate-900 dark:text-white">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent text-slate-900 dark:text-white">
         <div className="max-w-7xl mx-auto space-y-8">
           <Skeleton className="w-[300px] h-[40px] bg-slate-200 dark:bg-slate-800" />
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -139,7 +139,7 @@ export default function DoctorTransactionHistory() {
 
   if (isError) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent text-slate-900 dark:text-white">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent text-slate-900 dark:text-white">
         <div className="max-w-7xl mx-auto text-center py-12">
           <div className="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center mx-auto mb-4 border border-rose-500/20">
             <AlertCircle className="w-8 h-8 text-rose-500" />
@@ -158,7 +158,7 @@ export default function DoctorTransactionHistory() {
   const summary = transactionData?.summary;
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent text-slate-900 dark:text-white transition-colors duration-300">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent text-slate-900 dark:text-white transition-colors duration-300">
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* Header */}

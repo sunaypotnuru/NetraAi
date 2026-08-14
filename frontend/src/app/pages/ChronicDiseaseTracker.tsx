@@ -89,7 +89,7 @@ export default function ChronicDiseaseTracker() {
     const chartData = filterData();
 
     return (
-        <div className="min-h-screen pt-20 pb-12 px-6 bg-gradient-to-br from-indigo-50 via-white to-blue-50">
+        <div className="min-h-screen pt-3 pb-12 px-6 bg-gradient-to-br from-indigo-50 via-white to-blue-50">
             <div className="max-w-6xl mx-auto space-y-8">
 
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">

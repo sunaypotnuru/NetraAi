@@ -36,7 +36,7 @@ export default function PatientExercisesPage() {
   const exerciseList = assignments || [];
 
   return (
-    <div className="min-h-screen bg-transparent pt-24 pb-12 px-6">
+    <div className="min-h-screen bg-transparent pt-3 pb-12 px-6">
       <div className="max-w-5xl mx-auto space-y-8">
 
         {/* Hero Header Banner */}

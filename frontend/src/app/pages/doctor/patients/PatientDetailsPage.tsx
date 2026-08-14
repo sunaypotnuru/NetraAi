@@ -195,7 +195,7 @@ export default function PatientDetailsPage() {
 
   if (!patient) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent text-slate-900 dark:text-white flex items-center justify-center">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent text-slate-900 dark:text-white flex items-center justify-center">
         <div className="max-w-md w-full text-center py-12 px-6 bg-white/70 dark:bg-slate-900/50 backdrop-blur-md border border-gray-200/50 dark:border-slate-800/50 shadow-2xl rounded-2xl">
           <AlertTriangle className="w-12 h-12 text-rose-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Patient Not Found</h2>
@@ -219,7 +219,7 @@ export default function PatientDetailsPage() {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent text-slate-900 dark:text-white transition-colors duration-300">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent text-slate-900 dark:text-white transition-colors duration-300">
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* Header */}

@@ -21,7 +21,7 @@ export default function AdminSOC2Evidence() {
 
   if (statsLoading || controlsLoading) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-white dark:bg-[#0B0F1A]">
+      <div className="min-h-screen pt-3 pb-12 px-6 bg-white dark:bg-[#0B0F1A]">
         <div className="max-w-7xl mx-auto space-y-8">
            <Skeleton className="h-[200px] w-full bg-white/5 rounded-3xl" />
            <Skeleton className="h-[500px] w-full bg-white/5 rounded-3xl" />
@@ -47,7 +47,7 @@ export default function AdminSOC2Evidence() {
   const avg = stats?.overall_compliance_percentage || 95;
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 bg-white dark:bg-[#0B0F1A]">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-white dark:bg-[#0B0F1A]">
       <div className="max-w-7xl mx-auto space-y-10">
         
         {/* Header */}

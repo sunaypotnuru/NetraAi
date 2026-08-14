@@ -103,7 +103,7 @@ export default function SystemHealthPage() {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 bg-transparent">
+    <div className="min-h-screen pt-3 pb-12 px-6 bg-transparent">
       <div className="max-w-7xl mx-auto">
 
         {/* Header Section */}

@@ -24,7 +24,7 @@ export default function DoctorRevenuePage() {
 
     if (error) {
         return (
-            <div className="min-h-screen pt-20 px-6 flex flex-col items-center justify-center text-center bg-gray-50">
+            <div className="min-h-screen pt-3 px-6 flex flex-col items-center justify-center text-center bg-gray-50">
                 <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
                 <h3 className="text-lg font-bold text-red-900">{t("doctor.revenue.failed_load", "Failed to load revenue data")}</h3>
                 <p className="text-red-700">{(error as Error).message}</p>
@@ -50,7 +50,7 @@ export default function DoctorRevenuePage() {
     const COLORS = ['#0EA5E9', '#8B5CF6', '#F59E0B', '#22C55E'];
 
     return (
-        <div className="min-h-screen pt-20 pb-12 px-6 bg-gradient-to-br from-[#F0F9FF] via-white to-[#F8FAFC]">
+        <div className="min-h-screen pt-3 pb-12 px-6 bg-gradient-to-br from-[#F0F9FF] via-white to-[#F8FAFC]">
             <div className="max-w-7xl mx-auto">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
                     <div className="flex items-center justify-between">

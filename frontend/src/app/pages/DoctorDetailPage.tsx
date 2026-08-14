@@ -93,7 +93,7 @@ export default function DoctorDetailPage() {
 
   if (!doctor) {
     return (
-      <div className="min-h-screen pt-24 flex flex-col items-center justify-center gap-4">
+      <div className="min-h-screen pt-3 flex flex-col items-center justify-center gap-4">
         <Stethoscope className="w-16 h-16 text-gray-200" />
         <h2 className="text-2xl font-bold text-[#0F172A]">{t('patient.doctors.not_found', "Doctor not found")}</h2>
         <p className="text-gray-500">{t('patient.doctors.not_loaded', "This doctor profile could not be loaded.")}</p>

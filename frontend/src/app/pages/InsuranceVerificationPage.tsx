@@ -54,7 +54,7 @@ export default function InsuranceVerificationPage() {
     };
 
     return (
-        <div className="min-h-screen pt-24 pb-12 px-6 bg-[#F8FAFC]">
+        <div className="min-h-screen pt-3 pb-12 px-6 bg-[#F8FAFC]">
             <div className="max-w-4xl mx-auto">
                 <div className="mb-8 flex items-center gap-3">
                     <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">

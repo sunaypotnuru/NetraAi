@@ -114,7 +114,7 @@ export default function CreateHealthGoalPage() {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-12 bg-transparent text-slate-900 dark:text-white">
+    <div className="min-h-screen pt-3 pb-12 bg-transparent text-slate-900 dark:text-white">
       <div className="max-w-3xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <button
