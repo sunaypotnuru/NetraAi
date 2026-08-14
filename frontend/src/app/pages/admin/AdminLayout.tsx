@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { useTranslation } from '@/lib/i18n';
 import { ConnectionStatus } from '@/components/shared/ConnectionStatus';
+import Breadcrumb from '@/components/shared/Breadcrumb';
 
 export default function AdminLayout() {
     const { t } = useTranslation();
@@ -156,19 +157,22 @@ export default function AdminLayout() {
 
             {/* Main Content */}
             <main className="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
-                {/* Unified Top Header Bar with Breadcrumbs on Left and Controls on Right */}
-                <header className="h-16 bg-white/70 dark:bg-[#080b11]/70 backdrop-blur-md border-b border-gray-200/80 dark:border-white/5 shrink-0 z-30 px-4 sm:px-6 flex items-center justify-between gap-4">
-                    {/* Left Side: Mobile Menu Button */}
-                    <div className="flex items-center gap-2 sm:gap-3 min-w-0 py-1">
-                        {isMobile && (
-                            <button
-                                onClick={() => setSidebarOpen(true)}
-                                className="p-2 -ml-2 text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 shrink-0"
-                                aria-label="Toggle menu"
-                            >
-                                <Menu className="w-5 h-5" />
-                            </button>
-                        )}
+                {/* Unified Top Header Bar: Mobile Menu | Breadcrumb | Controls */}
+                <header className="h-16 bg-white/70 dark:bg-[#080b11]/70 backdrop-blur-md border-b border-gray-200/80 dark:border-white/5 shrink-0 z-30 px-4 sm:px-6 flex items-center gap-3">
+                    {/* Mobile Menu Button */}
+                    {isMobile && (
+                        <button
+                            onClick={() => setSidebarOpen(true)}
+                            className="p-2 -ml-2 text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 shrink-0"
+                            aria-label="Toggle menu"
+                        >
+                            <Menu className="w-5 h-5" />
+                        </button>
+                    )}
+
+                    {/* Breadcrumb — grows to fill available space */}
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                        <Breadcrumb />
                     </div>
 
                     {/* Right Side: Connection Status, Theme Toggle, Super Admin Badge */}

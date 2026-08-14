@@ -90,8 +90,8 @@ export default function Root() {
       {!isAdminPage && <NavbarMain />}
 
       <main className="flex-1 overflow-x-hidden">
-        {/* Global Location Breadcrumbs */}
-        <Breadcrumb />
+        {/* Global Location Breadcrumbs — hidden for admin (embedded in AdminLayout header) */}
+        {!isAdminPage && <Breadcrumb />}
 
         <AnimatePresence mode="wait" initial={false}>
           <motion.div

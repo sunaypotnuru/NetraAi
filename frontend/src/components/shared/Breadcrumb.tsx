@@ -5,7 +5,7 @@ import { useAuthStore } from "@/lib/store";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { doctorAPI, adminAPI, patientAPI } from "@/lib/api";
 
-export default function Breadcrumb() {
+export default function Breadcrumb({ inline = false }: { inline?: boolean }) {
   const location = useLocation();
   const { t } = useTranslation();
   const { user } = useAuthStore();
@@ -175,8 +175,41 @@ export default function Breadcrumb() {
 
   const isAdmin = location.pathname.startsWith('/admin');
 
+  // Inline mode: renders just the nav row, no outer wrapper — for embedding inside flex headers
+  if (inline || isAdmin) {
+    return (
+      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
+        <Link
+          to={homePath}
+          className="flex items-center gap-1 hover:text-[#8B5CF6] transition-colors"
+          title={homePath === "/" ? "Landing Page" : "Portal Dashboard"}
+        >
+          <Home className="w-3.5 h-3.5" />
+        </Link>
+
+        {breadcrumbItems.map((item) => (
+          <div key={item.path} className="flex items-center gap-2">
+            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+            {item.isLast ? (
+              <span className="font-semibold text-[#0F172A] dark:text-white truncate max-w-[200px]">
+                {item.name}
+              </span>
+            ) : (
+              <Link
+                to={item.path}
+                className="hover:text-[#8B5CF6] transition-colors"
+              >
+                {item.name}
+              </Link>
+            )}
+          </div>
+        ))}
+      </nav>
+    );
+  }
+
   return (
-    <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isAdmin ? 'pt-3 pb-1' : 'pt-20 pb-1'}`}>
+    <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-1`}>
       <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md px-4 py-2 rounded-xl border border-gray-200/60 dark:border-gray-700/60 shadow-xs">
         <Link
           to={homePath}
