@@ -8,6 +8,7 @@ import SOSButton from "@/components/shared/SOSButton";
 import Breadcrumb from "@/components/shared/Breadcrumb";
 import { VoiceAccessibility } from "@/components/features/accessibility/VoiceAccessibility";
 import ChatbotWidget from "@/components/features/ai/ChatbotWidget";
+import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import { useAuthStore } from "../../lib/store";
 
 import { useThemeStore } from "../../lib/themeStore";
