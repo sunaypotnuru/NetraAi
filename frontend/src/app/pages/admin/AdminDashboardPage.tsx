@@ -32,27 +32,30 @@ interface DashboardStats {
 
 
 function AnimatedCounter({ target, suffix = "" }: { target: number | string; suffix?: string }) {
-    const [current, setCurrent] = useState(0);
+    const [current, setCurrent] = useState(typeof target === "number" ? target : 0);
 
     useEffect(() => {
-        if (typeof target === "number") {
-            let start = 0;
-            const end = target;
-            if (start === end) {
-                setCurrent(end);
-                return;
-            }
-            const duration = 1000;
-            const stepTime = Math.abs(Math.floor(duration / end));
-            const timer = setInterval(() => {
-                start += 1;
-                setCurrent(start);
-                if (start >= end) {
-                    clearInterval(timer);
-                }
-            }, Math.max(stepTime, 15));
-            return () => clearInterval(timer);
+        if (typeof target !== "number") return;
+        if (target <= 0) {
+            setCurrent(0);
+            return;
         }
+        const duration = 800;
+        const startTime = performance.now();
+        let animationFrameId: number;
+
+        const updateCounter = (now: number) => {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const val = Math.floor(progress * target);
+            setCurrent(val);
+            if (progress < 1) {
+                animationFrameId = requestAnimationFrame(updateCounter);
+            }
+        };
+
+        animationFrameId = requestAnimationFrame(updateCounter);
+        return () => cancelAnimationFrame(animationFrameId);
     }, [target]);
 
     return (
