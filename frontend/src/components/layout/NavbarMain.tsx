@@ -18,6 +18,7 @@ import { ConnectionStatus } from "@/components/shared/ConnectionStatus";
 const patientNav = [
   { label: "Models", path: "/patient/models", icon: Eye },
   { label: "AR Exercises", path: "/patient/exercises", icon: Dumbbell },
+  { label: "Hospitals", path: "/patient/hospitals", icon: MapPin },
   { label: "Doctors", path: "/patient/doctors", icon: Video },
   { label: "Appointments", path: "/patient/appointments", icon: Calendar },
 ];
