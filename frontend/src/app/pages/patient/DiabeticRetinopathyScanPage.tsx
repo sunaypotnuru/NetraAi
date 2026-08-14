@@ -95,8 +95,6 @@ const DiabeticRetinopathyScanPage = () => {
       className="container mx-auto p-4 max-w-4xl space-y-6 bg-transparent"
       initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
     >
-      <Breadcrumb />
-
       <Button
         variant="outline"
         onClick={() => navigate("/patient/models")}

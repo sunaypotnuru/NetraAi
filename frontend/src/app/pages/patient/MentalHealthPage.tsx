@@ -176,8 +176,6 @@ const MentalHealthPage = () => {
           show: { opacity: 1, transition: { staggerChildren: 0.1 } }
         }}
       >
-        <Breadcrumb />
-
         <Button
           variant="ghost"
           onClick={() => navigate("/patient/models")}
