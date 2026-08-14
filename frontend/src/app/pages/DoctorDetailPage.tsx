@@ -115,7 +115,7 @@ export default function DoctorDetailPage() {
     : [];
 
   return (
-    <div className="min-h-screen pt-20 pb-16 px-4 sm:px-6 bg-gradient-to-br from-[#F0FDFA] via-white to-[#F8FAFC]">
+    <div className="min-h-screen pt-3 pb-16 px-4 sm:px-6 bg-gradient-to-br from-[#F0FDFA] via-white to-[#F8FAFC]">
       <div className="max-w-5xl mx-auto">
         <Button variant="ghost" onClick={() => navigate("/patient/doctors")} className="mb-6 gap-2 text-gray-500 hover:text-[#0D9488]">
           <ArrowLeft className="w-4 h-4" /> {t('patient.doctors.back_to_doctors', "Back to Doctors")}

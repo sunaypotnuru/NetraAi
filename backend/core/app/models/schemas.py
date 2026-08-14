@@ -233,10 +233,17 @@ class VideoTokenResponse(BaseModel):
 class BlogBase(BaseModel):
     title: str
     content: str
-    author: str
+    excerpt: Optional[str] = None
+    author: str = "Netra AI Team"
     image_url: Optional[str] = None
-    category: Optional[str] = None
+    category: Optional[str] = "Medical AI"
+    published: Optional[bool] = True
+    featured: Optional[bool] = False
     tags: Optional[List[str]] = Field(default_factory=list)
+    meta_description: Optional[str] = None
+    slug: Optional[str] = None
+    views: Optional[int] = 0
+    likes: Optional[int] = 0
 
 
 class BlogCreate(BlogBase):
@@ -245,8 +252,9 @@ class BlogCreate(BlogBase):
 
 class BlogResponse(BlogBase):
     id: str
-    created_at: datetime
-    updated_at: Optional[datetime] = None
-    views: int = 0
+    created_at: Optional[Any] = None
+    updated_at: Optional[Any] = None
+    published_at: Optional[Any] = None
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, extra="ignore")
+

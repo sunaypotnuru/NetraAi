@@ -78,14 +78,14 @@ export default function AdminBlogsPage() {
   // API call to get blogs using centralized blogsAPI
   const { data: blogsData, isLoading, refetch } = useQuery({
     queryKey: ['admin-blogs', searchTerm, statusFilter, sortBy],
-    queryFn: async (): Promise<BlogsResponse> => {
-      const params = {
-        ...(searchTerm && { search: searchTerm }),
-        ...(statusFilter !== 'all' && { status: statusFilter }),
-        sort_by: sortBy
-      };
-      const response = await blogsAPI.getBlogs(params);
-      return response.data;
+    queryFn: async (): Promise<any> => {
+      try {
+        const response = await blogsAPI.getBlogs();
+        return response.data;
+      } catch (err) {
+        console.error('Error fetching blogs:', err);
+        return [];
+      }
     }
   });
 
@@ -176,9 +176,9 @@ export default function AdminBlogsPage() {
       image_url: blog.image_url,
       published: blog.published,
       featured: blog.featured,
-      tags: blog.tags,
-      meta_description: blog.meta_description,
-      slug: blog.slug
+      tags: blog.tags || [],
+      meta_description: blog.meta_description || '',
+      slug: blog.slug || ''
     });
     setEditingId(blog.id);
     setIsFormOpen(true);
@@ -229,23 +229,16 @@ export default function AdminBlogsPage() {
     );
   }
 
-  if (!blogsData) {
-    return (
-      <div className="min-h-screen pt-24 pb-12 px-6 bg-white dark:bg-[#0B0F1A] flex flex-col items-center justify-center text-center">
-        <AlertTriangle className="w-16 h-16 text-red-500 mb-4" />
-        <h2 className="text-2xl font-bold text-white mb-2">Unable to Load Blogs</h2>
-        <p className="text-gray-400 mb-6 max-w-md">There was an error loading the blog data from the Hugging Face backend.</p>
-        <Button onClick={() => refetch()} className="bg-[#0EA5E9] hover:bg-[#0284C7] text-white">
-          <RefreshCw className="w-4 h-4 mr-2" /> Try Again
-        </Button>
-      </div>
-    );
-  }
+  const rawBlogsData = blogsData || [];
+  const blogs: Blog[] = Array.isArray(rawBlogsData)
+    ? rawBlogsData
+    : (rawBlogsData?.blogs || []);
 
-  const blogs: Blog[] = Array.isArray(blogsData) ? (blogsData as any) : (blogsData?.blogs || []);
-  const total = Array.isArray(blogsData) ? blogsData.length : (blogsData?.total || 0);
-  const total_published = Array.isArray(blogsData) ? (blogsData as any).filter((b: any) => b.published).length : (blogsData?.total_published || 0);
-  const total_drafts = Array.isArray(blogsData) ? (blogsData as any).filter((b: any) => !b.published).length : (blogsData?.total_drafts || 0);
+  const total = blogs.length;
+  const total_published = blogs.filter(b => b.published !== false).length;
+  const total_drafts = blogs.filter(b => b.published === false).length;
+
+
 
   return (
     <div className="min-h-screen pt-24 pb-12 px-6 bg-white dark:bg-[#0B0F1A]">

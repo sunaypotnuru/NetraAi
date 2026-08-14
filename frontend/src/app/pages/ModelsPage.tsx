@@ -68,11 +68,8 @@ export default function ModelsPage() {
   ];
 
   return (
-    <div className="min-h-screen pt-20 pb-16 px-4 sm:px-6 bg-background">
+    <div className="min-h-screen pt-3 pb-16 px-4 sm:px-6 bg-background">
       <div className="max-w-7xl mx-auto space-y-8">
-
-        {/* Breadcrumb */}
-        <Breadcrumb />
 
         {/* Header */}
         <motion.div
