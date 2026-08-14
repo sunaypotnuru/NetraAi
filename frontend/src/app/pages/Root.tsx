@@ -101,7 +101,9 @@ export default function Root() {
             transition={{ duration: 0.18, ease: "easeInOut" }}
             className="h-full w-full"
           >
-            <Outlet />
+            <ErrorBoundary>
+              <Outlet />
+            </ErrorBoundary>
           </motion.div>
         </AnimatePresence>
       </main>

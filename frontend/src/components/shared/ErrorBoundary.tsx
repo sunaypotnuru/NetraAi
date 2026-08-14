@@ -27,12 +27,25 @@ export class ErrorBoundary extends Component<Props, State> {
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
 
-    // Auto-reload on chunk load errors (dynamic import failures after new deployments)
+    // Auto-recovery for chunk load errors and Minified React errors #300 / #310
     const errorMsg = error?.message?.toLowerCase() || error?.toString()?.toLowerCase() || "";
-    if (errorMsg.includes('fetch') || errorMsg.includes('dynamically imported module') || errorMsg.includes('chunk')) {
-      console.warn('Chunk load error detected, initiating auto-recovery reload...');
-      window.location.reload();
-      return;
+    if (
+      errorMsg.includes('fetch') || 
+      errorMsg.includes('dynamically imported module') || 
+      errorMsg.includes('chunk') ||
+      errorMsg.includes('minified react error #300') ||
+      errorMsg.includes('minified react error #310') ||
+      errorMsg.includes('invariant=300') ||
+      errorMsg.includes('invariant=310')
+    ) {
+      const lastReload = sessionStorage.getItem('last_auto_recovery_time');
+      const now = Date.now();
+      if (!lastReload || now - parseInt(lastReload, 10) > 10000) {
+        sessionStorage.setItem('last_auto_recovery_time', now.toString());
+        console.warn('React hook/chunk transition error detected, performing auto-recovery...');
+        window.location.reload();
+        return;
+      }
     }
 
     this.setState({ error, errorInfo });

@@ -13,14 +13,15 @@ import { ECGLoadingScreen } from "../components/shared/ECGLoadingScreen";
 import ProtectedRoute from "../components/features/domain/ProtectedRoute";
 
 // Helper to wrap lazy components with Suspense and auto-recovery for chunk errors
-const withSuspense = (Component: React.LazyExoticComponent<any>) => {
-    return () => (
+const withSuspense = (LazyComp: React.LazyExoticComponent<any>) => {
+    const Wrapped: React.FC<any> = (props) => (
         <ErrorBoundary>
             <Suspense fallback={<ECGLoadingScreen />}>
-                <Component />
+                <LazyComp {...props} />
             </Suspense>
         </ErrorBoundary>
     );
+    return Wrapped;
 };
 
 // Error-resilient lazy loader to handle version mismatches/chunk load errors
