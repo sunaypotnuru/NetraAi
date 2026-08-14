@@ -9,7 +9,6 @@ import { Mic, Square, Activity, AlertCircle, CheckCircle2, ChevronRight, FileTex
 import { motion, AnimatePresence } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { AIVoicePulse } from '../../../components/AIVoicePulse';
-import Breadcrumb from "@/components/shared/Breadcrumb";
 import { logger } from "@/lib/logger";
 
 

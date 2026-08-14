@@ -3,7 +3,6 @@ import { useNavigate } from "react-router";
 import { Eye, Scan, Mic, Brain, Activity } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useTranslation } from "../../lib/i18n";
-import Breadcrumb from "@/components/shared/Breadcrumb";
 
 export default function ModelsPage() {
   const navigate = useNavigate();

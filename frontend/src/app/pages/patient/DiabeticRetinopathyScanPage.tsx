@@ -7,7 +7,6 @@ import { patientAPI } from '@/lib/api';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/alert";
-import Breadcrumb from "@/components/shared/Breadcrumb";
 
 // DR Grade color mapping
 const gradeColors = {

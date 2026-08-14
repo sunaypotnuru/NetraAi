@@ -8,7 +8,6 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/alert";
 import { AIVoicePulse } from '../../../components/AIVoicePulse';
-import Breadcrumb from "@/components/shared/Breadcrumb";
 
 const ParkinsonsVoicePage = () => {
   const { t } = useTranslation();
