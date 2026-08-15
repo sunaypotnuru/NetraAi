@@ -118,7 +118,7 @@ export default function AdminDashboardPage() {
                         <pre className="text-xs text-red-500/80">{JSON.stringify(error, null, 2)}</pre>
                     </div>
                 )}
-                <Button onClick={() => window.location.reload()} className="bg-[#0D9488] hover:bg-[#0F766E] text-white px-8 rounded-xl font-bold shadow-lg shadow-[#0D9488]/20">
+                <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['adminStats'] })} className="bg-[#0D9488] hover:bg-[#0F766E] text-white px-8 rounded-xl font-bold shadow-lg shadow-[#0D9488]/20">
                     {t("common.try_again", "Try Again")}
                 </Button>
             </div>

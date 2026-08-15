@@ -109,10 +109,7 @@ export default function DoctorDashboardPage() {
         if (is403) {
             return (
                 <div 
-                    className="min-h-screen w-full flex flex-col items-center justify-center relative p-6 select-none"
-                    style={{
-                        background: 'radial-gradient(circle at center, #0F172A 0%, #020617 100%)',
-                    }}
+                    className="min-h-screen w-full flex flex-col items-center justify-center relative p-6 select-none bg-slate-50 dark:bg-slate-950"
                 >
                     {/* Premium Ambient Background Glows */}
                     {isRejected ? (

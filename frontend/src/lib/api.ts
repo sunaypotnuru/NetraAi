@@ -417,10 +417,10 @@ export const settingsAPI = {
 
 // Gamification
 export const gamificationAPI = {
-  getAchievements: () => api.get("/api/v1/patient/achievements"),
-  getLeaderboard: () => api.get("/api/v1/patient/leaderboard"),
-  getReferrals: () => api.get("/api/v1/patient/referrals"),
-  createReferral: (data: Record<string, unknown>) => api.post("/api/v1/patient/referrals", data),
+  getAchievements: () => api.get("/api/v1/gamification/achievements"),
+  getLeaderboard: () => api.get("/api/v1/gamification/leaderboard"),
+  getReferrals: () => api.get("/api/v1/referrals/stats"),
+  createReferral: (data: Record<string, unknown>) => api.post("/api/v1/referrals/apply/" + (data.code || "unknown")),
   trackLogin: () => api.post("/api/v1/gamification/track-login"),
 };
 

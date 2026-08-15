@@ -68,7 +68,7 @@ export default function BookingSummaryPage() {
             toast.success(t('patient.booking.success', "Booking confirmed! Proceeding to intake."));
             
             // Step 2: Redirect to Intake Form
-            const specialty = (doctor.specialty || "general").toLowerCase().replace(/\s+/g, '-');
+            const specialty = (doctor.specialty || "general").toLowerCase().replace(/\s+/g, '_');
             navigate(`/patient/intake/${specialty}/${apptId}`);
         } catch (err) {
             console.error("Booking failed:", err);

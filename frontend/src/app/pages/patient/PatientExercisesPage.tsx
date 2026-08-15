@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
-import { Activity, Dumbbell, PlayCircle, Target, Clock, Bone } from "lucide-react";
+import { Activity, Dumbbell, PlayCircle, Target, Clock, AlertTriangle, RefreshCcw } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/lib/i18n";
@@ -11,7 +11,7 @@ interface PatientExercise {
   id: string; // patient_exercise_id
   prescribed_reps: number;
   prescribed_sets: number;
-  exercises: {
+  exercises?: {
     id: string;
     name: string;
     description: string;
@@ -25,7 +25,7 @@ export default function PatientExercisesPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const { data: assignments = [], isLoading } = useQuery<PatientExercise[]>({
+  const { data: assignments = [], isLoading, isError, refetch } = useQuery<PatientExercise[]>({
     queryKey: ["myExercises"],
     queryFn: async () => {
       const res = await api.get("/api/v1/exercises/my-exercises");
@@ -33,7 +33,8 @@ export default function PatientExercisesPage() {
     }
   });
 
-  const exerciseList = assignments || [];
+  // Filter only assignments that have a valid nested exercises object
+  const exerciseList = assignments.filter((a) => !!a.exercises);
 
   return (
     <div className="min-h-screen bg-transparent pt-3 pb-12 px-6">
@@ -59,26 +60,74 @@ export default function PatientExercisesPage() {
             </p>
           </div>
 
-          <Button
-            onClick={() => navigate(`/patient/exercises/ar/${exerciseList[0]?.id || 'ex-1'}`)}
-            className="z-10 bg-white text-[#0D9488] hover:bg-teal-50 font-bold px-6 py-6 rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shrink-0"
-          >
-            <PlayCircle className="w-6 h-6 text-[#0D9488]" />
-            <span>{t("patient.exercises.launch_ar", "Launch Live AR Session")}</span>
-          </Button>
+          {/* Hero launch button — only shown when there are exercises available */}
+          {exerciseList.length > 0 && (
+            <Button
+              onClick={() => navigate(`/patient/exercises/ar/${exerciseList[0].id}`)}
+              className="z-10 bg-white text-[#0D9488] hover:bg-teal-50 font-bold px-6 py-6 rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shrink-0"
+            >
+              <PlayCircle className="w-6 h-6 text-[#0D9488]" />
+              <span>{t("patient.exercises.launch_ar", "Launch Live AR Session")}</span>
+            </Button>
+          )}
 
           {/* Background Decorative Graphic */}
           <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-teal-400/10 rounded-full blur-3xl pointer-events-none" />
         </motion.div>
 
-        {isLoading ? (
+        {/* Error State */}
+        {isError && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex flex-col items-center justify-center py-16 gap-4 text-center"
+          >
+            <AlertTriangle className="w-12 h-12 text-rose-400" />
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Failed to load exercises</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm">
+              There was an error fetching your assigned exercises. Please try again.
+            </p>
+            <Button
+              onClick={() => refetch()}
+              className="bg-[#0D9488] hover:bg-[#0F766E] text-white rounded-xl px-5 py-2 font-semibold flex items-center gap-2"
+            >
+              <RefreshCcw className="w-4 h-4" />
+              Retry
+            </Button>
+          </motion.div>
+        )}
+
+        {/* Loading State */}
+        {!isError && isLoading && (
           <div className="h-64 flex items-center justify-center">
             <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
-        ) : (
+        )}
+
+        {/* Empty State */}
+        {!isError && !isLoading && exerciseList.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center justify-center py-20 gap-5 text-center"
+          >
+            <div className="w-20 h-20 rounded-2xl bg-teal-500/10 flex items-center justify-center border border-teal-500/20">
+              <Activity className="w-10 h-10 text-teal-400" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No exercises assigned yet</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm">
+                Your doctor hasn't assigned any exercises yet. Check back after your next appointment.
+              </p>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Exercise Grid */}
+        {!isError && !isLoading && exerciseList.length > 0 && (
           <div className="grid md:grid-cols-2 gap-6">
             {exerciseList.map((assignment, index) => {
-              const ex = assignment.exercises;
+              const ex = assignment.exercises!;
               return (
                 <motion.div
                   key={assignment.id}

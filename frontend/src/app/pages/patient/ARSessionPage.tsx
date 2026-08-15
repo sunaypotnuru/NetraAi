@@ -51,7 +51,7 @@ export default function ARSessionPage() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Assignment details
-  const { data: assignments = [] } = useQuery<ExerciseAssignment[]>({
+  const { data: assignments = [], isLoading: assignmentsLoading } = useQuery<ExerciseAssignment[]>({
     queryKey: ["myExercises"],
     queryFn: async () => {
       const res = await api.get("/api/v1/exercises/my-exercises");
@@ -271,13 +271,35 @@ export default function ARSessionPage() {
     };
   }, []);
 
-  if (!assignment || !exercise) {
+  // Proper loading → not-found separation
+  if (assignmentsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-950 text-slate-400">
         <div className="text-center space-y-4">
           <Loader2 className="w-10 h-10 animate-spin text-sky-500 mx-auto" />
           <p className="text-sm font-medium">{t('patient.a_r_session_page.loading_or_invalid_assignment', "Loading session configurations...")}</p>
         </div>
+      </div>
+    );
+  }
+
+  if (!assignment || !exercise) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-400 gap-6">
+        <div className="text-center space-y-3">
+          <CameraIcon className="w-14 h-14 text-slate-600 mx-auto" />
+          <h2 className="text-xl font-bold text-white">Session Not Found</h2>
+          <p className="text-sm text-slate-400 max-w-xs">
+            This exercise assignment could not be found. It may have been removed or the link is invalid.
+          </p>
+        </div>
+        <Button
+          onClick={() => navigate('/patient/exercises')}
+          className="bg-sky-500 hover:bg-sky-600 text-white rounded-xl px-6 py-3 font-semibold"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Exercises
+        </Button>
       </div>
     );
   }
@@ -319,7 +341,9 @@ export default function ARSessionPage() {
                 <Clock className="w-4 h-4 text-sky-400"/>
                 {t('patient.a_r_session_page.time_left_2', "Time Left")}
               </span>
-              <span className="text-2xl font-mono font-bold text-white">00:{timeLeft.toString().padStart(2, '0')}</span>
+              <span className="text-2xl font-mono font-bold text-white">
+                {String(Math.floor(timeLeft / 60)).padStart(2, '0')}:{String(timeLeft % 60).padStart(2, '0')}
+              </span>
             </div>
             <Progress value={(timeLeft / (exercise.duration_seconds ?? 1)) * 100} className="h-1.5 bg-slate-800 indicator-white rounded-full overflow-hidden" />
           </div>
