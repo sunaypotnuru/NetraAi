@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { api } from '@/lib/api';
-import { useAuth } from '@/hooks/useAuth';
+import api from '@/lib/api';
+import { useAuth } from '@/app/contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 
 interface EmergencyContact {
