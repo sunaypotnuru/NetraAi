@@ -63,39 +63,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          if (!id.includes('node_modules')) return;
-
-          // ── Large, self-contained libraries (safe to split) ───────
-          if (id.includes('node_modules/exceljs')) return 'exceljs';
-          if (id.includes('node_modules/jspdf')) return 'jspdf';
-          if (id.includes('node_modules/html2canvas')) return 'html2canvas';
-          if (id.includes('node_modules/recharts')) return 'recharts';
-          if (id.includes('node_modules/livekit-client')) return 'livekit-client';
-          if (id.includes('node_modules/@livekit')) return 'livekit';
-          if (id.includes('node_modules/motion') || id.includes('node_modules/framer-motion')) return 'animation';
-          if (id.includes('node_modules/lucide-react')) return 'icons';
-          if (id.includes('node_modules/lodash')) return 'lodash';
-          if (id.includes('node_modules/date-fns')) return 'date-fns';
-
-          // ── Supabase (large, loads lazily) ────────────────────────
-          if (id.includes('node_modules/@supabase')) return 'supabase';
-
-          // ── i18n ──────────────────────────────────────────────────
-          if (id.includes('node_modules/i18next') || id.includes('node_modules/react-i18next')) return 'i18n';
-
-          // ── MUI (large, only used on some pages) ──────────────────
-          if (id.includes('node_modules/@mui')) return 'mui';
-
-          // ⚠️ CRITICAL: Keep React ecosystem together to prevent forwardRef undefined errors ⚠️
-          if (id.includes('node_modules/@radix-ui')) return 'react-vendor';
-          if (id.match(/\/node_modules\/react(-dom|-router-dom)?\//)) return 'react-vendor';
-          if (id.includes('node_modules/react-')) return 'react-vendor'; // react-hook-form, etc.
-
-          // Kept together in 'react-vendor' to avoid chunk-initialization
-          // race conditions (e.g. React.forwardRef undefined).
-          return 'vendor';
-        },
+        manualChunks: undefined,
       },
     },
     chunkSizeWarningLimit: 800, // Reduced to 800KB to catch large chunks earlier
