@@ -60,16 +60,26 @@ export default function PatientExercisesPage() {
             </p>
           </div>
 
-          {/* Hero launch button — only shown when there are exercises available */}
-          {exerciseList.length > 0 && (
+          {/* Hero launch button */}
+          <div className="flex gap-4">
+            {exerciseList.length > 0 && (
+              <Button
+                onClick={() => navigate(`/patient/exercises/ar/${exerciseList[0].id}`)}
+                className="z-10 bg-white text-[#0D9488] hover:bg-teal-50 font-bold px-6 py-6 rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shrink-0"
+              >
+                <PlayCircle className="w-6 h-6 text-[#0D9488]" />
+                <span>{t("patient.exercises.launch_ar", "Launch Live AR Session")}</span>
+              </Button>
+            )}
+            
             <Button
-              onClick={() => navigate(`/patient/exercises/ar/${exerciseList[0].id}`)}
-              className="z-10 bg-white text-[#0D9488] hover:bg-teal-50 font-bold px-6 py-6 rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shrink-0"
+              onClick={() => navigate(`/patient/exercises/ar/demo`)}
+              className="z-10 bg-teal-800 text-white hover:bg-teal-900 border border-teal-500/30 font-bold px-6 py-6 rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shrink-0"
             >
-              <PlayCircle className="w-6 h-6 text-[#0D9488]" />
-              <span>{t("patient.exercises.launch_ar", "Launch Live AR Session")}</span>
+              <PlayCircle className="w-6 h-6 text-white" />
+              <span>Try Demo Session</span>
             </Button>
-          )}
+          </div>
 
           {/* Background Decorative Graphic */}
           <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-teal-400/10 rounded-full blur-3xl pointer-events-none" />
@@ -116,9 +126,18 @@ export default function PatientExercisesPage() {
             </div>
             <div>
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No exercises assigned yet</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm">
+              <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mb-6">
                 Your doctor hasn't assigned any exercises yet. Check back after your next appointment.
               </p>
+              
+              {/* DEMO BUTTON */}
+              <Button
+                onClick={() => navigate(`/patient/exercises/ar/demo`)}
+                className="bg-[#0D9488] hover:bg-[#0F766E] text-white font-bold px-8 py-6 rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 mx-auto"
+              >
+                <PlayCircle className="w-6 h-6" />
+                <span>Try AR Demo Session</span>
+              </Button>
             </div>
           </motion.div>
         )}
