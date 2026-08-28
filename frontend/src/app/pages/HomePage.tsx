@@ -122,7 +122,7 @@ export default function HomePage() {
               <div className="text-teal-100 text-sm uppercase tracking-wide">Features</div>
             </div>
             <div className="text-center">
-              <div className="text-5xl font-bold mb-2"><Counter to={4} /></div>
+              <div className="text-5xl font-bold mb-2"><Counter to={5} /></div>
               <div className="text-teal-100 text-sm uppercase tracking-wide">AI Models</div>
             </div>
             <div className="text-center">
@@ -152,7 +152,7 @@ export default function HomePage() {
             </div>
           </ScrollReveal>
 
-          <StaggerContainer stagger="normal" direction="up" className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <StaggerContainer stagger="normal" direction="up" className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {aiModels.map((model) => (
               <AnimatedCard
                 key={model.title}
