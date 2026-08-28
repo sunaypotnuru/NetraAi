@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 import asyncio
 from typing import Optional
-import random
+import secrets
 
 from app.core.security import get_current_user
 
@@ -64,8 +64,8 @@ async def verify_insurance(
         )
 
     # Success scenario with mock data
-    mock_copay = random.choice([0.0, 15.0, 25.0, 50.0])
-    mock_deductible = random.choice([0.0, 250.0, 500.0, 1500.0])
+    mock_copay = secrets.choice([0.0, 15.0, 25.0, 50.0])
+    mock_deductible = secrets.choice([0.0, 250.0, 500.0, 1500.0])
 
     return InsuranceVerifyResponse(
         verified=True,

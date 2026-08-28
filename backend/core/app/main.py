@@ -182,6 +182,52 @@ async def lifespan(app: FastAPI):
         logger.warning("⚠️ This should only be used for development/testing")
     
     logger.info("✅ Configuration validation passed")
+
+    # ═══════════════════════════════════════════════════════
+    # HIGH PRIORITY: AI Provider Validation
+    # ═══════════════════════════════════════════════════════
+    groq_key = os.getenv("GROQ_API_KEY", "")
+    gemini_key = os.getenv("GEMINI_API_KEY", "")
+    if not groq_key and not gemini_key:
+        logger.critical("❌ No AI provider configured! Set GROQ_API_KEY or GEMINI_API_KEY")
+        raise RuntimeError("At least one AI provider key required (GROQ_API_KEY or GEMINI_API_KEY)")
+    if not groq_key:
+        logger.warning("⚠️  GROQ_API_KEY missing - using Gemini fallback only")
+    if not gemini_key:
+        logger.warning("⚠️  GEMINI_API_KEY missing - no AI fallback available")
+
+    # ═══════════════════════════════════════════════════════
+    # HIGH PRIORITY: Payment Gateway (only if enabled)
+    # ═══════════════════════════════════════════════════════
+    enable_payments = os.getenv("ENABLE_PAYMENTS", "false").lower() == "true"
+    if enable_payments:
+        razorpay_secret = os.getenv("RAZORPAY_KEY_SECRET", "")
+        if not razorpay_secret:
+            logger.critical("❌ ENABLE_PAYMENTS=true but RAZORPAY_KEY_SECRET is missing")
+            raise RuntimeError("RAZORPAY_KEY_SECRET required when ENABLE_PAYMENTS=true")
+
+    # ═══════════════════════════════════════════════════════
+    # MEDIUM PRIORITY: Notification Services (warn only)
+    # ═══════════════════════════════════════════════════════
+    if not os.getenv("TWILIO_AUTH_TOKEN"):
+        logger.warning("⚠️  TWILIO_AUTH_TOKEN missing - SMS notifications disabled")
+    if not os.getenv("SENDGRID_API_KEY"):
+        logger.warning("⚠️  SENDGRID_API_KEY missing - email delivery may be degraded")
+
+    # ═══════════════════════════════════════════════════════
+    # MEDIUM PRIORITY: Infrastructure Services (warn only)
+    # ═══════════════════════════════════════════════════════
+    if not os.getenv("LIVEKIT_API_SECRET"):
+        logger.warning("⚠️  LIVEKIT_API_SECRET missing - video consultations disabled")
+    if not os.getenv("REDIS_URL"):
+        logger.warning("⚠️  REDIS_URL missing - caching disabled, expect slower performance")
+
+    logger.info("✅ All configuration validation passed")
+
+    # Initialize JWT secret cache for fast verification
+    from app.core.security import _initialize_jwt_secret
+    _initialize_jwt_secret()
+    logger.info("✅ JWT secret initialized and cached")
     
     # ═══════════════════════════════════════════════════════════════
     # STARTUP TASKS

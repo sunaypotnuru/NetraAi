@@ -27,7 +27,7 @@ livekit-api==0.5.1
 
 # ── BASIC IMAGE PROCESSING ─────────────────────────────────
 Pillow>=10.0.0
-numpy>=1.24.0
+numpy==1.26.4
 
 # ── AI INTEGRATION ─────────────────────────────────────────
 google-generativeai>=0.8.0
@@ -55,7 +55,8 @@ faster-whisper>=1.0.0
 sentence-transformers
 
 # ── SELF-HOSTED AI (DeepSeek-R1 via Ollama - FREE, HIPAA-Compliant) ──────────
-ollama==0.4.4
+# Removed: not used in production
+# ollama==0.4.4
 
 
 # Phone number validation

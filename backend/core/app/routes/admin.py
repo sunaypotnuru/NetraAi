@@ -65,8 +65,8 @@ async def get_platform_stats(
         try:
             r = supabase.table("profiles_patient").select("id", count="exact").execute()
             patient_count = r.count or 0
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Non-critical data fetch failed: {e}")
 
         try:
             r = supabase.table("users").select("id", count="exact").eq("role", "doctor").execute()
@@ -75,32 +75,33 @@ async def get_platform_stats(
             else:
                 r2 = supabase.table("profiles_doctor").select("id", count="exact").eq("is_verified", True).execute()
                 doctor_count = r2.count if (r2.count and r2.count > 0) else 1
-        except Exception:
+        except Exception as e:
+            logger.warning(f"Failed to get doctor count: {e}")
             doctor_count = 1
 
         try:
             r = supabase.table("appointments").select("id", count="exact").execute()
             appt_count = r.count or 0
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Non-critical data fetch failed: {e}")
 
         try:
             r = supabase.table("scans").select("id", count="exact").execute()
             scan_count = r.count or 0
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Non-critical data fetch failed: {e}")
 
         try:
             r = supabase.table("appointments").select("id", count="exact").eq("status", "completed").execute()
             completed_count = r.count or 0
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Non-critical data fetch failed: {e}")
 
         try:
             r = supabase.table("appointments").select("id", count="exact").eq("status", "pending").execute()
             _ = r.count or 0  # noqa: F841
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Non-critical data fetch failed: {e}")
 
         # 2. Growth data â€” build from current totals across current year months
         user_total = patient_count + doctor_count
@@ -160,8 +161,8 @@ async def get_platform_stats(
                         .execute()
                     )
                     patient_map = {p["id"]: p["full_name"] for p in pats_res.data or []}
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.warning(f"Non-critical data fetch failed: {e}")
 
             for appt in latest_appts.data or []:
                 name = patient_map.get(appt.get("patient_id"), "Unknown Patient")
@@ -341,7 +342,8 @@ async def get_auth_metadata_batch(user_ids: list[str]) -> Dict[str, Any]:
                 auth_user = supabase.auth.admin.get_user_by_id(uid)
                 if auth_user and hasattr(auth_user, "user"):
                     auth_map[uid] = auth_user.user
-            except Exception:
+            except Exception as e:
+                logger.debug(f"Failed to fetch auth metadata for user: {e}")
                 continue
     except Exception as e:
         logger.warning(f"Failed to fetch auth metadata batch: {e}")
@@ -429,8 +431,8 @@ async def get_patient_detail(
             if auth_user and hasattr(auth_user, "user"):
                 metadata = auth_user.user.user_metadata or {}
                 phone = metadata.get("phone") or phone
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Non-critical data fetch failed: {e}")
 
         profile_data = patient_res.data
         profile_data["phone"] = phone
@@ -918,8 +920,8 @@ async def get_user_detail(
                     "total_appointments": len(appts_res.data or []),
                     "total_scans": len(scans_res.data or []),
                 }
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Non-critical data fetch failed: {e}")
 
         # Try doctor table
         try:
@@ -961,8 +963,8 @@ async def get_user_detail(
                         else 0
                     ),
                 }
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Non-critical data fetch failed: {e}")
 
         raise HTTPException(status_code=404, detail="User not found")
     except HTTPException:
@@ -1046,8 +1048,8 @@ async def delete_user(id: str, current_user: TokenPayload = Depends(get_current_
             )
             if res.data:
                 return {"success": True, "message": "User deleted successfully"}
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Non-critical data fetch failed: {e}")
 
         # Try doctor
         try:
@@ -1059,8 +1061,8 @@ async def delete_user(id: str, current_user: TokenPayload = Depends(get_current_
             )
             if res.data:
                 return {"success": True, "message": "User deleted successfully"}
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Non-critical data fetch failed: {e}")
 
         raise HTTPException(status_code=404, detail="User not found")
     except HTTPException:
@@ -1244,8 +1246,8 @@ async def create_team_member(
             unique_name = f"team/{uuid.uuid4()}.{file_ext}"
             try:
                 supabase.storage.create_bucket("avatars", options={"public": True})
-            except Exception:
-                pass  # Bucket may already exist
+            except Exception as e:
+                logger.warning(f"Non-critical data fetch failed: {e}")  # Bucket may already exist
             supabase.storage.from_("avatars").upload(
                 path=unique_name,
                 file=contents,
@@ -1300,8 +1302,8 @@ async def update_team_member(
             unique_name = f"team/{id}_{uuid.uuid4()}.{file_ext}"
             try:
                 supabase.storage.create_bucket("avatars", options={"public": True})
-            except Exception:
-                pass  # Bucket may already exist
+            except Exception as e:
+                logger.warning(f"Non-critical data fetch failed: {e}")  # Bucket may already exist
             supabase.storage.from_("avatars").upload(
                 path=unique_name,
                 file=contents,
@@ -1454,8 +1456,8 @@ async def get_payment_detail(
                     .execute()
                 )
                 patient = patient_res.data
-            except Exception:
-                pass
+            except Exception as e:
+                logger.warning(f"Non-critical data fetch failed: {e}")
 
         # Get doctor info
         doctor_id = payment.get("doctor_id")
@@ -1470,8 +1472,8 @@ async def get_payment_detail(
                     .execute()
                 )
                 doctor = doctor_res.data
-            except Exception:
-                pass
+            except Exception as e:
+                logger.warning(f"Non-critical data fetch failed: {e}")
 
         # Get appointment info
         appointment_id = payment.get("appointment_id")
@@ -1486,8 +1488,8 @@ async def get_payment_detail(
                     .execute()
                 )
                 appointment = appointment_res.data
-            except Exception:
-                pass
+            except Exception as e:
+                logger.warning(f"Non-critical data fetch failed: {e}")
 
         # Get refund history
         try:
@@ -1495,7 +1497,8 @@ async def get_payment_detail(
                 supabase.table("refunds").select("*").eq("payment_id", id).execute()
             )
             refunds = refunds_res.data or []
-        except Exception:
+        except Exception as e:
+            logger.warning(f"Failed to fetch refunds: {e}")
             refunds = []
 
         return {

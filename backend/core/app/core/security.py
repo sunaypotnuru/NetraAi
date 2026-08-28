@@ -13,6 +13,30 @@ from app.models.schemas import TokenPayload, UserRole  # type: ignore
 logger = logging.getLogger(__name__)
 security = HTTPBearer(auto_error=True)  # Automatically reject requests without valid Bearer token
 
+# Module-level cached JWT secret to avoid brute-force on every request
+_processed_jwt_secret = None
+_jwt_algorithm = "HS256"
+
+
+def _initialize_jwt_secret() -> None:
+    """Process and cache the JWT secret once at module load. Called from lifespan."""
+    global _processed_jwt_secret, _jwt_algorithm
+    jwt_secret = settings.SUPABASE_JWT_SECRET
+    if not jwt_secret:
+        return
+    raw_secret = jwt_secret.strip().strip('"').strip("'")
+    if len(raw_secret) > 32:
+        try:
+            padded = raw_secret + "=" * ((4 - len(raw_secret) % 4) % 4)
+            decoded = base64.b64decode(padded)
+            _processed_jwt_secret = decoded
+            logger.info("JWT secret loaded (base64-decoded format)")
+            return
+        except Exception:
+            pass
+    _processed_jwt_secret = raw_secret
+    logger.info("JWT secret loaded (raw format)")
+
 
 async def get_current_user_ws(token: str) -> Dict[str, Any]:
     """
@@ -83,19 +107,24 @@ def verify_supabase_jwt(token: str) -> Dict[str, Any]:
                         pass
                 alg = "HS256"  # Override algorithm to HS256
         else:
-            # 3. Handle Symmetric (HS256) - BRUTE FORCE
-            raw_secret = jwt_secret.strip().strip('"').strip("'")
-            logger.info(
-                f"JWT Debug: Secret length={len(raw_secret)}, Starts with='{raw_secret[:3]}...'"
-            )
-            secrets_to_try = [raw_secret]
-            if len(raw_secret) > 32:
-                try:
-                    padded = raw_secret + "=" * ((4 - len(raw_secret) % 4) % 4)
-                    decoded = base64.b64decode(padded)
-                    secrets_to_try.insert(0, decoded)
-                except Exception:
-                    pass
+            # 3. Handle Symmetric (HS256) - Use cached secret if available
+            if _processed_jwt_secret is not None:
+                secrets_to_try = [_processed_jwt_secret]
+                logger.debug("JWT: Using cached pre-processed secret (fast path)")
+            else:
+                # Fallback: brute-force decode (only on first request before cache is ready)
+                raw_secret = jwt_secret.strip().strip('"').strip("'")
+                logger.info(
+                    f"JWT Debug: Secret length={len(raw_secret)}, Starts with='{raw_secret[:3]}...'"
+                )
+                secrets_to_try = [raw_secret]
+                if len(raw_secret) > 32:
+                    try:
+                        padded = raw_secret + "=" * ((4 - len(raw_secret) % 4) % 4)
+                        decoded = base64.b64decode(padded)
+                        secrets_to_try.insert(0, decoded)
+                    except Exception:
+                        pass
 
         # 4. Brute Force Decode
         payload = None
@@ -176,6 +205,14 @@ def get_current_user(
 
     # DEV / demo bypass controlled by backend settings only.
     is_bypass_active = settings.BYPASS_AUTH
+
+    # Belt-and-suspenders: Never allow bypass in production even if startup check missed it
+    if is_bypass_active and environment == "production":
+        logger.critical("BYPASS_AUTH attempted in production - rejecting request!")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Security configuration error"
+        )
 
     # Log bypass status for debugging
     logger.debug("BYPASS_AUTH setting: %s", settings.BYPASS_AUTH)

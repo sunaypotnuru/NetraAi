@@ -1,4 +1,4 @@
-import random
+import secrets
 import logging
 from fastapi import APIRouter, Query, Depends, HTTPException
 from typing import Optional
@@ -61,9 +61,9 @@ async def get_fda_metrics(model_name: str, hours: int = Query(24)):
                     "model_name": model_name,
                     "timestamp": record["timestamp"],
                     "sensitivity": 0.85 + (conf * 0.1),
-                    "specificity": 0.92 + (random.uniform(-0.01, 0.01)),
+                    "specificity": 0.92 + (secrets.randbelow(21) - 10) / 1000.0,
                     "ppv": 0.88 + (conf * 0.05),
-                    "npv": 0.90 + (random.uniform(-0.01, 0.01)),
+                    "npv": 0.90 + (secrets.randbelow(21) - 10) / 1000.0,
                     "auc_roc": 0.94 + (conf * 0.02),
                     "calibration_error": max(0.01, 0.1 - (conf * 0.1)),
                     "prediction_latency": record.get("prediction_latency_ms", 0.0),
@@ -90,14 +90,14 @@ def _generate_mock_fda_metrics(model_name: str, hours: int):
             {
                 "model_name": model_name,
                 "timestamp": ts.isoformat() + "Z",
-                "sensitivity": max(0.7, base_sens + random.uniform(-0.015, 0.015)),
-                "specificity": max(0.7, base_sens + random.uniform(-0.015, 0.015)),
-                "ppv": max(0.7, base_sens + random.uniform(-0.02, 0.02)),
-                "npv": max(0.8, base_sens + random.uniform(-0.01, 0.01)),
-                "auc_roc": max(0.8, base_sens + random.uniform(-0.01, 0.01)),
-                "calibration_error": random.uniform(0.01, 0.03),
-                "prediction_latency": random.uniform(120, 160),
-                "total_predictions": random.randint(120, 180),
+                "sensitivity": max(0.7, base_sens + (secrets.randbelow(31) - 15) / 1000.0),
+                "specificity": max(0.7, base_sens + (secrets.randbelow(31) - 15) / 1000.0),
+                "ppv": max(0.7, base_sens + (secrets.randbelow(41) - 20) / 1000.0),
+                "npv": max(0.8, base_sens + (secrets.randbelow(21) - 10) / 1000.0),
+                "auc_roc": max(0.8, base_sens + (secrets.randbelow(21) - 10) / 1000.0),
+                "calibration_error": 0.01 + secrets.randbelow(21) / 1000.0,
+                "prediction_latency": 120 + secrets.randbelow(41),
+                "total_predictions": 120 + secrets.randbelow(61),
                 "mocked": True,
             }
         )
@@ -142,14 +142,14 @@ async def get_latest_fda_metrics(model_name: str):
     return {
         "model_name": model_name,
         "timestamp": datetime.utcnow().isoformat() + "Z",
-        "sensitivity": base_sens + random.uniform(-0.02, 0.02),
-        "specificity": base_sens + random.uniform(-0.02, 0.02),
-        "ppv": base_sens + random.uniform(-0.03, 0.03),
-        "npv": base_sens + random.uniform(-0.01, 0.01),
-        "auc_roc": base_sens + random.uniform(-0.01, 0.01),
-        "calibration_error": random.uniform(0.01, 0.05),
-        "prediction_latency": random.uniform(100, 300),
-        "total_predictions": random.randint(500, 2000),
+        "sensitivity": base_sens + (secrets.randbelow(41) - 20) / 1000.0,
+        "specificity": base_sens + (secrets.randbelow(41) - 20) / 1000.0,
+        "ppv": base_sens + (secrets.randbelow(61) - 30) / 1000.0,
+        "npv": base_sens + (secrets.randbelow(21) - 10) / 1000.0,
+        "auc_roc": base_sens + (secrets.randbelow(21) - 10) / 1000.0,
+        "calibration_error": 0.01 + secrets.randbelow(41) / 1000.0,
+        "prediction_latency": 100 + secrets.randbelow(201),
+        "total_predictions": 500 + secrets.randbelow(1501),
         "mocked": True,
     }
 

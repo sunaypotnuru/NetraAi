@@ -3,6 +3,8 @@ FastAPI wrapper for SOC 2 Evidence Collector
 Provides REST API endpoints for SOC 2 evidence collection and management
 """
 
+import os
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -12,6 +14,8 @@ import logging
 import json
 
 from soc2_evidence_collector import SOC2EvidenceCollector
+
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -35,16 +39,16 @@ app.add_middleware(
 
 # Configuration
 CONFIG = {
-    "evidence_dir": "./soc2-evidence",
+    "evidence_dir": os.getenv("SOC2_EVIDENCE_DIR", "./soc2-evidence"),
     "database": {
-        "host": "localhost",
-        "port": 5432,
-        "database": "netra_ai",
-        "user": "netra_ai",
-        "password": "secure_password",
+        "host": os.getenv("DB_HOST", "localhost"),
+        "port": int(os.getenv("DB_PORT", "5432")),
+        "database": os.getenv("DB_NAME", "netra_ai"),
+        "user": os.getenv("DB_USER", "netra_ai"),
+        "password": os.getenv("DB_PASSWORD", ""),
     },
-    "github_token": "your_github_token",
-    "github_repo": "netra-ai/netra-ai-platform",
+    "github_token": os.getenv("GITHUB_TOKEN", ""),
+    "github_repo": os.getenv("GITHUB_REPO", "netra-ai/netra-ai-platform"),
 }
 
 # Initialize evidence collector

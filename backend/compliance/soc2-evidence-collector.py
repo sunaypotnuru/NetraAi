@@ -1399,16 +1399,16 @@ class SOC2EvidenceCollector:
 
 if __name__ == "__main__":
     config = {
-        "evidence_dir": "./soc2-evidence",
+        "evidence_dir": os.getenv("SOC2_EVIDENCE_DIR", "./soc2-evidence"),
         "database": {
-            "host": "localhost",
-            "port": 5432,
-            "database": "netra_ai",
-            "user": "netra_ai",
-            "password": "secure_password",
+            "host": os.getenv("DB_HOST", "localhost"),
+            "port": int(os.getenv("DB_PORT", "5432")),
+            "database": os.getenv("DB_NAME", "netra_ai"),
+            "user": os.getenv("DB_USER", "netra_ai"),
+            "password": os.getenv("DB_PASSWORD", ""),
         },
         "github_token": os.getenv("GITHUB_TOKEN"),
-        "github_repo": "netra-ai/netra-ai-platform",
+        "github_repo": os.getenv("GITHUB_REPO", "netra-ai/netra-ai-platform"),
     }
 
     collector = SOC2EvidenceCollector(config)

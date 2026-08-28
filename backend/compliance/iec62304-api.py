@@ -3,6 +3,8 @@ FastAPI wrapper for IEC 62304 Traceability System
 Provides REST API endpoints for requirements traceability management
 """
 
+import os
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -11,6 +13,8 @@ from datetime import datetime
 import logging
 
 from iec62304_traceability import TraceabilityMatrix, SafetyClass
+
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -34,11 +38,11 @@ app.add_middleware(
 
 # Database configuration
 DB_CONFIG = {
-    "host": "localhost",
-    "port": 5432,
-    "database": "netra_ai",
-    "user": "netra_ai",
-    "password": "secure_password",
+    "host": os.getenv("DB_HOST", "localhost"),
+    "port": int(os.getenv("DB_PORT", "5432")),
+    "database": os.getenv("DB_NAME", "netra_ai"),
+    "user": os.getenv("DB_USER", "netra_ai"),
+    "password": os.getenv("DB_PASSWORD", ""),
 }
 
 # Initialize traceability system

@@ -1184,23 +1184,23 @@ async def simulate_audit_logs():
     Background task to simulate audit logs for demo.
     In production, this would be replaced by actual tool execution logging.
     """
-    import random  # noqa: F401
+    import secrets  # noqa: F401
 
     tool_names = [tool["name"] for tool in MCP_TOOLS]
     statuses = ["SUCCESS", "SUCCESS", "SUCCESS", "SUCCESS", "ERROR"]  # 80% success rate
     patient_ids = [f"PAT_{i:04d}" for i in range(1, 101)]
 
     while True:
-        await asyncio.sleep(random.uniform(2, 8))  # Random interval between logs
+        await asyncio.sleep(2 + secrets.randbelow(7))  # Random interval between logs
 
-        tool_name = random.choice(tool_names)
-        status = random.choice(statuses)
-        patient_id = random.choice(patient_ids)
-        latency_ms = random.uniform(150, 1200)
+        tool_name = secrets.choice(tool_names)
+        status = secrets.choice(statuses)
+        patient_id = secrets.choice(patient_ids)
+        latency_ms = 150 + secrets.randbelow(1051)
 
         details = {
-            "user_id": f"USER_{random.randint(1, 20):03d}",
-            "ip_address": f"192.168.1.{random.randint(1, 255)}",
+            "user_id": f"USER_{secrets.randbelow(20) + 1:03d}",
+            "ip_address": f"192.168.1.{secrets.randbelow(255) + 1}",
             "category": next(
                 (t["category"] for t in MCP_TOOLS if t["name"] == tool_name), "Unknown"
             ),

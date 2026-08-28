@@ -10,11 +10,11 @@ uvicorn[standard]
 python-multipart
 httpx
 jinja2
-pydantic<2.0
+pydantic>=2.0.0
 
 # ── IMAGE PROCESSING & COMPUTER VISION ─────────────────────
 Pillow
-numpy<2.0
+numpy==1.26.4
 opencv-python
 scikit-learn
 pandas

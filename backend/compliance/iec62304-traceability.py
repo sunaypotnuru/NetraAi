@@ -4,6 +4,7 @@ Manages requirements, design, implementation, and testing traceability
 """
 
 import json
+import os
 import logging
 from datetime import datetime
 from typing import Dict, List, Optional
@@ -479,11 +480,11 @@ class TraceabilityMatrix:
 # Example usage
 if __name__ == "__main__":
     db_config = {
-        "host": "localhost",
-        "port": 5432,
-        "database": "netra_ai",
-        "user": "netra_ai",
-        "password": "secure_password",
+        "host": os.getenv("DB_HOST", "localhost"),
+        "port": int(os.getenv("DB_PORT", "5432")),
+        "database": os.getenv("DB_NAME", "netra_ai"),
+        "user": os.getenv("DB_USER", "netra_ai"),
+        "password": os.getenv("DB_PASSWORD", ""),
     }
 
     tm = TraceabilityMatrix(db_config)
