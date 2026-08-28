@@ -88,6 +88,7 @@ const HealthGoalDetailsPage = withSuspense(lazyWithRetry(() => import("./pages/p
 const LogGoalProgressPage = withSuspense(lazyWithRetry(() => import("./pages/patient/goals/LogGoalProgressPage")));
 const FamilyMembersPage = withSuspense(lazyWithRetry(() => import("./pages/patient/family/FamilyMembersPage")));
 const AddEditFamilyMemberPage = withSuspense(lazyWithRetry(() => import("./pages/patient/family/AddEditFamilyMemberPage")));
+const EmergencyContactsPage = withSuspense(lazyWithRetry(() => import("./pages/patient/EmergencyContactsPage")));
 const VitalsHistoryPage = withSuspense(lazyWithRetry(() => import("./pages/patient/records/VitalsHistoryPage")));
 const LabResultsHistoryPage = withSuspense(lazyWithRetry(() => import("./pages/patient/records/LabResultsHistoryPage")));
 const FollowUpPage = withSuspense(lazyWithRetry(() => import("./pages/FollowUpPage")));
@@ -286,6 +287,7 @@ export const router = createBrowserRouter([
                     { path: "family", Component: FamilyMembersPage },
                     { path: "family/add", Component: AddEditFamilyMemberPage },
                     { path: "family/edit/:memberId", Component: AddEditFamilyMemberPage },
+                    { path: "emergency-contacts", Component: EmergencyContactsPage },
                     { path: "records/vitals", Component: VitalsHistoryPage },
                     { path: "records/lab-results", Component: LabResultsHistoryPage },
                     { path: "follow-up/:appointmentId", Component: FollowUpPage },

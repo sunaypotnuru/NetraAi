@@ -63,7 +63,7 @@ class ChatResponse(BaseModel):
     tokens_used: Optional[int] = None
 
 
-# System prompt for mental health support
+# System prompt for mental health support with enhanced crisis protocols
 MENTAL_HEALTH_SYSTEM_PROMPT = """You are a compassionate mental health support assistant. Your role is to:
 
 1. Listen empathetically to users' concerns
@@ -73,19 +73,42 @@ MENTAL_HEALTH_SYSTEM_PROMPT = """You are a compassionate mental health support a
 5. Encourage professional help when needed
 
 IMPORTANT GUIDELINES:
-- You are NOT a replacement for professional therapy
+- You are NOT a replacement for professional therapy or medical advice
 - Always encourage users to seek professional help for serious concerns
-- If you detect crisis keywords (suicide, self-harm), immediately provide crisis hotlines
+- If you detect ANY crisis indicators (suicide, self-harm, violence), IMMEDIATELY:
+  * Express concern and validate their feelings
+  * Provide crisis hotlines prominently
+  * Strongly urge immediate professional intervention
+  * DO NOT try to "solve" the crisis - escalate to professionals
 - Be warm, non-judgmental, and supportive
 - Use simple, clear language
-- Provide actionable advice
+- Provide actionable advice for non-crisis situations
+- Acknowledge limitations - refer to mental health professionals when appropriate
 
-CRISIS HOTLINES (always mention if crisis detected):
-- National Suicide Prevention Lifeline: 988
-- Crisis Text Line: Text HOME to 741741
-- SAMHSA National Helpline: 1-800-662-4357
+CRISIS DETECTION KEYWORDS (trigger immediate escalation):
+- Suicide ideation: "kill myself", "end my life", "want to die", "planning suicide"
+- Self-harm: "cut myself", "hurt myself", "self-harm", "overdose"
+- Severe distress: "can't go on", "no reason to live", "better off dead"
 
-Remember: You're here to support, not diagnose or treat."""
+CRISIS RESPONSE PROTOCOL:
+1. Acknowledge their pain: "I hear you're in a lot of pain right now"
+2. Express concern: "I'm very concerned about your safety"
+3. Provide hotlines: List 988 and Crisis Text Line prominently
+4. Encourage immediate action: "Please reach out to these resources right now"
+5. Validate decision to seek help: "Reaching out takes courage"
+
+CRISIS HOTLINES (always mention for crisis situations):
+- National Suicide Prevention Lifeline: 988 (24/7 free support)
+- Crisis Text Line: Text HOME to 741741 (24/7 text support)
+- SAMHSA National Helpline: 1-800-662-4357 (substance abuse/mental health)
+
+NON-CRISIS SUPPORT:
+- For anxiety: Breathing exercises, grounding techniques
+- For depression: Behavioral activation, self-care routines
+- For stress: Time management, boundary setting
+- Always suggest professional therapy as complement to coping strategies
+
+Remember: You're here to support and guide toward professional help, not to diagnose, treat, or manage crises alone."""
 
 
 async def chat_with_groq(
@@ -136,30 +159,80 @@ async def chat_with_groq(
 
 def detect_crisis_in_response(user_message: str, ai_response: str) -> dict:
     """
-    Detect if crisis intervention is needed
+    Enhanced multi-layer crisis detection with pattern matching
     Returns crisis info if detected
+    
+    LAYERS:
+    1. Direct suicide/self-harm keywords
+    2. Contextual phrases indicating intent
+    3. Combination patterns (e.g., "feel" + "worthless" + "give up")
     """
-    crisis_keywords = [
+    text_lower = user_message.lower()
+    
+    # Layer 1: High-severity direct keywords (immediate crisis)
+    critical_keywords = [
         "kill myself",
         "suicide",
         "end my life",
         "want to die",
-        "self-harm",
+        "going to die",
+        "planning to die",
+        "better off dead",
+        "should be dead",
+        "wish i was dead",
+        "no reason to live",
+        "can't go on anymore"
+    ]
+    
+    # Layer 2: Self-harm indicators
+    self_harm_keywords = [
         "cut myself",
         "hurt myself",
-        "no reason to live",
-        "hopeless",
-        "can't go on",
-        "better off dead",
+        "self harm",
+        "self-harm",
+        "harm myself",
+        "cutting",
+        "burning myself",
+        "overdose"
     ]
-
-    text_lower = user_message.lower()
-
-    for keyword in crisis_keywords:
+    
+    # Layer 3: Contextual crisis indicators (combined patterns)
+    despair_indicators = ["hopeless", "worthless", "pointless", "meaningless", "can't do this"]
+    giving_up_indicators = ["give up", "giving up", "quit life", "done with life", "no point"]
+    
+    # Check critical keywords first
+    for keyword in critical_keywords:
         if keyword in text_lower:
             return {
                 "crisis_detected": True,
+                "severity": "critical",
                 "message": "I'm very concerned about what you're sharing. Please reach out for immediate help.",
+                "hotlines": [
+                    {
+                        "name": "National Suicide Prevention Lifeline",
+                        "number": "988",
+                        "description": "24/7 free and confidential support",
+                    },
+                    {
+                        "name": "Crisis Text Line",
+                        "number": "Text HOME to 741741",
+                        "description": "24/7 text support",
+                    },
+                    {
+                        "name": "SAMHSA National Helpline",
+                        "number": "1-800-662-4357",
+                        "description": "Substance abuse and mental health services",
+                    },
+                ],
+            }
+    
+    # Check self-harm keywords
+    for keyword in self_harm_keywords:
+        if keyword in text_lower:
+            return {
+                "crisis_detected": True,
+                "severity": "high",
+                "message": "I'm concerned about your safety. Please reach out for help right away.",
                 "hotlines": [
                     {
                         "name": "National Suicide Prevention Lifeline",
@@ -173,6 +246,24 @@ def detect_crisis_in_response(user_message: str, ai_response: str) -> dict:
                     },
                 ],
             }
+    
+    # Check contextual patterns (despair + giving up)
+    despair_count = sum(1 for phrase in despair_indicators if phrase in text_lower)
+    giving_up_count = sum(1 for phrase in giving_up_indicators if phrase in text_lower)
+    
+    if despair_count >= 2 or (despair_count >= 1 and giving_up_count >= 1):
+        return {
+            "crisis_detected": True,
+            "severity": "moderate",
+            "message": "It sounds like you're going through a really difficult time. Please consider reaching out for support.",
+            "hotlines": [
+                {
+                    "name": "National Suicide Prevention Lifeline",
+                    "number": "988",
+                    "description": "24/7 free and confidential support",
+                },
+            ],
+        }
 
     return {"crisis_detected": False}
 

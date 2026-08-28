@@ -1526,10 +1526,35 @@ async def trigger_emergency_sos(
                         detail="No valid emergency contacts configured. Please update your profile.",
                     )
 
-                # Broadcast to all contacts
+                # Broadcast to all contacts with delivery tracking
+                sms_results = []
                 for phone in emergency_phones:
-                    client.messages.create(
-                        body=sms_body, from_=settings.TWILIO_PHONE_NUMBER, to=phone
+                    try:
+                        message = client.messages.create(
+                            body=sms_body, from_=settings.TWILIO_PHONE_NUMBER, to=phone
+                        )
+                        sms_results.append({
+                            "phone": phone,
+                            "status": message.status,
+                            "sid": message.sid,
+                            "success": True
+                        })
+                        logger.info(f"SOS SMS sent to {phone}: {message.sid} (status: {message.status})")
+                    except Exception as sms_err:
+                        sms_results.append({
+                            "phone": phone,
+                            "status": "failed",
+                            "error": str(sms_err),
+                            "success": False
+                        })
+                        logger.error(f"Failed to send SOS SMS to {phone}: {sms_err}")
+                
+                # Check if at least one SMS was sent successfully
+                successful_sms = [r for r in sms_results if r.get("success")]
+                if not successful_sms:
+                    raise HTTPException(
+                        status_code=503,
+                        detail="Failed to send SMS to any emergency contacts. Please call emergency services directly."
                     )
             else:
                 logger.warning(

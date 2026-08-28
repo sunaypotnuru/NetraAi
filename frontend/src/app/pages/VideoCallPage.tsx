@@ -78,6 +78,8 @@ export default function VideoCallPage() {
   const [isRecording, setIsRecording] = useState(false);
   const [egressId, setEgressId] = useState<string | null>(null);
   const [isTogglingRecord, setIsTogglingRecord] = useState(false);
+  const [showRecordingConsent, setShowRecordingConsent] = useState(false);
+  const [recordingConsentGiven, setRecordingConsentGiven] = useState(false);
 
   // Notes and History
   const [clinicalNotes, setClinicalNotes] = useState("");
@@ -151,6 +153,13 @@ export default function VideoCallPage() {
 
   const toggleRecording = async () => {
     if (!appointmentId) return;
+    
+    // HIPAA Compliance: Require explicit consent before recording (45 CFR § 164.508)
+    if (!isRecording && !recordingConsentGiven) {
+      setShowRecordingConsent(true);
+      return;
+    }
+    
     setIsTogglingRecord(true);
     try {
       if (isRecording && egressId) {
@@ -169,6 +178,13 @@ export default function VideoCallPage() {
     } finally {
       setIsTogglingRecord(false);
     }
+  };
+  
+  const handleRecordingConsentAccept = () => {
+    setRecordingConsentGiven(true);
+    setShowRecordingConsent(false);
+    // Automatically start recording after consent
+    toggleRecording();
   };
 
   // Helper render for the shared controls and side panels
@@ -468,6 +484,23 @@ export default function VideoCallPage() {
       {/* Simulated Interactive Telemedicine Room Mode (Fallback / Mock mode) */}
       {connectionState === 'ready' && isMockMode && (
         <div className="flex-1 flex flex-col overflow-hidden bg-slate-950">
+          {/* HIPAA Compliance Warning - Mock Mode Alert */}
+          <div className="bg-yellow-500/20 border-b-2 border-yellow-500 px-6 py-3 flex items-center gap-3 shrink-0">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-500/30">
+              <svg className="w-5 h-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <p className="text-yellow-100 font-semibold text-sm">
+                ⚠️ Demo Mode Active - LiveKit Connection Unavailable
+              </p>
+              <p className="text-yellow-200/80 text-xs mt-0.5">
+                This is a simulated video consultation for testing purposes only. Real-time video streaming requires LiveKit server configuration. No actual PHI transmission is occurring.
+              </p>
+            </div>
+          </div>
+          
           {/* Top Bar */}
           <div className="h-16 flex items-center justify-between px-6 bg-[#1E293B] border-b border-white/10 shrink-0 select-none">
             <div className="flex items-center gap-4">
@@ -798,6 +831,86 @@ export default function VideoCallPage() {
           </div>
         </LiveKitRoom>
       )}
+      
+      {/* HIPAA Recording Consent Dialog (45 CFR § 164.508) */}
+      <AnimatePresence>
+        {showRecordingConsent && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            onClick={() => setShowRecordingConsent(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6"
+            >
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center shrink-0">
+                  <Circle className="w-6 h-6 text-red-600 fill-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-1">
+                    Recording Consent Required
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    HIPAA compliance notice
+                  </p>
+                </div>
+              </div>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <p className="text-sm text-gray-800 leading-relaxed mb-3">
+                  By clicking "I Consent," you authorize the recording of this video consultation for medical record-keeping purposes.
+                </p>
+                <ul className="text-xs text-gray-700 space-y-2">
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                    <span>Recording will include video, audio, and any shared content</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                    <span>Recordings are encrypted and stored securely (HIPAA-compliant)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                    <span>Only authorized healthcare providers can access recordings</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                    <span>You can request recording deletion by contacting support</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="flex gap-3">
+                <Button
+                  onClick={handleRecordingConsentAccept}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                >
+                  <Check className="w-4 h-4 mr-2" />
+                  I Consent to Recording
+                </Button>
+                <Button
+                  onClick={() => setShowRecordingConsent(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+              </div>
+              
+              <p className="text-xs text-gray-500 mt-4 text-center">
+                Protected by HIPAA • 45 CFR § 164.508
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

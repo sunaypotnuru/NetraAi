@@ -34,6 +34,7 @@ export default function DashboardPage() {
     { label: t("patient.dashboard.qa_risk", "Risk Assessment"), desc: t("patient.dashboard.qa_risk_desc", "Clinical scoring"), icon: Heart, path: "/patient/risk-assessment", color: "#E11D48", bg: "#FFF1F2" },
     { label: t("patient.dashboard.qa_meds", "Medications"), desc: t("patient.dashboard.qa_meds_desc", "Pill trackers & alerts"), icon: Pill, path: "/patient/medications", color: "#6366F1", bg: "#EEF2FF" },
     { label: t("patient.dashboard.qa_vitals", "Track Vitals"), desc: t("patient.dashboard.qa_vitals_desc", "Chronic disease monitoring"), icon: Activity, path: "/patient/tracker", color: "#E11D48", bg: "#FFF1F2" },
+    { label: "Emergency Contacts", desc: "Manage SOS contacts", icon: PhoneCall, path: "/patient/emergency-contacts", color: "#DC2626", bg: "#FEF2F2" },
   ];
   const [showFamilyDropdown, setShowFamilyDropdown] = useState(false);
   const [showCustomize, setShowCustomize] = useState(false);

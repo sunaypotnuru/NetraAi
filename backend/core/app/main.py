@@ -60,6 +60,7 @@ from app.routes.doctor_portal import router as doctor_portal_router
 from app.routes.patient_portal import router as patient_portal_router
 from app.routes.websocket import router as websocket_router
 from app.routes.blogs import router as blogs_router
+from app.routes.emergency_contacts import router as emergency_contacts_router
 from app.middleware.activity import ActivityLoggingMiddleware  # type: ignore
 from app.middleware.input_validation import SecurityInputValidationMiddleware  # type: ignore
 from app.middleware.csrf_protection import CSRFProtectionMiddleware  # type: ignore
@@ -517,6 +518,7 @@ app.include_router(auth_security_router, prefix=settings.API_V1_STR)
 
 # Categories 5-6: Doctor & Patient Portal Features
 app.include_router(doctor_portal_router)  # Already has /api/v1/doctor prefix
+app.include_router(emergency_contacts_router)  # Already has /api/v1/patient prefix
 
 
 # WebSocket Routes (Category 4: Messaging System)

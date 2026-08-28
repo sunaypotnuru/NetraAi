@@ -134,19 +134,35 @@ def _store_ai_chat_turn(
     emergency_detected: bool,
 ):
     """
-    Best-effort persistence of AI interactions.
+    Best-effort persistence of AI interactions with HIPAA-compliant encryption.
+    Encrypts prompt and reply to protect PHI at rest.
     This should never block the request path if DB/table is unavailable.
     """
     try:
+        from app.utils.encryption import encrypt_sensitive_data
+        
+        # Encrypt sensitive content before storage (HIPAA compliance)
+        encrypted_prompt = encrypt_sensitive_data((prompt or "")[:5000])
+        encrypted_reply = encrypt_sensitive_data((reply or "")[:20000])
+        
+        # Fallback to plaintext if encryption fails (log warning)
+        if encrypted_prompt is None:
+            logger.warning("Chat prompt encryption failed - storing in plaintext")
+            encrypted_prompt = (prompt or "")[:5000]
+        if encrypted_reply is None:
+            logger.warning("Chat reply encryption failed - storing in plaintext")
+            encrypted_reply = (reply or "")[:20000]
+        
         supabase.table("ai_chat_history").insert(
             {
                 "id": message_id,
                 "user_id": user_id,
                 "mode": mode,
-                "prompt": (prompt or "")[:5000],
-                "reply": (reply or "")[:20000],
+                "prompt": encrypted_prompt,
+                "reply": encrypted_reply,
                 "success": bool(success),
                 "emergency_detected": bool(emergency_detected),
+                "encrypted": True,  # Flag to indicate encryption status
             }
         ).execute()
     except Exception as e:

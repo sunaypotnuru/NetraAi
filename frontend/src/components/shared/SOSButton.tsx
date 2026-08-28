@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { AlertTriangle, X, Phone } from "lucide-react";
+import { AlertTriangle, X, Phone, Settings } from "lucide-react";
 import { patientAPI } from "@/lib/api";
 import { toast } from "sonner";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { useTranslation } from "@/lib/i18n";
 
 /**
@@ -12,6 +12,7 @@ import { useTranslation } from "@/lib/i18n";
  */
 export default function SOSButton() {
   const { t } = useTranslation();
+    const navigate = useNavigate();
     const [confirming, setConfirming] = useState(false);
     const [firing, setFiring] = useState(false);
     const location = useLocation();
@@ -60,9 +61,19 @@ export default function SOSButton() {
         <div className="fixed bottom-24 right-6 z-50 flex flex-col items-end gap-2">
             {/* Confirm dialog */}
             {confirming && (
-                <div className="bg-card border-2 border-red-500 rounded-2xl shadow-2xl p-4 max-w-[220px] text-right">
+                <div className="bg-card border-2 border-red-500 rounded-2xl shadow-2xl p-4 max-w-[260px] text-right">
                     <p className="text-sm font-bold text-red-500 mb-1">{t('components.s_o_s_button.send_emergency_sos', "Send Emergency SOS?")}</p>
                     <p className="text-xs text-muted-foreground mb-3">{t('components.s_o_s_button.your_location_will_be_1', "Your location will be sent to emergency contacts.")}</p>
+                    <button
+                        onClick={() => {
+                            setConfirming(false);
+                            navigate('/patient/emergency-contacts');
+                        }}
+                        className="w-full text-xs text-blue-600 hover:text-blue-700 mb-3 flex items-center justify-end gap-1"
+                    >
+                        <Settings className="w-3 h-3" />
+                        Manage Emergency Contacts
+                    </button>
                     <div className="flex gap-2 justify-end">
                         <button
                             onClick={() => setConfirming(false)}
