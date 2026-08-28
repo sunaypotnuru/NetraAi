@@ -58,9 +58,9 @@ def _best_effort_audit(action: str, payload: dict) -> None:
                 "timestamp": _utcnow().isoformat(),
             }
         ).execute()
-    except Exception:
+    except Exception as e:
+        logger.warning(f"Failed to write to audit trail: {e}")
         # Never block authentication flow on audit pipeline failures.
-        pass
 
 
 @router.post("/precheck")
@@ -126,9 +126,9 @@ async def get_auth_security_policy():
         )
         if result.data and len(result.data) > 0:
             enforce_admin_2fa = bool(result.data[0].get("value", False))
-    except Exception:
+    except Exception as e:
+        logger.warning(f"Failed to fetch 2FA enforcement config: {e}")
         # Keep default policy if config table is unavailable.
-        pass
 
     return {"enforce_admin_2fa": enforce_admin_2fa}
 

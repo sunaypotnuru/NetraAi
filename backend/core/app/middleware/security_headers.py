@@ -23,18 +23,34 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
 
         # Permissions Policy (formerly Feature Policy)
+        # Comprehensive policy to restrict access to sensitive browser features
         permissions_policy = (
-            "geolocation=(), "
-            "microphone=(), "
+            "accelerometer=(), "
+            "ambient-light-sensor=(), "
+            "autoplay=(), "
+            "battery=(), "
             "camera=(), "
-            "payment=(), "
-            "usb=(), "
-            "magnetometer=(), "
-            "gyroscope=(), "
-            "speaker=(), "
-            "vibrate=(), "
+            "display-capture=(), "
+            "document-domain=(), "
+            "encrypted-media=(), "
+            "execution-while-not-rendered=(), "
+            "execution-while-out-of-viewport=(), "
             "fullscreen=(self), "
-            "sync-xhr=()"
+            "geolocation=(), "
+            "gyroscope=(), "
+            "magnetometer=(), "
+            "microphone=(), "
+            "midi=(), "
+            "navigation-override=(), "
+            "payment=(), "
+            "picture-in-picture=(), "
+            "publickey-credentials-get=(), "
+            "screen-wake-lock=(), "
+            "speaker=(), "
+            "sync-xhr=(), "
+            "usb=(), "
+            "web-share=(), "
+            "xr-spatial-tracking=()"
         )
         response.headers["Permissions-Policy"] = permissions_policy
 
@@ -89,8 +105,13 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         # Additional security headers (skip for API docs)
         if request.url.path not in ["/docs", "/redoc", "/openapi.json"]:
             response.headers["X-Permitted-Cross-Domain-Policies"] = "none"
+            
+            # Cross-Origin Policies for defense-in-depth
+            # COEP: Requires explicit CORS opt-in for cross-origin resources
             response.headers["Cross-Origin-Embedder-Policy"] = "require-corp"
+            # COOP: Isolates browsing context to prevent cross-origin attacks
             response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+            # CORP: Prevents cross-origin resource loading (main protection layer)
             response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
 
         # Cache control for sensitive endpoints

@@ -43,5 +43,6 @@ def warmup_deepseek_sync():
         # The actual first call will handle the connection
         logger.info("📡 AI services initialized (Groq + Gemini Fallback).")
         return True
-    except Exception:
+    except Exception as e:
+        logger.error(f"Failed to initialize AI services: {e}", exc_info=True)
         return False

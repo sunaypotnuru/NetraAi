@@ -237,8 +237,9 @@ class DocumentService:
                 file_path = file_url.split(f"{self.storage_bucket}/")[-1]
 
                 self.supabase.storage.from_(self.storage_bucket).remove([file_path])
-            except Exception:
-                pass  # Continue even if storage deletion fails
+            except Exception as e:
+                logger.warning(f"Failed to delete file from storage: {file_path}. Error: {e}")
+                # Continue even if storage deletion fails
 
         # Delete from database
         response = (

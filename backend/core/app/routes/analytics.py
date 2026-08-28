@@ -50,28 +50,28 @@ class SimpleAnalyticsRestService:
 
         try:
             patient_count = supabase.table("profiles_patient").select("id", count="exact").execute().count or 0
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Failed to fetch patient count: {e}")
 
         try:
             doctor_count = supabase.table("profiles_doctor").select("id", count="exact").execute().count or 0
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Failed to fetch doctor count: {e}")
 
         try:
             appt_count = supabase.table("appointments").select("id", count="exact").execute().count or 0
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Failed to fetch appointment count: {e}")
 
         try:
             scan_count = supabase.table("scans").select("id", count="exact").execute().count or 0
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Failed to fetch scan count: {e}")
 
         try:
             completed_count = supabase.table("appointments").select("id", count="exact").eq("status", "completed").execute().count or 0
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Failed to fetch completed appointment count: {e}")
 
         completion_rate = (completed_count / appt_count * 100) if appt_count > 0 else 0
         estimated_revenue = completed_count * 50.0
@@ -102,8 +102,8 @@ class SimpleAnalyticsRestService:
 
                 cnt = supabase.table("appointments").select("id", count="exact").gte("created_at", day_str).lt("created_at", next_day_str).execute().count or 0
                 daily_trends.append({"date": day_str, "appointments": cnt})
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error(f"Failed to fetch appointment trends: {e}")
         return {"daily_trends": list(reversed(daily_trends))}
 
     def get_ai_usage_trends(self, start: datetime, end: datetime):
@@ -117,8 +117,8 @@ class SimpleAnalyticsRestService:
 
                 cnt = supabase.table("scans").select("id", count="exact").gte("created_at", day_str).lt("created_at", next_day_str).execute().count or 0
                 daily_trends.append({"date": day_str, "consultations": cnt, "avg_confidence": 0.92})
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error(f"Failed to fetch AI usage trends: {e}")
         return {"daily_trends": list(reversed(daily_trends))}
 
 

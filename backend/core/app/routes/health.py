@@ -38,7 +38,8 @@ async def detailed_health():
         disk = psutil.disk_usage("/")
         memory_percent = mem.percent
         disk_percent = disk.percent
-    except Exception:
+    except Exception as e:
+        logger.warning(f"Failed to retrieve system metrics: {e}")
         cpu_percent = 0
         memory_percent = 0
         disk_percent = 0

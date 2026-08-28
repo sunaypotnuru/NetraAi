@@ -51,8 +51,8 @@ async def get_documents(
                     logger.info(
                         f"BYPASS_AUTH: Mapping zero-UUID to real patient ID: {user_id}"
                     )
-            except Exception:
-                pass
+            except Exception as e:
+                logger.warning(f"Failed to map zero-UUID to real patient ID: {e}")
 
         query = supabase.table("documents").select("*").eq("patient_id", user_id)
 
@@ -172,8 +172,8 @@ async def upload_document(
                     logger.info(
                         f"BYPASS_AUTH: Mapping upload to real patient ID: {user_id}"
                     )
-            except Exception:
-                pass
+            except Exception as e:
+                logger.warning(f"Failed to map upload to real patient ID: {e}")
 
         # Unique filename to avoid collisions
         file_id = str(uuid.uuid4())
@@ -183,8 +183,9 @@ async def upload_document(
         # Ensure private bucket exists
         try:
             supabase.storage.create_bucket("documents", options={"public": False})
-        except Exception:
-            pass  # Bucket already exists
+        except Exception as e:
+            logger.debug(f"Document bucket already exists or creation failed: {e}")
+            # Bucket already exists
 
         # Upload to Supabase Storage (private bucket)
         supabase.storage.from_("documents").upload(
@@ -342,8 +343,9 @@ async def delete_document(
         if storage_path:
             try:
                 supabase.storage.from_("documents").remove([storage_path])
-            except Exception:
-                pass  # Non-fatal; proceed with DB deletion
+            except Exception as e:
+                logger.warning(f"Failed to delete document from storage: {storage_path}. Error: {e}")
+                # Non-fatal; proceed with DB deletion
 
         del_res = supabase.table("documents").delete().eq("id", document_id).execute()
         if hasattr(del_res, "__await__"):

@@ -215,7 +215,8 @@ async def _best_effort_store_health_results(
                     "checked_at": datetime.now().isoformat(),
                 }
             ).execute()
-    except Exception:
+    except Exception as e:
+        logger.warning(f"Failed to store health check results: {e}")
         # Intentionally swallow to avoid crashing the API due to monitoring persistence issues
         return
 
@@ -228,9 +229,9 @@ async def _periodic_health_monitor(interval_seconds: int) -> None:
             ]
             service_results = await asyncio.gather(*service_checks)
             await _best_effort_store_health_results(service_results)
-        except Exception:
+        except Exception as e:
+            logger.error(f"Health monitor cycle failed: {e}")
             # Keep the loop running even if a single cycle fails
-            pass
 
         await asyncio.sleep(max(30, interval_seconds))
 
@@ -251,7 +252,8 @@ def start_periodic_health_monitor() -> None:
 
     try:
         interval = int(os.getenv("HEALTHCHECK_INTERVAL_SECONDS", "300"))
-    except Exception:
+    except Exception as e:
+        logger.warning(f"Invalid HEALTHCHECK_INTERVAL_SECONDS value, using default 300s: {e}")
         interval = 300
 
     _periodic_health_task = asyncio.create_task(_periodic_health_monitor(interval))

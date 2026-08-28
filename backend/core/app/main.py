@@ -376,6 +376,10 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Register custom exception handlers for standardized error responses
+from app.core.exception_handlers import register_exception_handlers  # type: ignore
+register_exception_handlers(app)
+logger.info("✅ Custom exception handlers registered")
 
 # CORS for React/Vite frontend with strict security
 def get_allowed_origins():

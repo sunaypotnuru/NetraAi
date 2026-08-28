@@ -60,7 +60,7 @@ export default function HomePage() {
       title: t("home.ai_models.dr_title", "Diabetic Retinopathy Detection"), 
       description: t("home.ai_models.dr_desc", "Automated DR screening and severity grading"), 
       accuracy: "95%",
-      status: "training",
+      status: "deployed",
       color: "#3B82F6" 
     },
     { 
@@ -68,7 +68,7 @@ export default function HomePage() {
       title: t("home.ai_models.cataract_title", "Cataract Detection"), 
       description: t("home.ai_models.cataract_desc", "Early cataract identification from eye images"), 
       accuracy: "95%",
-      status: "training",
+      status: "deployed",
       color: "#8B5CF6" 
     },
     { 
