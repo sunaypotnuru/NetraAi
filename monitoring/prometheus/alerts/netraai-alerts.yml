@@ -1,0 +1,244 @@
+groups:
+  - name: netraai_critical
+    interval: 30s
+    rules:
+      # ============================================================================
+      # CRITICAL ALERTS - Immediate Action Required
+      # ============================================================================
+      
+      - alert: ServiceDown
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: critical
+          category: availability
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "{{ $labels.job }} on {{ $labels.instance }} has been down for more than 2 minutes"
+          runbook_url: "https://docs.netraai.com/runbooks/service-down"
+          action: "1. Check service logs 2. Verify network connectivity 3. Restart service if needed"
+
+      - alert: HighErrorRate
+        expr: rate(mcp_tool_invocations_total{status="error"}[5m]) / rate(mcp_tool_invocations_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          category: reliability
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} (threshold: 5%)"
+          action: "Check application logs for error patterns and investigate root cause"
+
+      - alert: DatabaseConnectionsExhausted
+        expr: pg_stat_database_numbackends / pg_settings_max_connections > 0.9
+        for: 5m
+        labels:
+          severity: critical
+          category: database
+        annotations:
+          summary: "Database connection pool nearly exhausted"
+          description: "{{ $value | humanizePercentage }} of max connections in use"
+          action: "1. Check for connection leaks 2. Review slow queries 3. Consider scaling database"
+
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes / 1024 / 1024 / 1024 > 14
+        for: 10m
+        labels:
+          severity: critical
+          category: resources
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is {{ $value }}GB (HuggingFace limit: 16GB)"
+          action: "1. Check for memory leaks 2. Review large model loading 3. Consider optimization"
+
+  - name: netraai_warning
+    interval: 1m
+    rules:
+      # ============================================================================
+      # WARNING ALERTS - Investigation Needed
+      # ============================================================================
+      
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(mcp_tool_latency_seconds_bucket[5m])) > 10
+        for: 10m
+        labels:
+          severity: warning
+          category: performance
+        annotations:
+          summary: "High P95 latency detected"
+          description: "95th percentile latency is {{ $value }}s for {{ $labels.tool_name }}"
+          action: "Investigate slow operations and consider optimization"
+
+      - alert: ElevatedErrorRate
+        expr: rate(mcp_tool_invocations_total{status="error"}[5m]) / rate(mcp_tool_invocations_total[5m]) > 0.01
+        for: 15m
+        labels:
+          severity: warning
+          category: reliability
+        annotations:
+          summary: "Elevated error rate"
+          description: "Error rate is {{ $value | humanizePercentage }} (threshold: 1%)"
+          action: "Monitor error logs for patterns"
+
+      - alert: LowModelConfidence
+        expr: avg(mcp_prediction_confidence) < 0.7
+        for: 30m
+        labels:
+          severity: warning
+          category: ai_quality
+        annotations:
+          summary: "Low AI model confidence detected"
+          description: "Average prediction confidence is {{ $value | humanizePercentage }}"
+          action: "Review input data quality and model performance"
+
+      - alert: HighCPUUsage
+        expr: rate(process_cpu_seconds_total[5m]) * 100 > 80
+        for: 15m
+        labels:
+          severity: warning
+          category: resources
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is {{ $value }}%"
+          action: "Check for CPU-intensive operations or infinite loops"
+
+      - alert: SlowDatabaseQueries
+        expr: rate(pg_stat_statements_mean_exec_time[5m]) > 1000
+        for: 10m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "Slow database queries detected"
+          description: "Average query time is {{ $value }}ms"
+          action: "Review query performance and add indexes if needed"
+
+  - name: netraai_info
+    interval: 5m
+    rules:
+      # ============================================================================
+      # INFO ALERTS - Informational, No Immediate Action
+      # ============================================================================
+      
+      - alert: HighTrafficVolume
+        expr: rate(mcp_tool_invocations_total[5m]) > 10
+        for: 30m
+        labels:
+          severity: info
+          category: traffic
+        annotations:
+          summary: "High traffic volume detected"
+          description: "Request rate is {{ $value }} req/s"
+          action: "Monitor for potential scaling needs"
+
+      - alert: ServiceRestarted
+        expr: time() - process_start_time_seconds < 300
+        labels:
+          severity: info
+          category: availability
+        annotations:
+          summary: "Service {{ $labels.job }} recently restarted"
+          description: "Service has been running for less than 5 minutes"
+          action: "Verify restart was intentional and service is healthy"
+
+      - alert: DiskSpaceWarning
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.2
+        for: 1h
+        labels:
+          severity: info
+          category: resources
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }}"
+          description: "Only {{ $value | humanizePercentage }} disk space remaining"
+          action: "Review logs and temporary files for cleanup opportunities"
+
+  - name: netraai_healthcare
+    interval: 1m
+    rules:
+      # ============================================================================
+      # HEALTHCARE-SPECIFIC ALERTS
+      # ============================================================================
+      
+      - alert: AuditLoggingFailure
+        expr: rate(audit_log_failures_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          category: compliance
+        annotations:
+          summary: "Audit logging failures detected"
+          description: "{{ $value }} audit log write failures in last 5 minutes"
+          action: "IMMEDIATE: Check audit log storage and verify HIPAA compliance"
+
+      - alert: PHIAccessSpike
+        expr: rate(phi_access_total[5m]) > rate(phi_access_total[1h]) * 3
+        for: 5m
+        labels:
+          severity: warning
+          category: security
+        annotations:
+          summary: "Unusual spike in PHI access detected"
+          description: "PHI access rate is 3x higher than usual"
+          action: "Review access logs for unauthorized access patterns"
+
+      - alert: EmergencyServiceDown
+        expr: up{job="netra-emergency-services"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          category: emergency
+        annotations:
+          summary: "Emergency services are DOWN"
+          description: "SOS/Emergency service is unavailable - CRITICAL"
+          action: "IMMEDIATE: Restore emergency service or activate backup procedures"
+
+      - alert: VideoConsultationFailures
+        expr: rate(livekit_connection_failures_total[5m]) > 0.1
+        for: 10m
+        labels:
+          severity: warning
+          category: telemedicine
+        annotations:
+          summary: "Video consultation connection failures"
+          description: "{{ $value }} connection failures per second"
+          action: "Check LiveKit service status and network connectivity"
+
+      - alert: AIModelInferenceTimeout
+        expr: rate(model_inference_timeout_total[5m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+          category: ai_reliability
+        annotations:
+          summary: "AI model inference timeouts detected"
+          description: "{{ $labels.model_name }} experiencing timeouts"
+          action: "Check model service health and resource availability"
+
+  - name: netraai_sla
+    interval: 5m
+    rules:
+      # ============================================================================
+      # SLA MONITORING
+      # ============================================================================
+      
+      - alert: SLABreachRisk
+        expr: (1 - (rate(mcp_tool_invocations_total{status="success"}[1h]) / rate(mcp_tool_invocations_total[1h]))) > 0.001
+        for: 30m
+        labels:
+          severity: warning
+          category: sla
+        annotations:
+          summary: "SLA breach risk - uptime below 99.9%"
+          description: "Current uptime: {{ $value | humanizePercentage }}"
+          action: "Investigate service reliability issues"
+
+      - alert: ResponseTimeSLABreachRisk
+        expr: histogram_quantile(0.95, rate(mcp_tool_latency_seconds_bucket[1h])) > 5
+        for: 1h
+        labels:
+          severity: warning
+          category: sla
+        annotations:
+          summary: "Response time SLA at risk"
+          description: "P95 latency is {{ $value }}s (SLA: <5s)"
+          action: "Optimize slow endpoints and review infrastructure capacity"

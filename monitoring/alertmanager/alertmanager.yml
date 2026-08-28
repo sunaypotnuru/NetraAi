@@ -1,0 +1,250 @@
+# ============================================================================
+# Alertmanager Configuration - NetraAI Healthcare Platform
+# ============================================================================
+
+global:
+  # Default notification timeout
+  resolve_timeout: 5m
+  
+  # Email configuration (SendGrid SMTP)
+  smtp_smarthost: 'smtp.sendgrid.net:587'
+  smtp_from: 'alerts@netraai.com'
+  smtp_auth_username: 'apikey'
+  smtp_auth_password: '${SENDGRID_API_KEY}'
+  smtp_require_tls: true
+
+# Templates for notifications
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# Route tree - defines how alerts are grouped and routed
+route:
+  # Root route - all alerts start here
+  receiver: 'default'
+  group_by: ['alertname', 'cluster', 'service']
+  
+  # How long to wait before sending initial notification
+  group_wait: 30s
+  
+  # How long to wait before sending notification about new alerts in same group
+  group_interval: 5m
+  
+  # How long to wait before re-sending notification
+  repeat_interval: 4h
+  
+  # Child routes for specific alert types
+  routes:
+    # CRITICAL alerts - immediate notification
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      group_wait: 10s
+      repeat_interval: 30m
+      continue: true  # Also send to default receiver
+    
+    # Healthcare compliance alerts - special handling
+    - match:
+        category: compliance
+      receiver: 'compliance-team'
+      group_wait: 1m
+      repeat_interval: 1h
+    
+    # Emergency service alerts - immediate escalation
+    - match:
+        category: emergency
+      receiver: 'emergency-oncall'
+      group_wait: 0s
+      repeat_interval: 15m
+    
+    # Security alerts - send to security team
+    - match:
+        category: security
+      receiver: 'security-team'
+      group_wait: 5m
+      repeat_interval: 2h
+    
+    # Database alerts - send to DBA team
+    - match:
+        category: database
+      receiver: 'database-team'
+      group_wait: 2m
+      repeat_interval: 1h
+    
+    # AI/ML alerts - send to ML engineering team
+    - match_re:
+        category: ai_.*
+      receiver: 'ml-engineering-team'
+      group_wait: 5m
+      repeat_interval: 2h
+    
+    # Warning alerts - less frequent notifications
+    - match:
+        severity: warning
+      receiver: 'warning-alerts'
+      group_wait: 5m
+      repeat_interval: 12h
+    
+    # Info alerts - daily digest
+    - match:
+        severity: info
+      receiver: 'info-digest'
+      group_wait: 1h
+      repeat_interval: 24h
+
+# Inhibition rules - suppress certain alerts when others are firing
+inhibit_rules:
+  # Suppress warning if critical alert is firing for same service
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'instance', 'job']
+  
+  # Suppress downstream service alerts if upstream is down
+  - source_match:
+      alertname: 'ServiceDown'
+      job: 'netra-core-api'
+    target_match_re:
+      job: 'netra-.*-service'
+    equal: ['cluster']
+  
+  # Suppress high latency alert if service is down
+  - source_match:
+      alertname: 'ServiceDown'
+    target_match:
+      alertname: 'HighLatency'
+    equal: ['instance', 'job']
+
+# Receivers - define where notifications are sent
+receivers:
+  # Default receiver - Slack + Email
+  - name: 'default'
+    email_configs:
+      - to: 'dev-team@netraai.com'
+        headers:
+          Subject: '[NetraAI] {{ .GroupLabels.alertname }}'
+        html: '{{ template "email.default.html" . }}'
+    
+    # Uncomment when Slack webhook is configured
+    # slack_configs:
+    #   - api_url: '${SLACK_WEBHOOK_URL}'
+    #     channel: '#netraai-alerts'
+    #     title: '{{ .GroupLabels.alertname }}'
+    #     text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+    #     color: '{{ if eq .Status "firing" }}danger{{ else }}good{{ end }}'
+  
+  # Critical alerts - SMS + Email + Slack
+  - name: 'critical-alerts'
+    email_configs:
+      - to: 'oncall@netraai.com, sunaypotnuru@gmail.com'
+        headers:
+          Subject: '[CRITICAL] {{ .GroupLabels.alertname }}'
+          Priority: 'urgent'
+        html: '{{ template "email.critical.html" . }}'
+    
+    # PagerDuty integration (when configured)
+    # pagerduty_configs:
+    #   - service_key: '${PAGERDUTY_SERVICE_KEY}'
+    #     description: '{{ .GroupLabels.alertname }}: {{ .GroupLabels.instance }}'
+    
+    # Twilio SMS (using webhook)
+    webhook_configs:
+      - url: 'http://netra-core-api:7860/api/v1/alerts/sms'
+        send_resolved: false
+        http_config:
+          bearer_token: '${ALERT_WEBHOOK_TOKEN}'
+  
+  # Compliance team - HIPAA/regulatory alerts
+  - name: 'compliance-team'
+    email_configs:
+      - to: 'compliance@netraai.com, legal@netraai.com'
+        headers:
+          Subject: '[COMPLIANCE] {{ .GroupLabels.alertname }}'
+          Priority: 'high'
+        html: '{{ template "email.compliance.html" . }}'
+  
+  # Emergency oncall - immediate escalation
+  - name: 'emergency-oncall'
+    email_configs:
+      - to: 'oncall@netraai.com'
+        headers:
+          Subject: '[EMERGENCY] {{ .GroupLabels.alertname }}'
+          Priority: 'urgent'
+    
+    webhook_configs:
+      - url: 'http://netra-emergency-services:7860/api/v1/alerts/emergency'
+        send_resolved: true
+        http_config:
+          bearer_token: '${ALERT_WEBHOOK_TOKEN}'
+  
+  # Security team
+  - name: 'security-team'
+    email_configs:
+      - to: 'security@netraai.com'
+        headers:
+          Subject: '[SECURITY] {{ .GroupLabels.alertname }}'
+        html: '{{ template "email.security.html" . }}'
+  
+  # Database team
+  - name: 'database-team'
+    email_configs:
+      - to: 'dba@netraai.com, dev-team@netraai.com'
+        headers:
+          Subject: '[DATABASE] {{ .GroupLabels.alertname }}'
+        html: '{{ template "email.database.html" . }}'
+  
+  # ML Engineering team
+  - name: 'ml-engineering-team'
+    email_configs:
+      - to: 'ml-team@netraai.com'
+        headers:
+          Subject: '[ML] {{ .GroupLabels.alertname }}'
+        html: '{{ template "email.ml.html" . }}'
+  
+  # Warning alerts - less urgent
+  - name: 'warning-alerts'
+    email_configs:
+      - to: 'dev-team@netraai.com'
+        headers:
+          Subject: '[WARNING] {{ .GroupLabels.alertname }}'
+        html: '{{ template "email.warning.html" . }}'
+  
+  # Info digest - daily summary
+  - name: 'info-digest'
+    email_configs:
+      - to: 'dev-team@netraai.com'
+        headers:
+          Subject: '[DAILY DIGEST] NetraAI System Status'
+        html: '{{ template "email.digest.html" . }}'
+
+# ============================================================================
+# CONFIGURATION NOTES
+# ============================================================================
+#
+# 1. ENVIRONMENT VARIABLES REQUIRED:
+#    - SENDGRID_API_KEY: SendGrid API key for email
+#    - SLACK_WEBHOOK_URL: Slack webhook URL (optional)
+#    - PAGERDUTY_SERVICE_KEY: PagerDuty service key (optional)
+#    - ALERT_WEBHOOK_TOKEN: Bearer token for webhook authentication
+#
+# 2. ALERT ROUTING LOGIC:
+#    - Critical alerts: Immediate notification (10s delay)
+#    - Warning alerts: Grouped notification (5m delay)
+#    - Info alerts: Daily digest (1h delay)
+#
+# 3. INHIBITION:
+#    - Prevents alert spam during cascading failures
+#    - Suppresses downstream alerts when upstream fails
+#    - Suppresses lower severity when higher severity fires
+#
+# 4. REPEAT INTERVALS:
+#    - Critical: Every 30 minutes (until resolved)
+#    - Warning: Every 12 hours
+#    - Info: Once per day
+#
+# 5. EMAIL TEMPLATES:
+#    - Custom HTML templates in /etc/alertmanager/templates/
+#    - Use {{ template "name" . }} syntax
+#    - Variables: .Alerts, .GroupLabels, .CommonAnnotations
+#
+# ============================================================================
