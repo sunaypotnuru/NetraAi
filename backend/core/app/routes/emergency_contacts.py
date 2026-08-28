@@ -11,8 +11,8 @@ from datetime import datetime
 
 from app.core.security import get_current_user, get_current_patient
 from app.services.supabase import supabase
-from app.core.schemas import TokenPayload
-from app.utils.validators import validate_phone
+from app.models.schemas import TokenPayload
+from app.routes.patient import validate_phone
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/patient/emergency-contacts", tags=["Emergency Contacts"])
