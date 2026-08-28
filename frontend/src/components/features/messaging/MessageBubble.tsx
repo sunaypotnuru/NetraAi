@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { Check, CheckCheck, Reply, Download, Image as ImageIcon } from "lucide-react";
 import { motion } from "motion/react";
 import { format } from "date-fns";
@@ -45,7 +46,7 @@ export default function MessageBubble({
   showAvatar = true,
 }: MessageBubbleProps) {
   const { t } = useTranslation();
-  const [showReactions, setShowReactions] = useState(false);
+  const [showReactions, setShowReactions] = React.useState(false);
 
   const handleReaction = (emoji: string) => {
     if (onReact) {

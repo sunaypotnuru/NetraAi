@@ -1,4 +1,5 @@
-import { useEffect, useRef, useMemo } from "react";
+import React from 'react';
+
 import { motion, AnimatePresence } from "motion/react";
 import { useLocation } from "react-router";
 
@@ -9,21 +10,21 @@ import { useLocation } from "react-router";
  */
 export default function PortalHeroOverlay() {
   const location = useLocation();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animRef = useRef<number>(0);
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
+  const animRef = React.useRef<number>(0);
 
   const isPatient = location.pathname.startsWith("/patient");
   const isDoctor  = location.pathname.startsWith("/doctor");
   const isAdmin   = location.pathname.startsWith("/admin");
 
   // Role-based accent color
-  const accent = useMemo(() => {
+  const accent = React.useMemo(() => {
     if (isAdmin) return { r: 139, g: 92,  b: 246 };  // purple
     if (isDoctor) return { r: 14,  g: 165, b: 233 };  // sky
     return { r: 13,  g: 148, b: 136 }; // teal
   }, [isAdmin, isDoctor]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");

@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { motion, AnimatePresence } from "motion/react";
 import { useNavigate } from "react-router";
 import { StaggerContainer, StaggerItem, FadeIn, ScaleIn } from "../../animations";
@@ -36,10 +37,10 @@ export default function DashboardPage() {
     { label: t("patient.dashboard.qa_vitals", "Track Vitals"), desc: t("patient.dashboard.qa_vitals_desc", "Chronic disease monitoring"), icon: Activity, path: "/patient/tracker", color: "#E11D48", bg: "#FFF1F2" },
     { label: "Emergency Contacts", desc: "Manage SOS contacts", icon: PhoneCall, path: "/patient/emergency-contacts", color: "#DC2626", bg: "#FEF2F2" },
   ];
-  const [showFamilyDropdown, setShowFamilyDropdown] = useState(false);
-  const [showCustomize, setShowCustomize] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [visibleWidgets, setVisibleWidgets] = useState(() => {
+  const [showFamilyDropdown, setShowFamilyDropdown] = React.useState(false);
+  const [showCustomize, setShowCustomize] = React.useState(false);
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [visibleWidgets, setVisibleWidgets] = React.useState(() => {
     const saved = localStorage.getItem("dashboardWidgets");
     return saved ? JSON.parse(saved) : {
       hero: true,
@@ -95,8 +96,8 @@ export default function DashboardPage() {
     onError: () => toast.error(t("patient.dashboard.pro_submit_error", "Failed to submit health report"))
   });
 
-  const [proAnswers, setProAnswers] = useState<Record<string, string>>({});
-  const [activePRO, setActivePRO] = useState<{ id: string; name: string; questions: Array<{ id: string; text: string; type: string }> } | null>(null);
+  const [proAnswers, setProAnswers] = React.useState<Record<string, string>>({});
+  const [activePRO, setActivePRO] = React.useState<{ id: string; name: string; questions: Array<{ id: string; text: string; type: string }> } | null>(null);
 
   const handlePROSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,7 +108,7 @@ export default function DashboardPage() {
     }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     const handleOpenCustomize = () => setShowCustomize((prev) => !prev);
     window.addEventListener("open-dashboard-customize", handleOpenCustomize);
 

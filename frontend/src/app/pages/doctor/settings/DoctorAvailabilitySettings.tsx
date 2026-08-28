@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
@@ -59,9 +59,9 @@ import { doctorAPI, authAPI } from '@/lib/api';
 export default function DoctorAvailabilitySettings() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState('schedule');
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingDay, setEditingDay] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = React.useState('schedule');
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [editingDay, setEditingDay] = React.useState<string | null>(null);
 
   const { data: availability, isLoading } = useQuery({
     queryKey: ['doctor-availability-settings'],

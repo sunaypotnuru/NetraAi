@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { motion } from "motion/react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Edit, Trash2, Mail, Loader2, Activity, MessageSquare } from "lucide-react";
@@ -34,10 +35,10 @@ interface TemplateFormState {
 export default function DoctorFollowUpTemplates() {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
-    const [isEditing, setIsEditing] = useState<string | null>(null);
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isEditing, setIsEditing] = React.useState<string | null>(null);
+    const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
-    const [formState, setFormState] = useState<TemplateFormState>({
+    const [formState, setFormState] = React.useState<TemplateFormState>({
         name: "",
         trigger_event: "upcoming_appointment",
         subject: "",

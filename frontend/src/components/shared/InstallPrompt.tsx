@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { X, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,10 +12,10 @@ interface BeforeInstallPromptEvent extends Event {
 
 export default function InstallPrompt() {
   const { t } = useTranslation();
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [showPrompt, setShowPrompt] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = React.useState<BeforeInstallPromptEvent | null>(null);
+  const [showPrompt, setShowPrompt] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Check if already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
       return;

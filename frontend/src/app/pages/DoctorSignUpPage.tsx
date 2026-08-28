@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { Link, useNavigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import { Stethoscope, Mail, Lock, User, Phone, Globe, Clock, DollarSign, ChevronRight, ChevronLeft, Check } from "lucide-react";
@@ -20,9 +21,9 @@ const getSteps = (t: (key: string, defaultValue?: string) => string) => [
 export default function DoctorSignUpPage() {
     const { t } = useTranslation();
     const steps = getSteps(t);
-    const [currentStep, setCurrentStep] = useState(0);
-    const [submitted, setSubmitted] = useState(false);
-    const [formData, setFormData] = useState({
+    const [currentStep, setCurrentStep] = React.useState(0);
+    const [submitted, setSubmitted] = React.useState(false);
+    const [formData, setFormData] = React.useState({
         email: "",
         password: "",
         full_name: "",

@@ -1,17 +1,18 @@
+import React from 'react';
 import { Upload, Activity, Heart, Shield, Eye, Stethoscope, Brain, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router";
 import { motion } from "framer-motion";
-import { useState, useEffect, useRef } from "react";
+
 import { useTranslation } from "@/lib/i18n";
 import { useAuthStore } from "@/lib/store";
 import "./hero-animations.css";
 
 const useTypewriter = (text: string, speed = 50) => {
-  const [displayText, setDisplayText] = useState('');
-  const indexRef = useRef(0);
+  const [displayText, setDisplayText] = React.useState('');
+  const indexRef = React.useRef(0);
 
-  useEffect(() => {
+  React.useEffect(() => {
     indexRef.current = 0;
     setDisplayText('');
     const timer = setInterval(() => {

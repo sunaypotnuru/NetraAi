@@ -9,7 +9,7 @@
  * - Submission tracking
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -30,11 +30,11 @@ const FEEDBACK_CATEGORIES = [
 ];
 
 export function AIQualityFeedback({ messageId, onClose }: AIQualityFeedbackProps) {
-  const [rating, setRating] = useState(0);
-  const [hoveredRating, setHoveredRating] = useState(0);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [comment, setComment] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [rating, setRating] = React.useState(0);
+  const [hoveredRating, setHoveredRating] = React.useState(0);
+  const [selectedCategories, setSelectedCategories] = React.useState<string[]>([]);
+  const [comment, setComment] = React.useState('');
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const handleCategoryToggle = (categoryId: string) => {
     setSelectedCategories((prev) =>

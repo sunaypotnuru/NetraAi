@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Global Animation Configuration for Netra-Ai
  * 
@@ -6,7 +7,7 @@
  */
 
 import { MotionConfig } from 'motion/react';
-import { ReactNode } from 'react';
+
 import { animationTokens } from './tokens';
 
 interface AnimationProviderProps {

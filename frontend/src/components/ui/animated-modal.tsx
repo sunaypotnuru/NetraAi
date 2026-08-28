@@ -24,7 +24,7 @@
  * </AnimatedModal>
  */
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X } from 'lucide-react';
 import { useReducedMotion } from '@/animations';
@@ -74,11 +74,11 @@ export const AnimatedModal: React.FC<AnimatedModalProps> = ({
   footer,
 }) => {
   const prefersReducedMotion = useReducedMotion();
-  const modalRef = useRef<HTMLDivElement>(null);
-  const previousActiveElement = useRef<HTMLElement | null>(null);
+  const modalRef = React.useRef<HTMLDivElement>(null);
+  const previousActiveElement = React.useRef<HTMLElement | null>(null);
 
   // Lock body scroll when modal is open
-  useEffect(() => {
+  React.useEffect(() => {
     if (isOpen) {
       previousActiveElement.current = document.activeElement as HTMLElement;
       document.body.style.overflow = 'hidden';
@@ -102,7 +102,7 @@ export const AnimatedModal: React.FC<AnimatedModalProps> = ({
   }, [isOpen]);
 
   // Handle escape key
-  useEffect(() => {
+  React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
         onClose();

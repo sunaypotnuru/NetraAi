@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import React from 'react';
+
 import { Command } from 'cmdk';
 import { Search, Users, Calendar, Settings, Activity, Heart, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router';
@@ -7,11 +8,11 @@ import { useTranslation } from "@/lib/i18n";
 
 export function CommandPalette() {
   const { t } = useTranslation();
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = React.useState(false);
     const navigate = useNavigate();
     const { user } = useAuth();
 
-    useEffect(() => {
+    React.useEffect(() => {
         const down = (e: KeyboardEvent) => {
             if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault();

@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import React from 'react';
+
 import { Search, Loader2, User, Calendar, FileText, Activity } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { searchAPI } from "@/lib/api";
@@ -49,15 +50,15 @@ interface SearchResults {
 
 export default function GlobalSearch() {
   const { t } = useTranslation();
-    const [query, setQuery] = useState("");
+    const [query, setQuery] = React.useState("");
     const [debouncedQuery] = useDebounce(query, 300);
-    const [results, setResults] = useState<SearchResults | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [isOpen, setIsOpen] = useState(false);
-    const searchRef = useRef<HTMLDivElement>(null);
+    const [results, setResults] = React.useState<SearchResults | null>(null);
+    const [loading, setLoading] = React.useState(false);
+    const [isOpen, setIsOpen] = React.useState(false);
+    const searchRef = React.useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
 
-    useEffect(() => {
+    React.useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
                 setIsOpen(false);
@@ -67,7 +68,7 @@ export default function GlobalSearch() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const fetchResults = async () => {
             if (debouncedQuery.length < 2) {
                 setResults(null);

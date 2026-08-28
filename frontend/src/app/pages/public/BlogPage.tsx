@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { FileText, Calendar, User } from 'lucide-react';
@@ -16,10 +16,10 @@ interface Blog {
 
 export default function BlogPage() {
   const { t } = useTranslation();
-  const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [blogs, setBlogs] = React.useState<Blog[]>([]);
+  const [loading, setLoading] = React.useState(true);
 
-  useEffect(() => {
+  React.useEffect(() => {
     fetchBlogs();
   }, []);
 

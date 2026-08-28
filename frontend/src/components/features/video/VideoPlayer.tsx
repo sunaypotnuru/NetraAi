@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import React from 'react';
+
 import { Play, Pause, Volume2, VolumeX, Maximize, Download, FileText } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useTranslation } from "@/lib/i18n";
@@ -21,20 +22,20 @@ interface Recording {
 
 export function VideoPlayer({ recordingId, autoPlay = false, onEnded }: VideoPlayerProps) {
   const { t } = useTranslation();
-    const [recording, setRecording] = useState<Recording | null>(null);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [isMuted, setIsMuted] = useState(false);
-    const [currentTime, setCurrentTime] = useState(0);
-    const [duration, setDuration] = useState(0);
-    const [volume, setVolume] = useState(1);
-    const [showControls, setShowControls] = useState(true);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [recording, setRecording] = React.useState<Recording | null>(null);
+    const [isPlaying, setIsPlaying] = React.useState(false);
+    const [isMuted, setIsMuted] = React.useState(false);
+    const [currentTime, setCurrentTime] = React.useState(0);
+    const [duration, setDuration] = React.useState(0);
+    const [volume, setVolume] = React.useState(1);
+    const [showControls, setShowControls] = React.useState(true);
+    const [loading, setLoading] = React.useState(true);
+    const [error, setError] = React.useState<string | null>(null);
 
-    const videoRef = useRef<HTMLVideoElement>(null);
-    const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const videoRef = React.useRef<HTMLVideoElement>(null);
+    const controlsTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
-    const loadRecording = useCallback(async () => {
+    const loadRecording = React.useCallback(async () => {
         try {
             setLoading(true);
             setError(null);
@@ -59,11 +60,11 @@ export function VideoPlayer({ recordingId, autoPlay = false, onEnded }: VideoPla
         }
     }, [recordingId]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         loadRecording();
     }, [loadRecording]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (autoPlay && videoRef.current) {
             videoRef.current.play();
         }

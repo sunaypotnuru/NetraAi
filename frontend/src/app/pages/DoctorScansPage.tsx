@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React from 'react';
+
 import { useTranslation } from '../../lib/i18n';
 import { motion } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
@@ -14,8 +15,8 @@ import ExcelJS from "exceljs";
 
 export default function DoctorScansPage() {
     const { t } = useTranslation();
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filterStatus, setFilterStatus] = useState('all');
+    const [searchTerm, setSearchTerm] = React.useState('');
+    const [filterStatus, setFilterStatus] = React.useState('all');
     const navigate = useNavigate();
 
     const { data: scans, isLoading, error } = useQuery({

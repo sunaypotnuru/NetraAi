@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * FadeIn Component
  * 
@@ -6,7 +7,7 @@
  */
 
 import { motion } from 'motion/react';
-import { ReactNode } from 'react';
+
 import { animationTokens } from '../tokens';
 import { useAnimationConfig } from '../hooks/useReducedMotion';
 

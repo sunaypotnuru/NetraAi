@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import React from 'react';
+
 import { motion } from "motion/react";
 import { Trophy, Star, TrendingUp, Award } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -54,15 +55,15 @@ interface Challenge {
 
 export default function AchievementsPage() {
   const { user: _user } = useAuthStore();
-  const [achievements, setAchievements] = useState<Achievement[]>([]);
-  const [badges, setBadges] = useState<Badge[]>([]);
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
-  const [userPoints, setUserPoints] = useState(0);
-  const [userLevel, setUserLevel] = useState(1);
-  const [nextLevelPoints, setNextLevelPoints] = useState(100);
-  const [loading, setLoading] = useState(true);
-  const [sharingAchievement, setSharingAchievement] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [achievements, setAchievements] = React.useState<Achievement[]>([]);
+  const [badges, setBadges] = React.useState<Badge[]>([]);
+  const [challenges, setChallenges] = React.useState<Challenge[]>([]);
+  const [userPoints, setUserPoints] = React.useState(0);
+  const [userLevel, setUserLevel] = React.useState(1);
+  const [nextLevelPoints, setNextLevelPoints] = React.useState(100);
+  const [loading, setLoading] = React.useState(true);
+  const [sharingAchievement, setSharingAchievement] = React.useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = React.useState("");
   const { t } = useTranslation();
 
   const DEFAULT_ACHIEVEMENTS: Achievement[] = [
@@ -206,7 +207,7 @@ export default function AchievementsPage() {
     },
   ];
 
-  const loadData = useCallback(async () => {
+  const loadData = React.useCallback(async () => {
     try {
       const [achievementsRes, badgesRes, challengesRes] = await Promise.all([
         api.get("/api/v1/gamification/achievements").catch(() => ({ data: null })),
@@ -248,7 +249,7 @@ export default function AchievementsPage() {
     }
   }, []);
 
-  useEffect(() => {
+  React.useEffect(() => {
     loadData();
   }, [loadData]);
 

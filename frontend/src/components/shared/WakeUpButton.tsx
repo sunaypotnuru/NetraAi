@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import React from 'react';
+
 import { Power, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from 'sonner';
 
 export function WakeUpButton() {
-  const [status, setStatus] = useState<'idle' | 'waking' | 'ready'>('idle');
-  const [message, setMessage] = useState('');
+  const [status, setStatus] = React.useState<'idle' | 'waking' | 'ready'>('idle');
+  const [message, setMessage] = React.useState('');
   
   const wakeUp = async () => {
     setStatus('waking');

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { motion, AnimatePresence } from "motion/react";
 import { MessageCircle, X, Send, Minimize2, Maximize2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,9 +20,9 @@ interface Message {
 export default function FloatingChatbot() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [isMinimized, setIsMinimized] = React.useState(false);
+  const [messages, setMessages] = React.useState<Message[]>([
     {
       id: "1",
       text: "Hello! I'm your Netra AI assistant. How can I help you today?",
@@ -29,8 +30,8 @@ export default function FloatingChatbot() {
       timestamp: new Date(),
     },
   ]);
-  const [inputValue, setInputValue] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+  const [inputValue, setInputValue] = React.useState("");
+  const [isTyping, setIsTyping] = React.useState(false);
   const { user } = useAuthStore();
 
   // Quick action buttons

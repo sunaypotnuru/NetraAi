@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import React from 'react';
+
 import {
   X, Save, Sparkles, Copy, Download,
   ChevronDown, ChevronUp, Mic, MicOff
@@ -26,21 +27,21 @@ interface SOAPNotes {
 
 export default function ScribePanel({ appointmentId, patientId = '', patientName, onClose }: ScribePanelProps) {
   const { t } = useTranslation();
-  const [isMinimized, setIsMinimized] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [transcript, setTranscript] = useState("");
-  const [soapNotes, setSOAPNotes] = useState<SOAPNotes>({
+  const [isMinimized, setIsMinimized] = React.useState(false);
+  const [isRecording, setIsRecording] = React.useState(false);
+  const [transcript, setTranscript] = React.useState("");
+  const [soapNotes, setSOAPNotes] = React.useState<SOAPNotes>({
     subjective: "",
     objective: "",
     assessment: "",
     plan: "",
   });
-  const [autoSaveStatus, setAutoSaveStatus] = useState<"saved" | "saving" | "unsaved">("saved");
-  const [lastSaved, setLastSaved] = useState<Date | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [autoSaveStatus, setAutoSaveStatus] = React.useState<"saved" | "saving" | "unsaved">("saved");
+  const [lastSaved, setLastSaved] = React.useState<Date | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = React.useState(false);
 
   // Load existing SOAP notes on mount
-  const loadExistingNotes = useCallback(async () => {
+  const loadExistingNotes = React.useCallback(async () => {
     try {
       const response = await api.get(`/api/v1/scribe/notes/${appointmentId}`);
       if (response.data.found) {
@@ -59,12 +60,12 @@ export default function ScribePanel({ appointmentId, patientId = '', patientName
     }
   }, [appointmentId]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     loadExistingNotes();
   }, [loadExistingNotes]);
 
   // Auto-save every 30 seconds
-  const handleSave = useCallback(async (isAutoSave = false) => {
+  const handleSave = React.useCallback(async (isAutoSave = false) => {
     setAutoSaveStatus("saving");
 
     try {
@@ -92,7 +93,7 @@ export default function ScribePanel({ appointmentId, patientId = '', patientName
     }
   }, [appointmentId, patientId, soapNotes, transcript]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const interval = setInterval(() => {
       if (autoSaveStatus === "unsaved") {
         handleSave(true);
@@ -103,7 +104,7 @@ export default function ScribePanel({ appointmentId, patientId = '', patientName
   }, [autoSaveStatus, handleSave]);
 
   // Mark as unsaved when notes change
-  useEffect(() => {
+  React.useEffect(() => {
     setAutoSaveStatus("unsaved");
   }, [soapNotes]);
 

@@ -11,7 +11,7 @@
  * - Collapsible sections
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card } from '@/components/ui/card';
 import {
   User,
@@ -47,7 +47,7 @@ interface SectionProps {
 }
 
 function CollapsibleSection({ title, icon: Icon, children, defaultOpen = true }: SectionProps) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const [isOpen, setIsOpen] = React.useState(defaultOpen);
 
   return (
     <div className="border-b border-gray-200 last:border-b-0">

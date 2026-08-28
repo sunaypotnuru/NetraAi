@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { motion } from "motion/react";
 import {
   Activity,
@@ -38,11 +39,11 @@ export default function VitalsHistoryPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const [vitals, setVitals] = useState<VitalRecord[]>([]);
-  const [filteredVitals, setFilteredVitals] = useState<VitalRecord[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [selectedType, setSelectedType] = useState<string>("all");
-  const [chartData, setChartData] = useState<any[]>([]);
+  const [vitals, setVitals] = React.useState<VitalRecord[]>([]);
+  const [filteredVitals, setFilteredVitals] = React.useState<VitalRecord[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [selectedType, setSelectedType] = React.useState<string>("all");
+  const [chartData, setChartData] = React.useState<any[]>([]);
 
   const vitalTypes = [
     { value: "all", label: t('patient.vitals.all', "All Vitals"), icon: Activity },
@@ -55,11 +56,11 @@ export default function VitalsHistoryPage() {
     { value: "oxygen_saturation", label: t('patient.vitals.oxygen', "Oxygen"), icon: Wind }
   ];
 
-  useEffect(() => {
+  React.useEffect(() => {
     fetchVitals();
   }, []);
 
-  useEffect(() => {
+  React.useEffect(() => {
     filterVitals();
     prepareChartData();
   }, [vitals, selectedType]);

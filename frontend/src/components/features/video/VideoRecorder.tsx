@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
+import React from 'react';
+
 import { Video, Square } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useTranslation } from "@/lib/i18n";
@@ -11,14 +12,14 @@ interface VideoRecorderProps {
 
 export function VideoRecorder({ consultationId, roomName, onRecordingComplete }: VideoRecorderProps) {
   const { t } = useTranslation();
-    const [isRecording, setIsRecording] = useState(false);
-    const [recordingId, setRecordingId] = useState<string | null>(null);
-    const [duration, setDuration] = useState(0);
-    const [error, setError] = useState<string | null>(null);
+    const [isRecording, setIsRecording] = React.useState(false);
+    const [recordingId, setRecordingId] = React.useState<string | null>(null);
+    const [duration, setDuration] = React.useState(0);
+    const [error, setError] = React.useState<string | null>(null);
     
-    const timerRef = useRef<NodeJS.Timeout | null>(null);
+    const timerRef = React.useRef<NodeJS.Timeout | null>(null);
 
-    useEffect(() => {
+    React.useEffect(() => {
         return () => {
             if (timerRef.current) {
                 clearInterval(timerRef.current);

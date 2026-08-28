@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import React from 'react';
+
 import { motion } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
@@ -45,14 +46,14 @@ interface RefundsResponse {
 
 export default function RefundManagementPage() {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('created_at');
-  const [page, setPage] = useState(1);
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [statusFilter, setStatusFilter] = React.useState('all');
+  const [sortBy, setSortBy] = React.useState('created_at');
+  const [page, setPage] = React.useState(1);
   const limit = 10;
 
   // Reset page on filter change
-  useEffect(() => {
+  React.useEffect(() => {
     setPage(1);
   }, [searchTerm, statusFilter, sortBy]);
 

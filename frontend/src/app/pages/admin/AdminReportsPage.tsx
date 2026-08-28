@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React from 'react';
+
 import { motion } from 'motion/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminAPI } from '@/lib/api';
@@ -66,14 +67,14 @@ interface NewReportState {
 export default function AdminReportsPage() {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
-    const [isGenerateOpen, setIsGenerateOpen] = useState(false);
-    const [newReport, setNewReport] = useState<NewReportState>({
+    const [isGenerateOpen, setIsGenerateOpen] = React.useState(false);
+    const [newReport, setNewReport] = React.useState<NewReportState>({
         title: '',
         report_type: 'financial',
         date_range: { start: new Date(new Date().setDate(new Date().getDate() - 30)).toISOString().split('T')[0], end: new Date().toISOString().split('T')[0] },
         metrics: ['revenue', 'consultations']
     });
-    const [activeFilter, setActiveFilter] = useState('all');
+    const [activeFilter, setActiveFilter] = React.useState('all');
     const apiBaseUrl = getRequiredApiBaseUrl();
 
     const { data: reports, isLoading } = useQuery<Report[]>({

@@ -7,7 +7,7 @@
  * - PDF (Portable Document Format) - using jsPDF
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, FileText, FileSpreadsheet, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -31,8 +31,8 @@ export function DataExportButton({
   variant = 'default',
   size = 'default',
 }: DataExportButtonProps) {
-  const [isExporting, setIsExporting] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
+  const [isExporting, setIsExporting] = React.useState(false);
+  const [showMenu, setShowMenu] = React.useState(false);
 
   const handleExport = async (format: 'csv' | 'json') => {
     setIsExporting(true);

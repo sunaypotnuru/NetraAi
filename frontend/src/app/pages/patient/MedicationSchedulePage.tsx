@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from 'react';
 import { motion } from "motion/react";
 import { Plus, Trash2, Calendar, Save, PhoneCall } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -22,11 +22,11 @@ export default function MedicationSchedulePage() {
     taken: boolean;
   }
 
-  const [schedule, setSchedule] = useState<Medication[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [schedule, setSchedule] = React.useState<Medication[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [saving, setSaving] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Load existing schedule from profile or fetch from DB
     if (profile?.medication_schedule) {
       setSchedule(profile.medication_schedule);

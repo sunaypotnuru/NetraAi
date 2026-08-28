@@ -1,4 +1,5 @@
-import { useEffect, useState, useRef } from "react";
+import React from 'react';
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Terminal, Download, Filter, Pause, Play, Wifi, WifiOff, FileText, FileSpreadsheet } from "lucide-react";
@@ -33,16 +34,16 @@ const DEMO_LOGS: AuditLog[] = [
 ];
 
 export function LiveAuditLog() {
-  const [logs, setLogs] = useState<AuditLog[]>([]);
-  const [isConnected, setIsConnected] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const [filter, setFilter] = useState<string>("");
-  const [showExportMenu, setShowExportMenu] = useState(false);
-  const [isDemo, setIsDemo] = useState(false);
-  const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const pausedLogsRef = useRef<AuditLog[]>([]);
-  const demoTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [logs, setLogs] = React.useState<AuditLog[]>([]);
+  const [isConnected, setIsConnected] = React.useState(false);
+  const [isPaused, setIsPaused] = React.useState(false);
+  const [filter, setFilter] = React.useState<string>("");
+  const [showExportMenu, setShowExportMenu] = React.useState(false);
+  const [isDemo, setIsDemo] = React.useState(false);
+  const wsRef = React.useRef<WebSocket | null>(null);
+  const reconnectTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const pausedLogsRef = React.useRef<AuditLog[]>([]);
+  const demoTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const connectWebSocket = () => {
     try {
@@ -126,7 +127,7 @@ export function LiveAuditLog() {
     }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     connectWebSocket();
     return () => {
       if (wsRef.current) wsRef.current.close();

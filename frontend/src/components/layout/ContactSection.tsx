@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { Send, MapPin, Phone, Mail, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -6,9 +7,9 @@ import api from "@/lib/api";
 import { useTranslation } from "@/lib/i18n";
 
 export function ContactSection() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { t } = useTranslation();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = React.useState({
     name: "",
     email: "",
     phone: "",

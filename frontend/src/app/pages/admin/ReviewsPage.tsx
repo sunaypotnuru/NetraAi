@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import { Star, Trash2, User, Stethoscope, Calendar, MessageSquare, Filter, ChevronLeft, ChevronRight } from "lucide-react";
@@ -47,13 +48,13 @@ interface ReviewsResponse {
 export default function ReviewsPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const [filterRating, setFilterRating] = useState<number | null>(null);
-  const [page, setPage] = useState(1);
-  const [localDeletedIds, setLocalDeletedIds] = useState<string[]>([]);
+  const [filterRating, setFilterRating] = React.useState<number | null>(null);
+  const [page, setPage] = React.useState(1);
+  const [localDeletedIds, setLocalDeletedIds] = React.useState<string[]>([]);
   const limit = 10;
 
   // Reset page on filter change
-  useEffect(() => {
+  React.useEffect(() => {
     setPage(1);
   }, [filterRating]);
 

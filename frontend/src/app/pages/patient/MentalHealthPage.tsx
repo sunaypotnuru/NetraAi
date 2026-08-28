@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from "@/lib/i18n";
 import { patientAPI } from '@/lib/api';
@@ -15,9 +15,9 @@ import { logger } from "@/lib/logger";
 const MentalHealthPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [recording, setRecording] = useState(false);
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
-  const [analyzing, setAnalyzing] = useState(false);
+  const [recording, setRecording] = React.useState(false);
+  const [audioBlob, setAudioBlob] = React.useState<Blob | null>(null);
+  const [analyzing, setAnalyzing] = React.useState(false);
 
   interface MentalHealthResult {
     transcription: string;
@@ -36,12 +36,12 @@ const MentalHealthPage = () => {
     processing_time_seconds: number;
   }
 
-  const [result, setResult] = useState<MentalHealthResult | null>(null);
-  const [error, setError] = useState('');
-  const [history, setHistory] = useState<any[]>([]);
-  const [loadingHistory, setLoadingHistory] = useState(true);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
-  const [chunks, setChunks] = useState<Blob[]>([]);
+  const [result, setResult] = React.useState<MentalHealthResult | null>(null);
+  const [error, setError] = React.useState('');
+  const [history, setHistory] = React.useState<any[]>([]);
+  const [loadingHistory, setLoadingHistory] = React.useState(true);
+  const [mediaRecorder, setMediaRecorder] = React.useState<MediaRecorder | null>(null);
+  const [chunks, setChunks] = React.useState<Blob[]>([]);
 
   // Load history from timeline
   const loadHistory = async () => {

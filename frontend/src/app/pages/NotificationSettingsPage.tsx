@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { motion } from "motion/react";
 import { Bell, Mail, Smartphone, Save, Eye, Type, Activity } from "lucide-react";
 import { useAccessibilityStore } from "../../lib/accessibility";
@@ -15,9 +16,9 @@ import { NotificationSettings } from "../../components/features/notifications/No
 
 export default function NotificationSettingsPage() {
   const { t } = useTranslation();
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [preferences, setPreferences] = useState({
+  const [loading, setLoading] = React.useState(true);
+  const [saving, setSaving] = React.useState(false);
+  const [preferences, setPreferences] = React.useState({
     email_enabled: true,
     push_enabled: true,
     sms_enabled: false,
@@ -39,7 +40,7 @@ export default function NotificationSettingsPage() {
 
   const { isSeniorMode, setSeniorMode } = useThemeStore();
 
-  useEffect(() => {
+  React.useEffect(() => {
     loadPreferences();
   }, []);
 

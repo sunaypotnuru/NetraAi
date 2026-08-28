@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
@@ -62,8 +62,8 @@ interface EarningsData {
 
 export default function DoctorEarningsSummary() {
   const navigate = useNavigate();
-  const [timeFilter, setTimeFilter] = useState('month');
-  const [activeTab, setActiveTab] = useState('overview');
+  const [timeFilter, setTimeFilter] = React.useState('month');
+  const [activeTab, setActiveTab] = React.useState('overview');
 
   const { data: earningsData, isLoading, isError, refetch } = useQuery({
     queryKey: ['doctor-earnings-summary', timeFilter],

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from '@/lib/i18n';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -20,9 +20,9 @@ const gradeColors = {
 const DiabeticRetinopathyScanPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  const [analyzing, setAnalyzing] = useState(false);
+  const [file, setFile] = React.useState<File | null>(null);
+  const [preview, setPreview] = React.useState<string | null>(null);
+  const [analyzing, setAnalyzing] = React.useState(false);
   interface DRResult {
     grade: number;
     grade_name: string;
@@ -34,8 +34,8 @@ const DiabeticRetinopathyScanPage = () => {
     heatmap_url?: string;
   }
 
-  const [result, setResult] = useState<DRResult | null>(null);
-  const [error, setError] = useState('');
+  const [result, setResult] = React.useState<DRResult | null>(null);
+  const [error, setError] = React.useState('');
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];

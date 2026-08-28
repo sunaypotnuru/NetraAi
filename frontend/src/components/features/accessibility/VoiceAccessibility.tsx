@@ -1,8 +1,10 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import React from 'react';
+
 import { motion, AnimatePresence } from "motion/react";
 import { Volume2, VolumeX, Download, X, AlertCircle, Headphones } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { useAccessibilityStore } from "@/lib/accessibility";
+import { debounce } from 'lodash';
 
 // Map app language codes to BCP-47 language tags for SpeechSynthesis
 const LANG_MAP: Record<string, string> = {
@@ -104,18 +106,18 @@ const detectOS = (): string => {
 export function VoiceAccessibility() {
   const { language, t } = useTranslation();
   const { voiceReader: enabled, toggleVoiceReader: setEnabled } = useAccessibilityStore();
-  const [speaking, setSpeaking] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
-  const [showDownloadAlert, setShowDownloadAlert] = useState(false);
-  const [missingVoiceLang, setMissingVoiceLang] = useState<string | null>(null);
+  const [speaking, setSpeaking] = React.useState(false);
+  const [showTooltip, setShowTooltip] = React.useState(false);
+  const [showDownloadAlert, setShowDownloadAlert] = React.useState(false);
+  const [missingVoiceLang, setMissingVoiceLang] = React.useState<string | null>(null);
   
   // Ref to track the current utterance to prevent garbage collection
-  const currentUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
-  const lastSpokenRef = useRef('');
-  const timeoutRef = useRef<number | null>(null);
+  const currentUtteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
+  const lastSpokenRef = React.useRef('');
+  const timeoutRef = React.useRef<number | null>(null);
 
   // Initialize voices
-  useEffect(() => {
+  React.useEffect(() => {
     if (typeof window === 'undefined' || !window.speechSynthesis) return;
 
     const loadVoices = () => {
@@ -151,7 +153,7 @@ export function VoiceAccessibility() {
     };
   }, [language]);
 
-  const stopSpeaking = useCallback(() => {
+  const stopSpeaking = React.useCallback(() => {
     if (typeof window !== 'undefined' && window.speechSynthesis) {
       window.speechSynthesis.cancel();
       setSpeaking(false);
@@ -159,7 +161,7 @@ export function VoiceAccessibility() {
     }
   }, []);
 
-  const speak = useCallback((text: string, isManualTrigger = false) => {
+  const speak = React.useCallback((text: string, isManualTrigger = false) => {
     if (!text || (!isManualTrigger && text === lastSpokenRef.current)) return;
     if (typeof window === 'undefined' || !window.speechSynthesis) return;
 
@@ -247,7 +249,7 @@ export function VoiceAccessibility() {
   };
 
   // Handle language changes
-  useEffect(() => {
+  React.useEffect(() => {
     lastSpokenRef.current = '';
     stopSpeaking();
 
@@ -264,46 +266,58 @@ export function VoiceAccessibility() {
   }, [language, enabled, stopSpeaking]);
 
   // Handle hover events
-  useEffect(() => {
+  React.useEffect(() => {
     if (!enabled) return;
 
-    const handleMouseOver = (e: MouseEvent) => {
-      if (timeoutRef.current !== null) {
-        window.clearTimeout(timeoutRef.current);
-      }
-      
-      timeoutRef.current = window.setTimeout(() => {
-        const target = e.target as Element;
-        if (!target || target === document.body) return;
-
-        // Find nearest readable element
-        let el: Element | null = target;
-        let text = '';
-        let depth = 0;
-        
-        while (el && el !== document.body && depth < 5) {
-          text = getReadableText(el);
-          if (text) break;
-          el = el.parentElement;
-          depth++;
+    // Debounced event handlers to prevent excessive calls
+    const debouncedMouseOver = React.useCallback(
+      debounce((e: MouseEvent) => {
+        if (timeoutRef.current !== null) {
+          window.clearTimeout(timeoutRef.current);
         }
+        
+        timeoutRef.current = window.setTimeout(() => {
+          const target = e.target as Element;
+          if (!target || target === document.body) return;
 
-        if (text) speak(text);
-      }, 350); // Balanced debounce delay
-    };
+          // Find nearest readable element
+          let el: Element | null = target;
+          let text = '';
+          let depth = 0;
+          
+          while (el && el !== document.body && depth < 5) {
+            text = getReadableText(el);
+            if (text) break;
+            el = el.parentElement;
+            depth++;
+          }
 
-    const handleMouseOut = () => {
-      if (timeoutRef.current !== null) {
-        window.clearTimeout(timeoutRef.current);
-      }
-    };
+          if (text) speak(text);
+        }, 350); // Balanced debounce delay
+      }, 100),
+      [enabled, speak]
+    );
+    
+    const debouncedMouseOut = React.useCallback(
+      debounce(() => {
+        if (timeoutRef.current !== null) {
+          window.clearTimeout(timeoutRef.current);
+        }
+      }, 100),
+      []
+    );
 
-    document.addEventListener('mouseover', handleMouseOver);
-    document.addEventListener('mouseout', handleMouseOut);
+    if (enabled) {
+      document.addEventListener('mouseover', debouncedMouseOver, { passive: true });
+      document.addEventListener('mouseout', debouncedMouseOut, { passive: true });
+    }
 
     return () => {
-      document.removeEventListener('mouseover', handleMouseOver);
-      document.removeEventListener('mouseout', handleMouseOut);
+      document.removeEventListener('mouseover', debouncedMouseOver);
+      document.removeEventListener('mouseout', debouncedMouseOut);
+      // Cancel any pending debounced calls
+      debouncedMouseOver.cancel();
+      debouncedMouseOut.cancel();
       if (timeoutRef.current !== null) {
         window.clearTimeout(timeoutRef.current);
       }

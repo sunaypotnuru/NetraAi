@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import React from 'react';
+
 import { motion, AnimatePresence } from "motion/react";
 import {
   Send, Paperclip, Search, ArrowLeft, Plus, X,
@@ -43,13 +44,13 @@ const EMOJI_SET = ["😊", "😂", "❤️", "👍", "🙏", "😢", "🔥", "�
 export default function MessagesPage() {
   const { t } = useTranslation();
   const { user } = useAuthStore();
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [sending, setSending] = useState(false);
-  const [showNewMessageDialog, setShowNewMessageDialog] = useState(false);
+  const [conversations, setConversations] = React.useState<Conversation[]>([]);
+  const [selectedConversation, setSelectedConversation] = React.useState<Conversation | null>(null);
+  const [messages, setMessages] = React.useState<Message[]>([]);
+  const [newMessage, setNewMessage] = React.useState("");
+  const [loading, setLoading] = React.useState(true);
+  const [sending, setSending] = React.useState(false);
+  const [showNewMessageDialog, setShowNewMessageDialog] = React.useState(false);
   interface Contact {
     id: string;
     full_name?: string;
@@ -59,31 +60,31 @@ export default function MessagesPage() {
     specialization?: string;
   }
 
-  const [availableContacts, setAvailableContacts] = useState<Contact[]>([]);
-  const [loadingContacts, setLoadingContacts] = useState(false);
+  const [availableContacts, setAvailableContacts] = React.useState<Contact[]>([]);
+  const [loadingContacts, setLoadingContacts] = React.useState(false);
   const { onlineUsers: globalOnlineUsers } = usePresenceStore();
   const { send, connect, isConnected } = useWebSocket();
-  const [partnerTyping, setPartnerTyping] = useState(false);
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [replyTo, setReplyTo] = useState<Message | null>(null);
-  const [hoveredMsg, setHoveredMsg] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isAdminConversation, setIsAdminConversation] = useState(false);
-  const [contactsError, setContactsError] = useState<string | null>(null);
+  const [partnerTyping, setPartnerTyping] = React.useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = React.useState(false);
+  const [replyTo, setReplyTo] = React.useState<Message | null>(null);
+  const [hoveredMsg, setHoveredMsg] = React.useState<string | null>(null);
+  const [uploading, setUploading] = React.useState(false);
+  const [lightboxUrl, setLightboxUrl] = React.useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [isAdminConversation, setIsAdminConversation] = React.useState(false);
+  const [contactsError, setContactsError] = React.useState<string | null>(null);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const prevMsgCountRef = useRef(0);
+  const messagesEndRef = React.useRef<HTMLDivElement>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const typingTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+  const prevMsgCountRef = React.useRef(0);
 
-  useEffect(() => {
+  React.useEffect(() => {
     loadConversations();
   }, [user?.id]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!selectedConversation || !user?.id) return;
 
     const conv = conversations.find(c => c.partner_id === selectedConversation.partner_id);
@@ -151,7 +152,7 @@ export default function MessagesPage() {
     };
   }, [selectedConversation, user?.id, connect, send]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Only auto-scroll if message count strictly increased (new message sent or received)
     if (messages.length > prevMsgCountRef.current) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -186,7 +187,7 @@ export default function MessagesPage() {
     }
   };
 
-  const broadcastTyping = useCallback(() => {
+  const broadcastTyping = React.useCallback(() => {
     if (!selectedConversation || !user?.id) return;
     const convId = [user.id, selectedConversation.partner_id].sort().join(":");
     send("messages", "typing", { conversation_id: convId, is_typing: true });

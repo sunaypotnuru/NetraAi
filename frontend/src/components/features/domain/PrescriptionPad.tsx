@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Stethoscope } from 'lucide-react';
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useTranslation } from "@/lib/i18n";
@@ -13,7 +13,7 @@ interface PrescriptionPadProps {
 
 export const PrescriptionPad = ({ patient }: PrescriptionPadProps) => {
   const { t } = useTranslation();
-    const [refills, setRefills] = useState<number | null>(null);
+    const [refills, setRefills] = React.useState<number | null>(null);
     const { user } = useAuth();
     const currentDate = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 

@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import React from 'react';
+
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from "@/lib/i18n";
@@ -32,9 +33,9 @@ interface DashboardStats {
 
 
 function AnimatedCounter({ target, suffix = "" }: { target: number | string; suffix?: string }) {
-    const [current, setCurrent] = useState(typeof target === "number" ? target : 0);
+    const [current, setCurrent] = React.useState(typeof target === "number" ? target : 0);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (typeof target !== "number") return;
         if (target <= 0) {
             setCurrent(0);
@@ -79,7 +80,7 @@ export default function AdminDashboardPage() {
         queryFn: () => adminAPI.getStats().then(res => res.data)
     });
 
-    useEffect(() => {
+    React.useEffect(() => {
         const setupRealtime = async () => {
             try {
                 const manager = getWebSocketManager();

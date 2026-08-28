@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { useMutation } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "motion/react";
 import { ShieldAlert, ShieldCheck, CreditCard, Activity, CheckCircle, AlertTriangle, Loader2 } from "lucide-react";
@@ -14,9 +15,9 @@ import { useTranslation } from "../../lib/i18n";
 export default function InsuranceVerificationPage() {
     const { t } = useTranslation();
     const { user } = useAuthStore();
-    const [provider, setProvider] = useState("");
-    const [policyNumber, setPolicyNumber] = useState("");
-    const [dob, setDob] = useState("");
+    const [provider, setProvider] = React.useState("");
+    const [policyNumber, setPolicyNumber] = React.useState("");
+    const [dob, setDob] = React.useState("");
 
     interface VerifyResult {
         verified: boolean;
@@ -27,7 +28,7 @@ export default function InsuranceVerificationPage() {
         message: string;
     }
 
-    const [result, setResult] = useState<VerifyResult | null>(null);
+    const [result, setResult] = React.useState<VerifyResult | null>(null);
 
     const verifyMutation = useMutation({
         mutationFn: () => insuranceAPI.verify({ provider, policy_number: policyNumber, patient_name: user?.name || "Self", date_of_birth: dob }),

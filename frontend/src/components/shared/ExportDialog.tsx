@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React from 'react';
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -17,9 +18,9 @@ interface ExportDialogProps {
 
 export default function ExportDialog({ open, onClose, entityType, filters }: ExportDialogProps) {
   const { t } = useTranslation();
-  const [format, setFormat] = useState('csv');
-  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [format, setFormat] = React.useState('csv');
+  const [selectedColumns, setSelectedColumns] = React.useState<string[]>([]);
+  const [loading, setLoading] = React.useState(false);
 
   const availableColumns: Record<string, string[]> = {
     appointments: ['id', 'patient_name', 'doctor_name', 'scheduled_at', 'status', 'type', 'reason'],

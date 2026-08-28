@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import React from 'react';
+
 import { motion } from "motion/react";
 import { Share2, Search, User, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -39,21 +40,21 @@ export default function DocumentShareModal({
 }: DocumentShareModalProps) {
   const { t } = useTranslation();
 
-  const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const [filteredDoctors, setFilteredDoctors] = useState<Doctor[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedDoctorId, setSelectedDoctorId] = useState<string>("");
-  const [notes, setNotes] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSharing, setIsSharing] = useState(false);
+  const [doctors, setDoctors] = React.useState<Doctor[]>([]);
+  const [filteredDoctors, setFilteredDoctors] = React.useState<Doctor[]>([]);
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [selectedDoctorId, setSelectedDoctorId] = React.useState<string>("");
+  const [notes, setNotes] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [isSharing, setIsSharing] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (isOpen) {
       fetchDoctors();
     }
   }, [isOpen]);
 
-  const filterDoctors = useCallback(() => {
+  const filterDoctors = React.useCallback(() => {
     let filtered = doctors;
 
     if (searchTerm) {
@@ -66,7 +67,7 @@ export default function DocumentShareModal({
     setFilteredDoctors(filtered);
   }, [doctors, searchTerm]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     filterDoctors();
   }, [filterDoctors]);
 

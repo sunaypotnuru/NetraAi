@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { motion } from "motion/react";
 import { Upload, FileText, Trash2, Download, Filter, Plus, Loader2, Share2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -28,15 +29,15 @@ interface Document {
 export default function DocumentsPage() {
   const { t } = useTranslation();
   const { i18n } = useI18Next();
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [categories, setCategories] = useState<Array<{ value: string; label: string }>>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [showUploadDialog, setShowUploadDialog] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [downloadingId, setDownloadingId] = useState<string | null>(null);
-  const [showShareModal, setShowShareModal] = useState(false);
-  const [selectedDocForShare, setSelectedDocForShare] = useState<Document | null>(null);
+  const [documents, setDocuments] = React.useState<Document[]>([]);
+  const [categories, setCategories] = React.useState<Array<{ value: string; label: string }>>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [selectedCategory, setSelectedCategory] = React.useState<string>("");
+  const [showUploadDialog, setShowUploadDialog] = React.useState(false);
+  const [uploading, setUploading] = React.useState(false);
+  const [downloadingId, setDownloadingId] = React.useState<string | null>(null);
+  const [showShareModal, setShowShareModal] = React.useState(false);
+  const [selectedDocForShare, setSelectedDocForShare] = React.useState<Document | null>(null);
   const location = useLocation();
   
   const isDoctor = location.pathname.startsWith('/doctor');
@@ -48,12 +49,12 @@ export default function DocumentsPage() {
   const bgPage = isDoctor ? 'from-[#F0F9FF] via-white to-[#F8FAFC]' : 'from-[#F0FDFA] via-white to-[#F8FAFC]';
 
   // Upload form state
-  const [uploadFile, setUploadFile] = useState<File | null>(null);
-  const [uploadTitle, setUploadTitle] = useState("");
-  const [uploadDescription, setUploadDescription] = useState("");
-  const [uploadCategory, setUploadCategory] = useState("general");
+  const [uploadFile, setUploadFile] = React.useState<File | null>(null);
+  const [uploadTitle, setUploadTitle] = React.useState("");
+  const [uploadDescription, setUploadDescription] = React.useState("");
+  const [uploadCategory, setUploadCategory] = React.useState("general");
 
-  useEffect(() => {
+  React.useEffect(() => {
     const loadDocuments = async () => {
       try {
         const response = await documentsAPI.getDocuments(selectedCategory || undefined);

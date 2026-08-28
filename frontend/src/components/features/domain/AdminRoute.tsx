@@ -1,6 +1,7 @@
+import React from 'react';
 import { Navigate } from 'react-router';
 import { useAuth } from '@/app/contexts/AuthContext';
-import { ReactNode } from 'react';
+
 import { ECGLoadingScreen } from '@/components/shared/ECGLoadingScreen';
 
 const AdminRoute = ({ children }: { children: ReactNode }) => {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router';
@@ -33,10 +33,10 @@ interface MedicalEvent {
 export default function PatientMedicalHistory() {
   const { patientId } = useParams();
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState('all');
-  const [filterDate, setFilterDate] = useState('all');
-  const [expandedEvents, setExpandedEvents] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [filterType, setFilterType] = React.useState('all');
+  const [filterDate, setFilterDate] = React.useState('all');
+  const [expandedEvents, setExpandedEvents] = React.useState<Set<string>>(new Set());
 
   const { data: patient, isLoading: patientLoading } = useQuery({
     queryKey: ['patient-basic', patientId],

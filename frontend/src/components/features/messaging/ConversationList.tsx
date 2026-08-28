@@ -9,7 +9,7 @@
  * - Real-time updates
  */
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { messagingAPI } from '@/services/api';
 import { getWebSocketManager } from '@/services/websocket';
 import type { ConversationWithDetails } from '@/types';
@@ -33,21 +33,21 @@ export function ConversationList({
   onSelectConversation,
   onNewConversation,
 }: ConversationListProps) {
-  const [conversations, setConversations] = useState<ConversationWithDetails[]>([]);
-  const [filteredConversations, setFilteredConversations] = useState<ConversationWithDetails[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState<'all' | 'direct' | 'group'>('all');
-  const [unreadOnly, setUnreadOnly] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [totalUnread, setTotalUnread] = useState(0);
+  const [conversations, setConversations] = React.useState<ConversationWithDetails[]>([]);
+  const [filteredConversations, setFilteredConversations] = React.useState<ConversationWithDetails[]>([]);
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [filterType, setFilterType] = React.useState<'all' | 'direct' | 'group'>('all');
+  const [unreadOnly, setUnreadOnly] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [totalUnread, setTotalUnread] = React.useState(0);
 
-  useEffect(() => {
+  React.useEffect(() => {
     loadConversations();
     connectWebSocket();
     return () => cleanup();
   }, []);
 
-  useEffect(() => {
+  React.useEffect(() => {
     filterConversations();
   }, [conversations, searchQuery, filterType, unreadOnly]);
 

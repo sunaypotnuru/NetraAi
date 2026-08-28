@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { motion, AnimatePresence } from "motion/react";
 import {
   FlaskConical,
@@ -26,18 +27,18 @@ export default function LabResultsHistoryPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const [labResults, setLabResults] = useState<LabResult[]>([]);
-  const [filteredResults, setFilteredResults] = useState<LabResult[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "preliminary" | "final" | "corrected">("all");
-  const [abnormalFilter, setAbnormalFilter] = useState<"all" | "normal" | "abnormal">("all");
+  const [labResults, setLabResults] = React.useState<LabResult[]>([]);
+  const [filteredResults, setFilteredResults] = React.useState<LabResult[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [statusFilter, setStatusFilter] = React.useState<"all" | "preliminary" | "final" | "corrected">("all");
+  const [abnormalFilter, setAbnormalFilter] = React.useState<"all" | "normal" | "abnormal">("all");
 
-  useEffect(() => {
+  React.useEffect(() => {
     fetchLabResults();
   }, []);
 
-  useEffect(() => {
+  React.useEffect(() => {
     filterResults();
   }, [labResults, searchTerm, statusFilter, abnormalFilter]);
 

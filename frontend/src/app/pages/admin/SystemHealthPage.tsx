@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { motion, AnimatePresence } from "motion/react";
 import {
   Activity, CheckCircle, XCircle, Clock, AlertTriangle,
@@ -22,10 +23,10 @@ interface ServiceHealth {
 
 export default function SystemHealthPage() {
   const { t } = useTranslation();
-  const [services, setServices] = useState<ServiceHealth[]>([]);
-  const [checking, setChecking] = useState(false);
-  const [lastCheck, setLastCheck] = useState<Date | null>(null);
-  const [overallHealth, setOverallHealth] = useState(0);
+  const [services, setServices] = React.useState<ServiceHealth[]>([]);
+  const [checking, setChecking] = React.useState(false);
+  const [lastCheck, setLastCheck] = React.useState<Date | null>(null);
+  const [overallHealth, setOverallHealth] = React.useState(0);
 
   const checkAllServices = async () => {
     setChecking(true);
@@ -63,7 +64,7 @@ export default function SystemHealthPage() {
     }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     checkAllServices();
     const interval = setInterval(checkAllServices, 30000);
     return () => clearInterval(interval);

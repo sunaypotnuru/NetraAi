@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import React from 'react';
+
 import { motion } from 'motion/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
@@ -59,15 +60,15 @@ interface UsersResponse {
 export default function AdminUsersPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [roleFilter, setRoleFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('created_at');
-  const [page, setPage] = useState(1);
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [roleFilter, setRoleFilter] = React.useState('all');
+  const [statusFilter, setStatusFilter] = React.useState('all');
+  const [sortBy, setSortBy] = React.useState('created_at');
+  const [page, setPage] = React.useState(1);
   const limit = 10;
 
   // Reset page when filters change
-  useEffect(() => {
+  React.useEffect(() => {
     setPage(1);
   }, [searchTerm, roleFilter, statusFilter, sortBy]);
 

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React from 'react';
+
 import { motion } from 'motion/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router';
@@ -47,7 +48,7 @@ export default function PaymentDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [refundReason, setRefundReason] = useState('');
+  const [refundReason, setRefundReason] = React.useState('');
 
   // Fetch payment details
   const { data: payment, isLoading } = useQuery({

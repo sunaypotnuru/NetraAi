@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { motion } from "motion/react";
 import { Settings, Save, Mail, Wrench, AlertTriangle, ToggleRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -31,7 +32,7 @@ interface SystemConfig {
 
 export default function ConfigurationPage() {
   const { t } = useTranslation();
-  const [config, setConfig] = useState<SystemConfig>({
+  const [config, setConfig] = React.useState<SystemConfig>({
     features: {
       aiNurse: true,
       chatbot: true,
@@ -52,10 +53,10 @@ export default function ConfigurationPage() {
       smsProvider: "Twilio",
     },
   });
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = React.useState(false);
+  const [saved, setSaved] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     loadConfiguration();
   }, []);
 

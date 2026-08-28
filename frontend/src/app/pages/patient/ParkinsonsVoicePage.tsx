@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from '@/lib/i18n';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,9 +12,9 @@ import { AIVoicePulse } from '../../../components/AIVoicePulse';
 const ParkinsonsVoicePage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [recording, setRecording] = useState(false);
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
-  const [analyzing, setAnalyzing] = useState(false);
+  const [recording, setRecording] = React.useState(false);
+  const [audioBlob, setAudioBlob] = React.useState<Blob | null>(null);
+  const [analyzing, setAnalyzing] = React.useState(false);
 
   interface ParkinsonsResult {
     risk_score: number;
@@ -22,10 +22,10 @@ const ParkinsonsVoicePage = () => {
     recommendation: string;
   }
 
-  const [result, setResult] = useState<ParkinsonsResult | null>(null);
-  const [error, setError] = useState('');
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
+  const [result, setResult] = React.useState<ParkinsonsResult | null>(null);
+  const [error, setError] = React.useState('');
+  const mediaRecorderRef = React.useRef<MediaRecorder | null>(null);
+  const chunksRef = React.useRef<Blob[]>([]);
 
   const startRecording = async () => {
     try {

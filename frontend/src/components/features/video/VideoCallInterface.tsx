@@ -11,7 +11,7 @@
  * - Emergency disconnect
  */
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React from 'react';
 import { videoAPI } from '@/services/api';
 import { getWebSocketManager } from '@/services/websocket';
 import type {
@@ -47,28 +47,28 @@ export function VideoCallInterface({
   onEnd,
 }: VideoCallInterfaceProps) {
   // Refs
-  const localVideoRef = useRef<HTMLVideoElement>(null);
-  const remoteVideoRef = useRef<HTMLVideoElement>(null);
-  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
-  const localStreamRef = useRef<MediaStream | null>(null);
-  const qualityIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const localVideoRef = React.useRef<HTMLVideoElement>(null);
+  const remoteVideoRef = React.useRef<HTMLVideoElement>(null);
+  const peerConnectionRef = React.useRef<RTCPeerConnection | null>(null);
+  const localStreamRef = React.useRef<MediaStream | null>(null);
+  const qualityIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
 
   // State
-  const [consultation, setConsultation] = useState<VideoConsultation | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
-  const [isAudioEnabled, setIsAudioEnabled] = useState(true);
-  const [isVideoEnabled, setIsVideoEnabled] = useState(true);
-  const [isScreenSharing, setIsScreenSharing] = useState(false);
-  const [qualityMetrics, setQualityMetrics] = useState<CallQualityMetrics | null>(null);
-  const [showConsentDialog, setShowConsentDialog] = useState(false);
-  const [showDiagnostics, setShowDiagnostics] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [connectionState, setConnectionState] = useState<RTCPeerConnectionState>('new');
+  const [consultation, setConsultation] = React.useState<VideoConsultation | null>(null);
+  const [isConnected, setIsConnected] = React.useState(false);
+  const [isAudioEnabled, setIsAudioEnabled] = React.useState(true);
+  const [isVideoEnabled, setIsVideoEnabled] = React.useState(true);
+  const [isScreenSharing, setIsScreenSharing] = React.useState(false);
+  const [qualityMetrics, setQualityMetrics] = React.useState<CallQualityMetrics | null>(null);
+  const [showConsentDialog, setShowConsentDialog] = React.useState(false);
+  const [showDiagnostics, setShowDiagnostics] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+  const [connectionState, setConnectionState] = React.useState<RTCPeerConnectionState>('new');
 
   /**
    * Initialize video consultation
    */
-  useEffect(() => {
+  React.useEffect(() => {
     initializeCall();
     return () => cleanup();
   }, [consultationId]);
@@ -371,7 +371,7 @@ export function VideoCallInterface({
   /**
    * Toggle audio
    */
-  const toggleAudio = useCallback(() => {
+  const toggleAudio = React.useCallback(() => {
     if (localStreamRef.current) {
       const audioTrack = localStreamRef.current.getAudioTracks()[0];
       if (audioTrack) {
@@ -384,7 +384,7 @@ export function VideoCallInterface({
   /**
    * Toggle video
    */
-  const toggleVideo = useCallback(() => {
+  const toggleVideo = React.useCallback(() => {
     if (localStreamRef.current) {
       const videoTrack = localStreamRef.current.getVideoTracks()[0];
       if (videoTrack) {
@@ -397,7 +397,7 @@ export function VideoCallInterface({
   /**
    * Toggle screen sharing
    */
-  const toggleScreenShare = useCallback(async () => {
+  const toggleScreenShare = React.useCallback(async () => {
     if (isScreenSharing) {
       // Stop screen sharing
       await getLocalMedia();

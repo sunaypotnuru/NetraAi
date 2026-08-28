@@ -1,8 +1,9 @@
+import React from 'react';
 import { motion, AnimatePresence } from "motion/react";
 import { FileText, Eye, Video, Activity, Download, Calendar, ChevronDown, Plus, AlertCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import jsPDF from "jspdf";
@@ -35,10 +36,10 @@ interface TimelineRecord {
 export default function HealthTimelinePage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const [expandedId, setExpandedId] = useState<string | number | null>(null);
-    const [filterType, setFilterType] = useState<string>('all');
-    const [isAddEventOpen, setIsAddEventOpen] = useState(false);
-    const [newEvent, setNewEvent] = useState({ title: "", description: "", date: new Date().toISOString().split('T')[0] });
+    const [expandedId, setExpandedId] = React.useState<string | number | null>(null);
+    const [filterType, setFilterType] = React.useState<string>('all');
+    const [isAddEventOpen, setIsAddEventOpen] = React.useState(false);
+    const [newEvent, setNewEvent] = React.useState({ title: "", description: "", date: new Date().toISOString().split('T')[0] });
     const queryClient = useQueryClient();
 
     const { data: recordsData, isLoading, error } = useQuery({

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React from 'react';
+
 import { useTranslation } from '../../lib/i18n';
 import { motion } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
@@ -9,7 +10,7 @@ import { HeartbeatLoader } from "@/components/shared/HeartbeatLoader";
 
 export default function DoctorRatingsPage() {
     const { t } = useTranslation();
-    const [filterRating, setFilterRating] = useState('all');
+    const [filterRating, setFilterRating] = React.useState('all');
 
     const { data: ratingsData, isLoading, error } = useQuery({
         queryKey: ['doctorRatings'],

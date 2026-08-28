@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Edit2, Trash2, Star, Phone, User, AlertCircle, Check, X, Shield } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -30,20 +30,20 @@ interface ContactFormData {
 export default function EmergencyContactsPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [contacts, setContacts] = useState<EmergencyContact[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [isAddingContact, setIsAddingContact] = useState(false);
-  const [editingContact, setEditingContact] = useState<string | null>(null);
-  const [formData, setFormData] = useState<ContactFormData>({
+  const [contacts, setContacts] = React.useState<EmergencyContact[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+  const [success, setSuccess] = React.useState<string | null>(null);
+  const [isAddingContact, setIsAddingContact] = React.useState(false);
+  const [editingContact, setEditingContact] = React.useState<string | null>(null);
+  const [formData, setFormData] = React.useState<ContactFormData>({
     full_name: '',
     phone: '',
     relationship: '',
     is_primary: false,
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     fetchContacts();
   }, []);
 

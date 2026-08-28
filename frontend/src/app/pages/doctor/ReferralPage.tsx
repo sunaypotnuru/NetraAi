@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { motion, AnimatePresence } from "motion/react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -32,12 +33,12 @@ interface PatientRecord {
 export default function ReferralPage() {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
-    const [referralNotes, setReferralNotes] = useState("");
-    const [searchTerm, setSearchTerm] = useState("");
-    const [activeTab, setActiveTab] = useState<'received' | 'sent'>('received');
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [targetDoctorId, setTargetDoctorId] = useState("");
-    const [selectedPatientId, setSelectedPatientId] = useState("");
+    const [referralNotes, setReferralNotes] = React.useState("");
+    const [searchTerm, setSearchTerm] = React.useState("");
+    const [activeTab, setActiveTab] = React.useState<'received' | 'sent'>('received');
+    const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
+    const [targetDoctorId, setTargetDoctorId] = React.useState("");
+    const [selectedPatientId, setSelectedPatientId] = React.useState("");
 
     const { data: sentReferrals, isLoading: isLoadingSent } = useQuery({
         queryKey: ['referrals-sent'],

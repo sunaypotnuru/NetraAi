@@ -5,7 +5,7 @@
  * All participants must consent before recording can start
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { videoAPI } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -23,8 +23,8 @@ export function RecordingConsentDialog({
   onConsent,
   onDecline,
 }: RecordingConsentDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [hasRead, setHasRead] = useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [hasRead, setHasRead] = React.useState(false);
 
   /**
    * Submit consent

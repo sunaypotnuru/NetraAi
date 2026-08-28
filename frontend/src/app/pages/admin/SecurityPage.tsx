@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { motion, AnimatePresence } from "motion/react";
 import {
   Shield, AlertTriangle, LogOut, Ban, CheckCircle,
@@ -45,12 +46,10 @@ interface SecurityStats {
   last_audit_date: string;
 }
 
-
-
 export default function SecurityPage() {
   const { t } = useTranslation();
-  const [loading, setLoading] = useState(false);
-  const [stats, setStats] = useState<SecurityStats>({
+  const [loading, setLoading] = React.useState(false);
+  const [stats, setStats] = React.useState<SecurityStats>({
     failed_logins_24h: 0,
     active_sessions: 0,
     open_alerts: 0,
@@ -58,13 +57,13 @@ export default function SecurityPage() {
     last_audit_date: new Date().toISOString(),
   });
 
-  const [activeSessions, setActiveSessions] = useState<ActiveSession[]>([]);
-  const [failedLogins, setFailedLogins] = useState<FailedLogin[]>([]);
-  const [securityAlerts, setSecurityAlerts] = useState<SecurityAlert[]>([]);
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-  const [ipWhitelistEnabled, setIpWhitelistEnabled] = useState(false);
-  const [ipWhitelist, setIpWhitelist] = useState<string[]>([]);
-  const [newIp, setNewIp] = useState("");
+  const [activeSessions, setActiveSessions] = React.useState<ActiveSession[]>([]);
+  const [failedLogins, setFailedLogins] = React.useState<FailedLogin[]>([]);
+  const [securityAlerts, setSecurityAlerts] = React.useState<SecurityAlert[]>([]);
+  const [twoFactorEnabled, setTwoFactorEnabled] = React.useState(false);
+  const [ipWhitelistEnabled, setIpWhitelistEnabled] = React.useState(false);
+  const [ipWhitelist, setIpWhitelist] = React.useState<string[]>([]);
+  const [newIp, setNewIp] = React.useState("");
 
   // Load all security data from backend APIs
   const fetchSecurityData = async () => {
@@ -176,7 +175,7 @@ export default function SecurityPage() {
     }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     fetchSecurityData();
   }, []);
 

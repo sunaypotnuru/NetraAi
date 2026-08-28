@@ -1,4 +1,5 @@
-import { useEffect, useState, useRef } from 'react';
+import React from 'react';
+
 import { Tldraw, createTLStore, defaultShapeUtils, TLRecord, Editor } from 'tldraw';
 import 'tldraw/tldraw.css';
 import { useDebouncedCallback } from 'use-debounce';
@@ -10,14 +11,14 @@ interface WhiteboardProps {
 }
 
 export function Whiteboard({ roomId, onEndConsultation }: WhiteboardProps) {
-    const [store] = useState(() => createTLStore({ shapeUtils: defaultShapeUtils }));
-    const [editor, setEditor] = useState<Editor | null>(null);
-    const wsRef = useRef<WebSocket | null>(null);
+    const [store] = React.useState(() => createTLStore({ shapeUtils: defaultShapeUtils }));
+    const [editor, setEditor] = React.useState<Editor | null>(null);
+    const wsRef = React.useRef<WebSocket | null>(null);
 
     // Track if we are currently handling remote changes to avoid echo
-    const handlingRemoteRef = useRef(false);
+    const handlingRemoteRef = React.useRef(false);
 
-    useEffect(() => {
+    React.useEffect(() => {
         // Initialize WebSocket using standard API base URL
         const wsUrl = getRequiredApiBaseUrl().replace(/^http/, 'ws');
         const ws = new WebSocket(`${wsUrl}/api/v1/whiteboard/ws/${roomId}`);
@@ -79,7 +80,7 @@ export function Whiteboard({ roomId, onEndConsultation }: WhiteboardProps) {
     }, 16, { maxWait: 16 });
 
     // Listen to local store changes and broadcast them
-    useEffect(() => {
+    React.useEffect(() => {
         if (!store) return;
 
         const cleanup = store.listen((entry) => {
@@ -102,7 +103,7 @@ export function Whiteboard({ roomId, onEndConsultation }: WhiteboardProps) {
     }, [store, broadcastDelta]);
 
     // Handle end of consultation snapshot
-    useEffect(() => {
+    React.useEffect(() => {
         if (editor && onEndConsultation) {
             (window as Window & { getWhiteboardSnapshot?: () => Promise<string | null> }).getWhiteboardSnapshot = async () => {
                 const shapeIds = Array.from(editor.getCurrentPageShapeIds());

@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { motion } from "motion/react";
 import { Copy, Share2, Users, Gift, Check } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -20,12 +21,12 @@ interface ReferralStats {
 
 export default function ReferralPage() {
   const { t } = useTranslation();
-  const [referralCode, setReferralCode] = useState("");
-  const [stats, setStats] = useState<ReferralStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [copied, setCopied] = useState(false);
+  const [referralCode, setReferralCode] = React.useState("");
+  const [stats, setStats] = React.useState<ReferralStats | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [copied, setCopied] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const loadData = async () => {
       try {
         const [codeRes, statsRes] = await Promise.all([

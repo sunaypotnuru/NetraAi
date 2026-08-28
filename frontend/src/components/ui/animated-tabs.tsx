@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * AnimatedTabs Component
  * 
@@ -11,7 +12,7 @@
  */
 
 import { motion, AnimatePresence } from 'motion/react';
-import { useState, useRef, useEffect } from 'react';
+
 import { useAnimationConfig } from '@/animations';
 import { cn } from '@/lib/utils';
 
@@ -48,14 +49,14 @@ export function AnimatedTabs({
   disableAnimations = false,
   variant = 'underline',
 }: AnimatedTabsProps) {
-  const [activeTab, setActiveTab] = useState(defaultTab || tabs[0]?.id);
-  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
-  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const [activeTab, setActiveTab] = React.useState(defaultTab || tabs[0]?.id);
+  const [indicatorStyle, setIndicatorStyle] = React.useState({ left: 0, width: 0 });
+  const tabRefs = React.useRef<Record<string, HTMLButtonElement | null>>({});
   const { shouldReduceMotion, getTransition } = useAnimationConfig();
   const shouldAnimate = !disableAnimations && !shouldReduceMotion;
 
   // Update indicator position
-  useEffect(() => {
+  React.useEffect(() => {
     const activeTabElement = tabRefs.current[activeTab];
     if (activeTabElement) {
       setIndicatorStyle({

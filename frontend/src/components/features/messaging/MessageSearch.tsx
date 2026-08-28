@@ -10,7 +10,7 @@
  * - Highlight search matches
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { messagingAPI } from '@/services/api';
 import type { MessageWithDetails } from '@/types';
 import { Card } from '@/components/ui/card';
@@ -31,14 +31,14 @@ export function MessageSearch({
   onSelectMessage,
   onClose,
 }: MessageSearchProps) {
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<MessageWithDetails[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
-  const [messageType, setMessageType] = useState<string>('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [hasSearched, setHasSearched] = useState(false);
+  const [query, setQuery] = React.useState('');
+  const [results, setResults] = React.useState<MessageWithDetails[]>([]);
+  const [isSearching, setIsSearching] = React.useState(false);
+  const [showFilters, setShowFilters] = React.useState(false);
+  const [messageType, setMessageType] = React.useState<string>('');
+  const [startDate, setStartDate] = React.useState('');
+  const [endDate, setEndDate] = React.useState('');
+  const [hasSearched, setHasSearched] = React.useState(false);
 
   /**
    * Perform search

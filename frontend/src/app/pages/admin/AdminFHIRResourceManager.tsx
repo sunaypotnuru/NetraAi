@@ -1,14 +1,15 @@
+import React from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import { Database, RefreshCw, CheckCircle, AlertCircle, Search, Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { useState } from "react";
+
 import { fhirAPI } from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AdminFHIRResourceManager() {
-  const [query, setQuery] = useState("");
-  const [resourceType, setResourceType] = useState("Patient");
+  const [query, setQuery] = React.useState("");
+  const [resourceType, setResourceType] = React.useState("Patient");
 
   const { data: fhirData, isLoading } = useQuery({
     queryKey: ["fhirResources", resourceType],

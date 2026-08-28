@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { Link, useNavigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import { Eye, Mail, Lock, User, Phone, Globe, FileText, ChevronRight, ChevronLeft, Check, Activity } from "lucide-react";
@@ -25,8 +26,8 @@ const languages = [
 export default function SignUpPage() {
   const { t } = useTranslation();
   const steps = getSteps(t);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState({
+  const [currentStep, setCurrentStep] = React.useState(0);
+  const [formData, setFormData] = React.useState({
     email: "",
     password: "",
     full_name: "",

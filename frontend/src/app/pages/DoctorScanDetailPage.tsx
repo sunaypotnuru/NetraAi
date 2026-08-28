@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React from 'react';
+
 import { useParams, useNavigate } from 'react-router';
 import { useTranslation } from '../../lib/i18n';
 import { motion } from 'motion/react';
@@ -16,9 +17,9 @@ export default function DoctorScanDetailPage() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const [doctorNotes, setDoctorNotes] = useState('');
-    const [finalDiagnosis, setFinalDiagnosis] = useState('');
-    const [recommendedAction, setRecommendedAction] = useState('');
+    const [doctorNotes, setDoctorNotes] = React.useState('');
+    const [finalDiagnosis, setFinalDiagnosis] = React.useState('');
+    const [recommendedAction, setRecommendedAction] = React.useState('');
 
     const { data: scans, isLoading, error } = useQuery({
         queryKey: ['doctorScans'],

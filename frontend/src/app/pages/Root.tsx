@@ -1,5 +1,6 @@
+import React from 'react';
 import { Outlet, useLocation } from "react-router";
-import { useState, useEffect } from "react";
+
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowUp } from "lucide-react";
 import NavbarMain from "@/components/layout/NavbarMain";
@@ -15,16 +16,16 @@ import { useThemeStore } from "../../lib/themeStore";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
-  useEffect(() => {
+  React.useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
   return null;
 }
 
 function ScrollToTopButton() {
-  const [show, setShow] = useState(false);
+  const [show, setShow] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const handleScroll = () => setShow(window.scrollY > 300);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -46,9 +47,9 @@ export default function Root() {
   const location = useLocation();
   const { user } = useAuthStore();
   const { theme } = useThemeStore();
-  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
+  const [resolvedTheme, setResolvedTheme] = React.useState<"light" | "dark">("light");
 
-  useEffect(() => {
+  React.useEffect(() => {
     const updateTheme = () => {
       if (theme === "system") {
         const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;

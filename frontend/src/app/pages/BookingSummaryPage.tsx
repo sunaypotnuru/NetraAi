@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { useParams, useNavigate, useLocation } from "react-router";
 import { motion } from "motion/react";
 import { 
@@ -30,9 +31,9 @@ export default function BookingSummaryPage() {
         [key: string]: unknown;
     }
     
-    const [doctor, setDoctor] = useState<Doctor | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [processing, setProcessing] = useState(false);
+    const [doctor, setDoctor] = React.useState<Doctor | null>(null);
+    const [loading, setLoading] = React.useState(true);
+    const [processing, setProcessing] = React.useState(false);
     
     // Appointment details passed via location state or defaults
     const appointmentData = location.state || {
@@ -41,7 +42,7 @@ export default function BookingSummaryPage() {
         reason: "General Consultation"
     };
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (!doctorId) return;
         doctorAPI.getDoctor(doctorId)
             .then(res => setDoctor(res.data))

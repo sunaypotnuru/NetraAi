@@ -87,11 +87,12 @@ export default defineConfig({
           // ── MUI (large, only used on some pages) ──────────────────
           if (id.includes('node_modules/@mui')) return 'mui';
 
-          // ⚠️ Everything else (React, Radix, router, forms, etc.) ⚠️
-          if (id.includes('node_modules/@radix-ui')) return 'radix';
-          if (id.match(/\/node_modules\/react(-dom|-router-dom)?\//)) return 'react';
+          // ⚠️ CRITICAL: Keep React ecosystem together to prevent forwardRef undefined errors ⚠️
+          if (id.includes('node_modules/@radix-ui')) return 'react-vendor';
+          if (id.match(/\/node_modules\/react(-dom|-router-dom)?\//)) return 'react-vendor';
+          if (id.includes('node_modules/react-')) return 'react-vendor'; // react-hook-form, etc.
 
-          // Kept together in 'vendor' to avoid chunk-initialization
+          // Kept together in 'react-vendor' to avoid chunk-initialization
           // race conditions (e.g. React.forwardRef undefined).
           return 'vendor';
         },

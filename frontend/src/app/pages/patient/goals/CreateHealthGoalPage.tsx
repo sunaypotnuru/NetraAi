@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { motion } from "motion/react";
 import {
   ArrowLeft,
@@ -29,17 +30,17 @@ export default function CreateHealthGoalPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const [isSaving, setIsSaving] = useState(false);
+  const [isSaving, setIsSaving] = React.useState(false);
 
   // Form state
-  const [goalType, setGoalType] = useState<string>("weight");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [targetValue, setTargetValue] = useState("");
-  const [currentValue, setCurrentValue] = useState("");
-  const [unit, setUnit] = useState("kg");
-  const [startDate, setStartDate] = useState<Date>(new Date());
-  const [targetDate, setTargetDate] = useState<Date>(
+  const [goalType, setGoalType] = React.useState<string>("weight");
+  const [title, setTitle] = React.useState("");
+  const [description, setDescription] = React.useState("");
+  const [targetValue, setTargetValue] = React.useState("");
+  const [currentValue, setCurrentValue] = React.useState("");
+  const [unit, setUnit] = React.useState("kg");
+  const [startDate, setStartDate] = React.useState<Date>(new Date());
+  const [targetDate, setTargetDate] = React.useState<Date>(
     new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
   );
 

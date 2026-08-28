@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import {
@@ -53,7 +54,7 @@ function severityLabel(sev: number): string {
 // -- Auto-fit map to markers --
 function FitBounds({ features }: { features: HotspotFeature[] }) {
   const map = useMap();
-  useEffect(() => {
+  React.useEffect(() => {
     if (features.length === 0) return;
     const coords = features
       .filter(f => f.geometry?.coordinates)
@@ -67,7 +68,7 @@ function FitBounds({ features }: { features: HotspotFeature[] }) {
 
 export default function EpidemicRadarPage() {
   const { t } = useTranslation();
-  const [days, setDays] = useState(30);
+  const [days, setDays] = React.useState(30);
   const now = new Date();
   const startDate = new Date(now.getTime() - days * 86400000).toISOString();
   const endDate = now.toISOString();

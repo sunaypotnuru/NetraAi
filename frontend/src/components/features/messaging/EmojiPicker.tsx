@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import React from 'react';
+
 import { Search, Clock } from "lucide-react";
 import { motion } from "motion/react";
 import { useTranslation } from "@/lib/i18n";
@@ -43,12 +44,12 @@ const EMOJI_CATEGORIES = {
 
 export default function EmojiPicker({ onSelect, onClose }: EmojiPickerProps) {
   const { t } = useTranslation();
-  const [selectedCategory, setSelectedCategory] = useState<keyof typeof EMOJI_CATEGORIES>("smileys");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [recentEmojis, setRecentEmojis] = useState<string[]>([]);
-  const pickerRef = useRef<HTMLDivElement>(null);
+  const [selectedCategory, setSelectedCategory] = React.useState<keyof typeof EMOJI_CATEGORIES>("smileys");
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [recentEmojis, setRecentEmojis] = React.useState<string[]>([]);
+  const pickerRef = React.useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Load recent emojis from localStorage
     const stored = localStorage.getItem("recentEmojis");
     if (stored) {

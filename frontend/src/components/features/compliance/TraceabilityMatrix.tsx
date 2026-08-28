@@ -4,7 +4,7 @@
  * design and test trace counts.
  */
 
-import React, { useState, useMemo } from "react";
+import React from 'react';
 
 export type TraceabilityStatus = "complete" | "partial" | "missing";
 
@@ -36,10 +36,10 @@ export function TraceabilityMatrix({
   onRequirementClick,
   onExport,
 }: TraceabilityMatrixProps) {
-  const [search, setSearch] = useState("");
-  const [safetyClass, setSafetyClass] = useState("");
+  const [search, setSearch] = React.useState("");
+  const [safetyClass, setSafetyClass] = React.useState("");
 
-  const filtered = useMemo(() => {
+  const filtered = React.useMemo(() => {
     return data.filter((row) => {
       const matchesSearch =
         !search ||

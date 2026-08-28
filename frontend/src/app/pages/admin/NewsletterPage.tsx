@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { motion, AnimatePresence } from "motion/react";
 import {
     Mail, Send, FileText, Trash2, Plus, Edit3, Check,
@@ -30,9 +31,9 @@ export default function AdminNewsletterPage() {
         { value: "doctors", label: t("admin.newsletter.doctors_only", "Doctors Only"), icon: MailOpen },
     ];
     const queryClient = useQueryClient();
-    const [composing, setComposing] = useState(false);
-    const [editing, setEditing] = useState<Newsletter | null>(null);
-    const [form, setForm] = useState({ subject: "", body: "", audience: "all" });
+    const [composing, setComposing] = React.useState(false);
+    const [editing, setEditing] = React.useState<Newsletter | null>(null);
+    const [form, setForm] = React.useState({ subject: "", body: "", audience: "all" });
 
     const { data, isLoading } = useQuery({
         queryKey: ["newsletters"],

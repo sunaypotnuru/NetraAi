@@ -1,4 +1,5 @@
-import { useState, ChangeEvent } from "react";
+import React from 'react';
+
 import { motion, AnimatePresence } from "motion/react";
 import { useMutation } from "@tanstack/react-query";
 import { Upload, Droplet, Activity, FileText, CheckCircle, Loader2, Info } from "lucide-react";
@@ -17,9 +18,9 @@ interface LabMetric {
 
 export default function LabAnalyzerPage() {
     const { t } = useTranslation();
-    const [file, setFile] = useState<File | null>(null);
-    const [previewURL, setPreviewURL] = useState<string | null>(null);
-    const [results, setResults] = useState<{ patient_name?: string; test_date?: string; metrics: LabMetric[] } | null>(null);
+    const [file, setFile] = React.useState<File | null>(null);
+    const [previewURL, setPreviewURL] = React.useState<string | null>(null);
+    const [results, setResults] = React.useState<{ patient_name?: string; test_date?: string; metrics: LabMetric[] } | null>(null);
 
     const analyzeMutation = useMutation({
         mutationFn: (f: File) => {

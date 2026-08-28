@@ -1,3 +1,4 @@
+import React from 'react';
 import { motion } from "motion/react";
 import { 
   Activity, 
@@ -31,7 +32,7 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useTranslation } from "@/lib/i18n";
@@ -40,7 +41,6 @@ import { XAIVisualizationPanel } from "@/components/features/ai/XAIVisualization
 import { AnalyticsDashboard } from "@/components/features/analytics/AnalyticsDashboard";
 import { LiveAuditLog } from "@/components/features/domain/LiveAuditLog";
 import { logger } from "@/lib/logger";
-
 
 interface MCPTool {
   name: string;
@@ -79,7 +79,7 @@ function getSupabaseAccessToken(): string | null {
 
 export default function MCPManagementPage() {
   const { t } = useTranslation();
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
 
   // Fetch MCP server status
   const { data: serverStatus, isLoading: _isStatusLoading, refetch: refetchStatus } = useQuery({
@@ -126,12 +126,11 @@ export default function MCPManagementPage() {
     refetchInterval: 30000,
   });
 
-
   // Enhanced MCP tools with real implementation status
-  const [tools, setTools] = useState<MCPTool[]>([]);
+  const [tools, setTools] = React.useState<MCPTool[]>([]);
 
   // Fetch tools data when server status is available
-  useEffect(() => {
+  React.useEffect(() => {
     if (serverStatus?.tools) {
       setTools(serverStatus.tools);
     }
@@ -147,9 +146,9 @@ export default function MCPManagementPage() {
     setTimeout(() => setIsRefreshing(false), 1000);
   };
 
-  const [testResults, setTestResults] = useState<any>(null);
-  const [showResultsModal, setShowResultsModal] = useState(false);
-  const [testingTool, setTestingTool] = useState<string | null>(null);
+  const [testResults, setTestResults] = React.useState<any>(null);
+  const [showResultsModal, setShowResultsModal] = React.useState(false);
+  const [testingTool, setTestingTool] = React.useState<string | null>(null);
 
   const handleRunTool = async (toolName: string) => {
     setTestingTool(toolName);

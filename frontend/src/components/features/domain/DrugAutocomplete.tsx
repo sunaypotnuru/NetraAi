@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+import React from 'react';
+
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 
@@ -24,14 +25,14 @@ interface DrugAutocompleteProps {
  */
 export default function DrugAutocomplete({ value, onChange, placeholder = "Type drug name...", className = "" }: DrugAutocompleteProps) {
   const { t } = useTranslation();
-    const [suggestions, setSuggestions] = useState<DrugSuggestion[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [open, setOpen] = useState(false);
-    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const containerRef = useRef<HTMLDivElement>(null);
+    const [suggestions, setSuggestions] = React.useState<DrugSuggestion[]>([]);
+    const [loading, setLoading] = React.useState(false);
+    const [open, setOpen] = React.useState(false);
+    const debounceRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+    const containerRef = React.useRef<HTMLDivElement>(null);
 
     // Close dropdown on outside click
-    useEffect(() => {
+    React.useEffect(() => {
         const handler = (e: MouseEvent) => {
             if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
                 setOpen(false);

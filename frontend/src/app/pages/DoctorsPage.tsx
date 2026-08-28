@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { Search, Star, Languages, DollarSign } from "lucide-react";
@@ -27,7 +28,7 @@ interface DoctorRecord {
 }
 
 export default function DoctorsPage() {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = React.useState("");
   const navigate = useNavigate();
   const { t } = useTranslation();
 

@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { useParams, useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { Star, MessageSquare, CheckCircle, ArrowRight, Heart } from "lucide-react";
@@ -11,13 +12,13 @@ export default function FollowUpPage() {
     const { t } = useTranslation();
     const { appointmentId } = useParams();
     const navigate = useNavigate();
-    const [rating, setRating] = useState(0);
-    const [hover, setHover] = useState(0);
-    const [review, setReview] = useState("");
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [submitted, setSubmitted] = useState(false);
+    const [rating, setRating] = React.useState(0);
+    const [hover, setHover] = React.useState(0);
+    const [review, setReview] = React.useState("");
+    const [isSubmitting, setIsSubmitting] = React.useState(false);
+    const [submitted, setSubmitted] = React.useState(false);
 
-    useEffect(() => {
+    React.useEffect(() => {
         // Check if already submitted
         if (appointmentId) {
             patientAPI.getFollowUp(appointmentId).then((res) => {

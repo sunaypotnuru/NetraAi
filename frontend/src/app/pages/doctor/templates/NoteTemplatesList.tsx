@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
@@ -53,10 +53,10 @@ interface NoteTemplatesResponse {
 export default function NoteTemplatesList() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('all');
-  const [formatFilter, setFormatFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('updated_at');
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [categoryFilter, setCategoryFilter] = React.useState('all');
+  const [formatFilter, setFormatFilter] = React.useState('all');
+  const [sortBy, setSortBy] = React.useState('updated_at');
 
   const { data: templatesData, isLoading, refetch } = useQuery({
     queryKey: ['doctor-note-templates', searchTerm, categoryFilter, formatFilter, sortBy],

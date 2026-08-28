@@ -1,9 +1,9 @@
 /**
  * AnimatedButton Component
- * 
+ *
  * Enhanced button with smooth micro-interactions.
  * Wraps the base Button component with Motion animations.
- * 
+ *
  * Features:
  * - Hover scale effect
  * - Tap feedback
@@ -12,13 +12,13 @@
  * - Respects reduced motion preferences
  */
 
-import { motion } from 'motion/react';
-import { forwardRef, useState } from 'react';
-import { Button, buttonVariants } from './button';
-import { type VariantProps } from 'class-variance-authority';
-import { useAnimationConfig } from '@/animations';
-import { cn } from '@/lib/utils';
-import { Loader2 } from 'lucide-react';
+import React from 'react';
+import { motion } from "motion/react";
+import { Button, buttonVariants } from "./button";
+import { type VariantProps } from "class-variance-authority";
+import { useAnimationConfig } from "@/animations";
+import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 
 interface AnimatedButtonProps
   extends React.ComponentPropsWithoutRef<typeof Button>,
@@ -27,11 +27,13 @@ interface AnimatedButtonProps
    * Show loading spinner
    */
   loading?: boolean;
+
   /**
    * Enable ripple effect on click
    * @default false
    */
   ripple?: boolean;
+
   /**
    * Disable hover/tap animations
    * @default false
@@ -46,7 +48,10 @@ interface Ripple {
   size: number;
 }
 
-export const AnimatedButton = forwardRef<HTMLButtonElement, AnimatedButtonProps>(
+export const AnimatedButton = React.forwardRef<
+  HTMLButtonElement,
+  AnimatedButtonProps
+>(
   (
     {
       children,
@@ -63,18 +68,26 @@ export const AnimatedButton = forwardRef<HTMLButtonElement, AnimatedButtonProps>
     ref
   ) => {
     const { shouldReduceMotion, getTransition } = useAnimationConfig();
-    const [ripples, setRipples] = useState<Ripple[]>([]);
 
+    // Store active ripple effects
+    const [ripples, setRipples] = React.useState<Ripple[]>([]);
+
+    // Button is disabled while loading or explicitly disabled
     const isDisabled = disabled || loading;
-    const shouldAnimate = !disableAnimations && !shouldReduceMotion && !isDisabled;
+
+    // Determine whether animations should run
+    const shouldAnimate =
+      !disableAnimations && !shouldReduceMotion && !isDisabled;
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
       // Create ripple effect
       if (ripple && !isDisabled) {
         const button = e.currentTarget;
         const rect = button.getBoundingClientRect();
+
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
+
         const size = Math.max(rect.width, rect.height) * 2;
 
         const newRipple: Ripple = {
@@ -88,28 +101,41 @@ export const AnimatedButton = forwardRef<HTMLButtonElement, AnimatedButtonProps>
 
         // Remove ripple after animation
         setTimeout(() => {
-          setRipples((prev) => prev.filter((r) => r.id !== newRipple.id));
+          setRipples((prev) =>
+            prev.filter((r) => r.id !== newRipple.id)
+          );
         }, 600);
       }
 
-      // Call original onClick
+      // Call original onClick handler
       if (onClick && !isDisabled) {
-         
-        onClick(e as any);
+        onClick(e);
       }
     };
 
     return (
       <motion.div
         className="inline-flex"
-        whileHover={shouldAnimate ? { scale: 1.02 } : undefined}
-        whileTap={shouldAnimate ? { scale: 0.98 } : undefined}
+        whileHover={
+          shouldAnimate
+            ? {
+                scale: 1.02,
+              }
+            : undefined
+        }
+        whileTap={
+          shouldAnimate
+            ? {
+                scale: 0.98,
+              }
+            : undefined
+        }
         transition={getTransition(150)}
       >
         <Button
           ref={ref}
           disabled={isDisabled}
-          className={cn('relative overflow-hidden', className)}
+          className={cn("relative overflow-hidden", className)}
           variant={variant}
           size={size}
           onClick={handleClick}
@@ -118,9 +144,18 @@ export const AnimatedButton = forwardRef<HTMLButtonElement, AnimatedButtonProps>
           {/* Loading spinner */}
           {loading && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
+              initial={{
+                opacity: 0,
+                scale: 0.8,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+              }}
+              exit={{
+                opacity: 0,
+                scale: 0.8,
+              }}
               transition={getTransition(200)}
               className="mr-2"
             >
@@ -129,7 +164,9 @@ export const AnimatedButton = forwardRef<HTMLButtonElement, AnimatedButtonProps>
           )}
 
           {/* Button content */}
-          <span className={cn(loading && 'opacity-70')}>{children}</span>
+          <span className={cn(loading && "opacity-70")}>
+            {children}
+          </span>
 
           {/* Ripple effects */}
           {ripple && (
@@ -152,7 +189,10 @@ export const AnimatedButton = forwardRef<HTMLButtonElement, AnimatedButtonProps>
                     y: ripple.y - ripple.size / 2,
                     opacity: 0,
                   }}
-                  transition={{ duration: 0.6, ease: 'easeOut' }}
+                  transition={{
+                    duration: 0.6,
+                    ease: "easeOut",
+                  }}
                 />
               ))}
             </span>
@@ -163,4 +203,4 @@ export const AnimatedButton = forwardRef<HTMLButtonElement, AnimatedButtonProps>
   }
 );
 
-AnimatedButton.displayName = 'AnimatedButton';
+AnimatedButton.displayName = "AnimatedButton";

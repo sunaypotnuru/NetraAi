@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import React from 'react';
+
 import { motion } from 'motion/react';
 import { useNavigate } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -29,14 +30,14 @@ interface AppointmentsResponse {
 
 export default function AdminAppointmentsPage() {
     const { t } = useTranslation();
-    const [searchTerm, setSearchTerm] = useState('');
-    const [statusFilter, setStatusFilter] = useState('All');
-    const [page, setPage] = useState(1);
+    const [searchTerm, setSearchTerm] = React.useState('');
+    const [statusFilter, setStatusFilter] = React.useState('All');
+    const [page, setPage] = React.useState(1);
     const limit = 10;
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    useEffect(() => {
+    React.useEffect(() => {
         const setupWS = async () => {
             try {
                 const manager = getWebSocketManager();
@@ -54,7 +55,7 @@ export default function AdminAppointmentsPage() {
     }, [queryClient]);
 
     // Reset page on filter change
-    useEffect(() => {
+    React.useEffect(() => {
         setPage(1);
     }, [searchTerm, statusFilter]);
 

@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import React from 'react';
+
 import { motion, AnimatePresence } from "motion/react";
 import DOMPurify from 'dompurify';
 import {
@@ -34,7 +35,7 @@ export default function ChatbotWidget() {
     const navigate = useNavigate();
     const { isOpen, toggle, close } = useChatbotStore();
 
-    const WELCOME: Message = useMemo(() => ({
+    const WELCOME: Message = React.useMemo(() => ({
         id: "welcome",
         role: "assistant" as const,
         content: user 
@@ -43,17 +44,17 @@ export default function ChatbotWidget() {
         timestamp: new Date(),
     }), [user]);
 
-    const [messages, setMessages] = useState<Message[]>([WELCOME]);
-    const [input, setInput] = useState("");
-    const [isTyping, setIsTyping] = useState(false);
-    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const [messages, setMessages] = React.useState<Message[]>([WELCOME]);
+    const [input, setInput] = React.useState("");
+    const [isTyping, setIsTyping] = React.useState(false);
+    const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
     // Update welcome message when user status changes
-    useEffect(() => {
+    React.useEffect(() => {
         setMessages([WELCOME]);
     }, [WELCOME]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 

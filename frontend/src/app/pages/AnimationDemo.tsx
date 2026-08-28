@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Animation Demo Page
  * 
@@ -9,7 +10,7 @@
  * Phase 3: Page Transitions (Modals, Drawers, Tooltips, etc.)
  */
 
-import { useState } from 'react';
+
 import { motion } from 'motion/react';
 import { FadeIn, SlideIn, StaggerContainer, ScrollReveal } from '@/animations';
 import {
@@ -54,18 +55,18 @@ import {
 } from 'lucide-react';
 
 export default function AnimationDemo() {
-  const [toasts, setToasts] = useState<Toast[]>([]);
-  const [isChecked, setIsChecked] = useState(false);
-  const [isSwitchOn, setIsSwitchOn] = useState(false);
-  const [inputValue, setInputValue] = useState('');
-  const [inputError, setInputError] = useState('');
+  const [toasts, setToasts] = React.useState<Toast[]>([]);
+  const [isChecked, setIsChecked] = React.useState(false);
+  const [isSwitchOn, setIsSwitchOn] = React.useState(false);
+  const [inputValue, setInputValue] = React.useState('');
+  const [inputError, setInputError] = React.useState('');
   
   // Phase 3 state
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [drawerSide, setDrawerSide] = useState<'left' | 'right' | 'top' | 'bottom'>('right');
-  const [progressValue, setProgressValue] = useState(45);
-  const [currentStep, setCurrentStep] = useState(2);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
+  const [drawerSide, setDrawerSide] = React.useState<'left' | 'right' | 'top' | 'bottom'>('right');
+  const [progressValue, setProgressValue] = React.useState(45);
+  const [currentStep, setCurrentStep] = React.useState(2);
 
   const addToast = (type: Toast['type']) => {
     const toast: Toast = {

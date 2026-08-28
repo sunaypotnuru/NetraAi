@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import React from 'react';
+
 import { useQuery } from "@tanstack/react-query";
 import { Users, User, ChevronDown } from "lucide-react";
 import { patientAPI } from "@/lib/api";
@@ -31,7 +32,7 @@ export default function FamilyProfileSwitcher() {
     });
 
     // Automatically ensure active profile is set to main if empty
-    useEffect(() => {
+    React.useEffect(() => {
         if (profile && !activePatientProfile) {
             setActivePatientProfile(profile);
         }

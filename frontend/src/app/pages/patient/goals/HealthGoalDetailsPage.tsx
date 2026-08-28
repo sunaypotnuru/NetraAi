@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { motion } from "motion/react";
 import {
   ArrowLeft,
@@ -48,20 +49,20 @@ export default function HealthGoalDetailsPage() {
   const navigate = useNavigate();
   const { goalId } = useParams<{ goalId: string }>();
 
-  const [goal, setGoal] = useState<HealthGoal | null>(null);
-  const [progressHistory, setProgressHistory] = useState<GoalProgress[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showEditDialog, setShowEditDialog] = useState(false);
-  const [chartData, setChartData] = useState<any[]>([]);
+  const [goal, setGoal] = React.useState<HealthGoal | null>(null);
+  const [progressHistory, setProgressHistory] = React.useState<GoalProgress[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [showEditDialog, setShowEditDialog] = React.useState(false);
+  const [chartData, setChartData] = React.useState<any[]>([]);
 
   // Edit form state
-  const [editTitle, setEditTitle] = useState("");
-  const [editDescription, setEditDescription] = useState("");
-  const [editTargetValue, setEditTargetValue] = useState("");
-  const [editStatus, setEditStatus] = useState<"active" | "completed" | "abandoned">("active");
-  const [isSaving, setIsSaving] = useState(false);
+  const [editTitle, setEditTitle] = React.useState("");
+  const [editDescription, setEditDescription] = React.useState("");
+  const [editTargetValue, setEditTargetValue] = React.useState("");
+  const [editStatus, setEditStatus] = React.useState<"active" | "completed" | "abandoned">("active");
+  const [isSaving, setIsSaving] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (goalId) {
       fetchGoalDetails();
     }

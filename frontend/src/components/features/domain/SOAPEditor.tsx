@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { ChevronDown, ChevronRight, FileText, Lightbulb } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useTranslation } from "@/lib/i18n";
@@ -83,10 +84,10 @@ const TEMPLATES = {
 
 export default function SOAPEditor({ notes, onChange }: SOAPEditorProps) {
   const { t } = useTranslation();
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+  const [expandedSections, setExpandedSections] = React.useState<Set<string>>(
     new Set(["subjective", "objective", "assessment", "plan"])
   );
-  const [showTemplates, setShowTemplates] = useState(false);
+  const [showTemplates, setShowTemplates] = React.useState(false);
 
   const toggleSection = (key: string) => {
     const newExpanded = new Set(expandedSections);

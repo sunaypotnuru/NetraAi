@@ -1,4 +1,5 @@
-import { useState, useRef } from "react";
+import React from 'react';
+
 import { motion } from "motion/react";
 import { User, Mail, Phone, Save, Heart, Users, Camera, Upload, Download } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -18,9 +19,9 @@ import { PageTransition } from "@/components/shared/PageTransition";
 export default function ProfilePage() {
   const { user, profile, updateProfile } = useAuthStore();
   const queryClient = useQueryClient();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = React.useState({
     full_name: profile?.full_name || "",
     phone: profile?.phone || "",
     age: profile?.age?.toString() || "",
@@ -29,14 +30,14 @@ export default function ProfilePage() {
     address: profile?.address || "",
     language: profile?.language || "en",
   });
-  const [callPrefs, setCallPrefs] = useState({
+  const [callPrefs, setCallPrefs] = React.useState({
     voice: profile?.call_preferences?.voice ?? true,
     time: profile?.call_preferences?.time || "09:00",
   });
-  const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(profile?.avatar_url || null);
-  const [exportingFhir, setExportingFhir] = useState(false);
+  const [saving, setSaving] = React.useState(false);
+  const [uploading, setUploading] = React.useState(false);
+  const [avatarPreview, setAvatarPreview] = React.useState<string | null>(profile?.avatar_url || null);
+  const [exportingFhir, setExportingFhir] = React.useState(false);
 
   const handleFhirExport = async () => {
     setExportingFhir(true);
@@ -392,8 +393,8 @@ interface FamilyMember {
 function FamilyMembersList() {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
-  const [isAdding, setIsAdding] = useState(false);
-  const [newMember, setNewMember] = useState({ full_name: "", age: "", gender: "male" });
+  const [isAdding, setIsAdding] = React.useState(false);
+  const [newMember, setNewMember] = React.useState({ full_name: "", age: "", gender: "male" });
 
   const { data: familyMembers, isLoading } = useQuery<FamilyMember[]>({
     queryKey: ['family-members'],

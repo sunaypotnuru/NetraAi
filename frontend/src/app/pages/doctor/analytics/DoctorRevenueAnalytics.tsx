@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
@@ -83,8 +83,8 @@ interface RevenueAnalytics {
 
 export default function DoctorRevenueAnalytics() {
   const navigate = useNavigate();
-  const [timeFilter, setTimeFilter] = useState('year');
-  const [activeTab, setActiveTab] = useState('overview');
+  const [timeFilter, setTimeFilter] = React.useState('year');
+  const [activeTab, setActiveTab] = React.useState('overview');
 
   const { data: analytics, isLoading, refetch } = useQuery({
     queryKey: ['doctor-revenue-analytics', timeFilter],

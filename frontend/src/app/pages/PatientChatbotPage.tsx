@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+import React from 'react';
+
 import { motion } from "motion/react";
 import DOMPurify from 'dompurify';
 import {
@@ -35,7 +36,7 @@ interface Message {
 export default function PatientChatbotPage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const [mode, setMode] = useState<"assistant" | "triage">("assistant");
+    const [mode, setMode] = React.useState<"assistant" | "triage">("assistant");
 
     const QUICK_PROMPTS = [
         { label: t('patient.chatbot.prompt_tired_label', "Tired & pale"), prompt: t('patient.chatbot.prompt_tired', "I've been feeling very tired and my palms look pale. What could this mean?") },
@@ -59,15 +60,15 @@ export default function PatientChatbotPage() {
         timestamp: new Date(),
     });
 
-    const [messages, setMessages] = useState<Message[]>([getWelcomeMessage("assistant")]);
-    const [input, setInput] = useState("");
-    const [isTyping, setIsTyping] = useState(false);
-    const [age] = useState<number | undefined>();
-    const [locationConsent, setLocationConsent] = useState(false);
-    const [coordinates, setCoordinates] = useState<LocationData | null>(null);
-    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const [messages, setMessages] = React.useState<Message[]>([getWelcomeMessage("assistant")]);
+    const [input, setInput] = React.useState("");
+    const [isTyping, setIsTyping] = React.useState(false);
+    const [age] = React.useState<number | undefined>();
+    const [locationConsent, setLocationConsent] = React.useState(false);
+    const [coordinates, setCoordinates] = React.useState<LocationData | null>(null);
+    const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (locationConsent) {
             navigator.geolocation.getCurrentPosition(
                 (pos) => setCoordinates({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
@@ -81,11 +82,11 @@ export default function PatientChatbotPage() {
         }
     }, [locationConsent]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         setMessages([getWelcomeMessage(mode)]);
     }, [mode]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 

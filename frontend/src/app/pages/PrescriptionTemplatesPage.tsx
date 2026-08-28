@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { motion } from "motion/react";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -28,14 +29,14 @@ interface Template {
 
 export default function PrescriptionTemplatesPage() {
   const { t } = useTranslation();
-  const [templates, setTemplates] = useState<Template[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showDialog, setShowDialog] = useState(false);
-  const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
-  const [saving, setSaving] = useState(false);
+  const [templates, setTemplates] = React.useState<Template[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [showDialog, setShowDialog] = React.useState(false);
+  const [editingTemplate, setEditingTemplate] = React.useState<Template | null>(null);
+  const [saving, setSaving] = React.useState(false);
 
   // Form state
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = React.useState({
     name: "",
     description: "",
     medications: "",
@@ -43,7 +44,7 @@ export default function PrescriptionTemplatesPage() {
     is_public: false,
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     const loadTemplates = async () => {
       try {
         const response = await templatesAPI.getTemplates();

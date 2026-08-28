@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import React from 'react';
+
 import { useParams, useNavigate } from "react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Camera } from "@mediapipe/camera_utils";
@@ -36,19 +37,19 @@ export default function ARSessionPage() {
   const { assignmentId } = useParams();
   const navigate = useNavigate();
 
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const cameraRef = useRef<Camera | null>(null);
-  const poseRef = useRef<Pose | null>(null);
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
+  const cameraRef = React.useRef<Camera | null>(null);
+  const poseRef = React.useRef<Pose | null>(null);
 
-  const [state, setState] = useState<PlayState>('idle');
-  const [sets] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(0); // in seconds
-  const [accuracy, setAccuracy] = useState(100);
-  const [currentAngles, setCurrentAngles] = useState<Record<string, number> | null>(null);
-  const [jointAccuracy, setJointAccuracy] = useState<Record<string, number>>({});
+  const [state, setState] = React.useState<PlayState>('idle');
+  const [sets] = React.useState(0);
+  const [timeLeft, setTimeLeft] = React.useState(0); // in seconds
+  const [accuracy, setAccuracy] = React.useState(100);
+  const [currentAngles, setCurrentAngles] = React.useState<Record<string, number> | null>(null);
+  const [jointAccuracy, setJointAccuracy] = React.useState<Record<string, number>>({});
 
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timerRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Assignment details
   const { data: assignments = [], isLoading: assignmentsLoading } = useQuery<ExerciseAssignment[]>({
@@ -87,7 +88,7 @@ export default function ARSessionPage() {
   });
 
   // Helper function to calculate angle between three points
-  const calculateAngle = useCallback((a: { x: number; y: number }, b: { x: number; y: number }, c: { x: number; y: number }): number => {
+  const calculateAngle = React.useCallback((a: { x: number; y: number }, b: { x: number; y: number }, c: { x: number; y: number }): number => {
     const radians = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x);
     let angle = Math.abs((radians * 180.0) / Math.PI);
     if (angle > 180.0) angle = 360 - angle;
@@ -95,7 +96,7 @@ export default function ARSessionPage() {
   }, []);
 
   // Calculate all joint angles from landmarks
-  const calculateJointAngles = useCallback((landmarks: Array<{ x: number; y: number; z: number; visibility?: number }>) => {
+  const calculateJointAngles = React.useCallback((landmarks: Array<{ x: number; y: number; z: number; visibility?: number }>) => {
     return {
       leftElbow: calculateAngle(landmarks[11], landmarks[13], landmarks[15]),
       rightElbow: calculateAngle(landmarks[12], landmarks[14], landmarks[16]),
@@ -109,7 +110,7 @@ export default function ARSessionPage() {
   }, [calculateAngle]);
 
   // Compare current angles with target pose
-  const compareWithTarget = useCallback((current: Record<string, number>, target: Record<string, number>, tolerance: number = 15) => {
+  const compareWithTarget = React.useCallback((current: Record<string, number>, target: Record<string, number>, tolerance: number = 15) => {
     if (!target) return { overall: 100, joints: {} };
 
     const scores: Record<string, number> = {};
@@ -128,7 +129,7 @@ export default function ARSessionPage() {
   }, []);
 
   // MediaPipe pose detection callback
-  const onResults = useCallback((results: Results) => {
+  const onResults = React.useCallback((results: Results) => {
     if (!canvasRef.current || !videoRef.current) return;
     const canvasCtx = canvasRef.current.getContext("2d");
     if (!canvasCtx) return;
@@ -197,7 +198,7 @@ export default function ARSessionPage() {
     canvasCtx.restore();
   }, [exercise, accuracy, jointAccuracy, calculateJointAngles, compareWithTarget]);
 
-  const initCamera = useCallback(() => {
+  const initCamera = React.useCallback(() => {
     if (!videoRef.current) return;
 
     setState('initializing');
@@ -233,7 +234,7 @@ export default function ARSessionPage() {
 
   }, [onResults, exercise, resetReps]);
 
-  const stopCamera = useCallback(() => {
+  const stopCamera = React.useCallback(() => {
     setState('completed');
     if (cameraRef.current) {
       cameraRef.current.stop();
@@ -245,7 +246,7 @@ export default function ARSessionPage() {
   }, []);
 
   // Timer effect
-  useEffect(() => {
+  React.useEffect(() => {
     if (state === 'running' && timeLeft > 0) {
       timerRef.current = setInterval(() => {
         setTimeLeft((prev: number) => {
@@ -263,7 +264,7 @@ export default function ARSessionPage() {
   }, [state, timeLeft, stopCamera]);
 
   // Clean up on unmount
-  useEffect(() => {
+  React.useEffect(() => {
     return () => {
       if (cameraRef.current) cameraRef.current.stop();
       if (poseRef.current) poseRef.current.close();

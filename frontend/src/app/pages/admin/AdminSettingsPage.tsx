@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import React from 'react';
+
 import { motion } from 'motion/react';
 import { Shield, Bell, Key, Check, AlertCircle, Globe, Clock, Share2, Server, CheckCircle2, Lock, Users, ExternalLink } from 'lucide-react';
 import { Card } from "@/components/ui/card";
@@ -26,30 +27,30 @@ type MfaFactor = {
 export default function AdminSettingsPage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const [security, setSecurity] = useState<SecuritySettings>({ twoFA: false, sessionTimeout: 60, ipWhitelisting: false });
-    const [notif, setNotif] = useState<NotifSettings>({ emailAlerts: true, smsAlerts: true, pushAlerts: true });
-    const [system, setSystem] = useState<SystemSettings>({
+    const [security, setSecurity] = React.useState<SecuritySettings>({ twoFA: false, sessionTimeout: 60, ipWhitelisting: false });
+    const [notif, setNotif] = React.useState<NotifSettings>({ emailAlerts: true, smsAlerts: true, pushAlerts: true });
+    const [system, setSystem] = React.useState<SystemSettings>({
         timezone: 'Asia/Kolkata',
         currency: 'INR',
         maintenanceMode: false,
         maintenanceMessage: 'NetraAI is currently undergoing scheduled clinical system maintenance.'
     });
     const { settings, updateSettings } = useSettingsStore();
-    const [platform, setPlatform] = useState<PlatformSettings>(settings);
+    const [platform, setPlatform] = React.useState<PlatformSettings>(settings);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (settings) setPlatform(settings);
     }, [settings]);
 
-    const [activePanel, setActivePanel] = useState<string | null>(null);
-    const [saving, setSaving] = useState(false);
+    const [activePanel, setActivePanel] = React.useState<string | null>(null);
+    const [saving, setSaving] = React.useState(false);
 
-    const [mfaLoading, setMfaLoading] = useState(false);
-    const [factors, setFactors] = useState<MfaFactor[]>([]);
-    const [enrollQr, setEnrollQr] = useState<string>('');
-    const [enrollFactorId, setEnrollFactorId] = useState<string>('');
-    const [verifyCode, setVerifyCode] = useState<string>('');
-    const [challengeId, setChallengeId] = useState<string>('');
+    const [mfaLoading, setMfaLoading] = React.useState(false);
+    const [factors, setFactors] = React.useState<MfaFactor[]>([]);
+    const [enrollQr, setEnrollQr] = React.useState<string>('');
+    const [enrollFactorId, setEnrollFactorId] = React.useState<string>('');
+    const [verifyCode, setVerifyCode] = React.useState<string>('');
+    const [challengeId, setChallengeId] = React.useState<string>('');
 
     const refreshMfaFactors = async () => {
         try {
@@ -139,7 +140,7 @@ export default function AdminSettingsPage() {
         }
     };
 
-    useEffect(() => {
+    React.useEffect(() => {
         refreshMfaFactors();
     }, []);
 

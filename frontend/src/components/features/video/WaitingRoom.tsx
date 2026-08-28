@@ -9,7 +9,7 @@
  * - Leave queue option
  */
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { videoAPI } from '@/services/api';
 import { getWebSocketManager } from '@/services/websocket';
 import type { WaitingRoomEntry } from '@/types';
@@ -29,13 +29,13 @@ export function WaitingRoom({
   onReady,
   onLeave,
 }: WaitingRoomProps) {
-  const [entry, setEntry] = useState<WaitingRoomEntry | null>(null);
-  const [position, setPosition] = useState<number>(0);
-  const [estimatedWait, setEstimatedWait] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [entry, setEntry] = React.useState<WaitingRoomEntry | null>(null);
+  const [position, setPosition] = React.useState<number>(0);
+  const [estimatedWait, setEstimatedWait] = React.useState<number>(0);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     joinWaitingRoom();
     return () => cleanup();
   }, [consultationId]);

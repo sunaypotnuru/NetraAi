@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate } from "react-router";
-import React, { lazy, Suspense, ComponentType } from "react";
+import React from 'react';
 import Root from "./pages/Root";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";

@@ -1,3 +1,4 @@
+import React from 'react';
 import { useNavigate } from "react-router";
 import { HeroStoryAnimation } from "@/components/layout/HeroStoryAnimation";
 import { HowItWorks } from "@/components/layout/HowItWorks";
@@ -6,7 +7,7 @@ import { ContactSection } from "@/components/layout/ContactSection";
 import { ReviewSection } from "@/components/layout/ReviewSection";
 import { Eye, Video, Globe, Stethoscope, Calendar, Shield, MapPin, FileText, MessageCircle, Send, Trophy, Users, PenTool, PhoneCall, Languages, Activity } from "lucide-react";
 import { useInView } from "motion/react";
-import { useState, useEffect, useRef } from "react";
+
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "../../lib/store";
 import { useTranslation } from "../../lib/i18n";
@@ -15,11 +16,11 @@ import { AnimatedCard, CardContent } from "@/components/ui/animated";
 import "../../components/layout/hero-animations.css";
 
 const Counter = ({ from = 0, to, duration = 2 }: { from?: number, to: number, duration?: number }) => {
-  const [count, setCount] = useState(from);
-  const ref = useRef(null);
+  const [count, setCount] = React.useState(from);
+  const ref = React.useRef(null);
   const isInView = useInView(ref, { once: false });
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!isInView) return;
     const start = from;
     const end = to;

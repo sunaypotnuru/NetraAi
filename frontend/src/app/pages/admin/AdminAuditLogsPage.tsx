@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React from 'react';
+
 import { motion, AnimatePresence } from 'motion/react';
 import { Shield, Search, Download, Filter, RefreshCw, User, Clock, Globe, X, Eye } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -32,10 +33,10 @@ const ACTION_COLORS: Record<string, string> = {
 
 export default function AdminAuditLogsPage() {
     const { t } = useTranslation();
-    const [search, setSearch] = useState('');
-    const [actionFilter, setActionFilter] = useState('');
-    const [dateFrom, setDateFrom] = useState('');
-    const [dateTo, setDateTo] = useState('');
+    const [search, setSearch] = React.useState('');
+    const [actionFilter, setActionFilter] = React.useState('');
+    const [dateFrom, setDateFrom] = React.useState('');
+    const [dateTo, setDateTo] = React.useState('');
 
     const { data, isLoading, refetch } = useQuery({
         queryKey: ['auditLogs', actionFilter, dateFrom, dateTo],

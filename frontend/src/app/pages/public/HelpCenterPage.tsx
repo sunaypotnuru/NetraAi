@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { motion } from "motion/react";
 import { Search, Book, Video, MessageCircle, FileText, HelpCircle, ArrowRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -7,7 +8,7 @@ import PageWrapper from "@/components/ui/PageWrapper";
 
 export default function HelpCenterPage() {
   const { t } = useTranslation();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = React.useState("");
 
   const categories = [
     {

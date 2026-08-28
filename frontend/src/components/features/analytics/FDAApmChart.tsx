@@ -3,7 +3,7 @@
  * Renders a line chart of ML model performance metrics over time.
  */
 
-import React, { useState } from "react";
+import React from 'react';
 import {
   ResponsiveContainer,
   LineChart,
@@ -56,7 +56,7 @@ export function FDAApmChart({
   thresholds,
   onExport,
 }: FDAApmChartProps) {
-  const [selectedMetrics, setSelectedMetrics] = useState<string[]>(metrics);
+  const [selectedMetrics, setSelectedMetrics] = React.useState<string[]>(metrics);
 
   const handleExport = () => {
     if (onExport) {

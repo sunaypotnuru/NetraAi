@@ -11,7 +11,7 @@
  * - Token usage tracking
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -55,17 +55,17 @@ export function AIConsultationInterface({
   patientContext,
   onClose,
 }: AIConsultationInterfaceProps) {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
-  const [showTemplates, setShowTemplates] = useState(false);
-  const [showContext, setShowContext] = useState(false);
-  const [showFeedback, setShowFeedback] = useState(false);
-  const [selectedMessageForFeedback, setSelectedMessageForFeedback] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [messages, setMessages] = React.useState<Message[]>([]);
+  const [input, setInput] = React.useState('');
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [selectedTemplate, setSelectedTemplate] = React.useState<string | null>(null);
+  const [showTemplates, setShowTemplates] = React.useState(false);
+  const [showContext, setShowContext] = React.useState(false);
+  const [showFeedback, setShowFeedback] = React.useState(false);
+  const [selectedMessageForFeedback, setSelectedMessageForFeedback] = React.useState<string | null>(null);
+  const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { useNavigate } from "react-router";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,7 +31,7 @@ export default function SettingsPage() {
   const { voiceReader, toggleVoiceReader, highContrast, toggleHighContrast, reducedMotion, toggleReducedMotion, fontSize, setFontSize } = useAccessibilityStore();
   
   // Profile Settings — sync with authProfile and user_metadata
-  const [profile, setProfile] = useState({
+  const [profile, setProfile] = React.useState({
     name: String(authProfile?.full_name || user?.user_metadata?.full_name || ""),
     email: String(user?.email || ""),
     phone: String(authProfile?.phone || user?.user_metadata?.phone || ""),
@@ -39,7 +40,7 @@ export default function SettingsPage() {
   });
 
   // Notification Settings with localStorage persistence
-  const [notifications, setNotifications] = useState(() => {
+  const [notifications, setNotifications] = React.useState(() => {
     const saved = localStorage.getItem("netra_patient_notifications");
     return saved ? JSON.parse(saved) : {
       emailNotifications: true,
@@ -54,7 +55,7 @@ export default function SettingsPage() {
   });
 
   // Privacy Settings with localStorage persistence
-  const [privacy, setPrivacy] = useState(() => {
+  const [privacy, setPrivacy] = React.useState(() => {
     const saved = localStorage.getItem("netra_patient_privacy");
     return saved ? JSON.parse(saved) : {
       twoFactorAuth: false,
@@ -65,7 +66,7 @@ export default function SettingsPage() {
   });
 
   // Communication Settings with localStorage persistence
-  const [communication, setCommunication] = useState(() => {
+  const [communication, setCommunication] = React.useState(() => {
     const saved = localStorage.getItem("netra_patient_communication");
     return saved ? JSON.parse(saved) : {
       contactMethod: "email",
@@ -75,15 +76,15 @@ export default function SettingsPage() {
   });
 
   // Modal Dialog States
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [passwordForm, setPasswordForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
-  const [savingPassword, setSavingPassword] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = React.useState(false);
+  const [passwordForm, setPasswordForm] = React.useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
+  const [savingPassword, setSavingPassword] = React.useState(false);
 
-  const [show2FAModal, setShow2FAModal] = useState(false);
-  const [otpCode, setOtpCode] = useState("");
+  const [show2FAModal, setShow2FAModal] = React.useState(false);
+  const [otpCode, setOtpCode] = React.useState("");
 
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = React.useState("");
 
   const handleSaveProfile = async () => {
     try {

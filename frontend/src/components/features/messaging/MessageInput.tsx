@@ -1,4 +1,5 @@
-import { useState, useRef, KeyboardEvent } from "react";
+import React from 'react';
+
 import { Send, Paperclip, Smile, X, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -29,10 +30,10 @@ export default function MessageInput({
   placeholder = "Type a message..."
 }: MessageInputProps) {
   const { t } = useTranslation();
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = React.useState(false);
+  const [isRecording, setIsRecording] = React.useState(false);
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     // Enter to send, Shift+Enter for new line

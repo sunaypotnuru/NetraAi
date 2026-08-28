@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { motion } from "motion/react";
 import {
   ArrowLeft,
@@ -33,23 +34,23 @@ export default function MedicationLogPage() {
   const navigate = useNavigate();
   const { medicationId } = useParams<{ medicationId: string }>();
 
-  const [medication, setMedication] = useState<Medication | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
+  const [medication, setMedication] = React.useState<Medication | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [isSaving, setIsSaving] = React.useState(false);
 
   // Form state
-  const [selectedStatus, setSelectedStatus] = useState<'taken' | 'missed' | 'skipped'>('taken');
-  const [scheduledDate, setScheduledDate] = useState<Date>(new Date());
-  const [scheduledTime, setScheduledTime] = useState<string>(
+  const [selectedStatus, setSelectedStatus] = React.useState<'taken' | 'missed' | 'skipped'>('taken');
+  const [scheduledDate, setScheduledDate] = React.useState<Date>(new Date());
+  const [scheduledTime, setScheduledTime] = React.useState<string>(
     new Date().toTimeString().slice(0, 5)
   );
-  const [takenDate, setTakenDate] = useState<Date>(new Date());
-  const [takenTime, setTakenTime] = useState<string>(
+  const [takenDate, setTakenDate] = React.useState<Date>(new Date());
+  const [takenTime, setTakenTime] = React.useState<string>(
     new Date().toTimeString().slice(0, 5)
   );
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] = React.useState("");
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (medicationId) {
       fetchMedicationDetails();
     }

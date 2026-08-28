@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React from 'react';
+
 import { motion } from 'motion/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router';
@@ -60,8 +61,8 @@ export default function AdminUserDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState<Partial<UserDetail>>({});
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [formData, setFormData] = React.useState<Partial<UserDetail>>({});
 
   // Fetch user details
   const { data: userData, isLoading } = useQuery({

@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import React from 'react';
+
 import { motion, AnimatePresence } from "motion/react";
 import { useNavigate } from "react-router";
 import { StaggerContainer, StaggerItem, FadeIn, ScaleIn } from "../../animations";
@@ -19,9 +20,9 @@ import { PresenceList } from "@/components/features/notifications/PresenceList";
 import { HeartbeatLoader } from "@/components/shared/HeartbeatLoader";
 
 function AnimatedCounter({ target, suffix = "" }: { target: number | string; suffix?: string }) {
-    const [current, setCurrent] = useState(0);
+    const [current, setCurrent] = React.useState(0);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (typeof target === "number") {
             let start = 0;
             const end = target;
@@ -65,7 +66,7 @@ export default function DoctorDashboardPage() {
         queryFn: () => doctorAPI.getDashboard().then(res => res.data)
     });
 
-    useEffect(() => {
+    React.useEffect(() => {
         const setupRealtime = async () => {
             try {
                 const manager = getWebSocketManager();

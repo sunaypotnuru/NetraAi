@@ -10,8 +10,8 @@
  * - Respects reduced motion preferences
  */
 
+import React from 'react';
 import { motion } from 'motion/react';
-import { forwardRef } from 'react';
 import {
   Card,
   CardHeader,
@@ -46,7 +46,7 @@ interface AnimatedCardProps extends React.ComponentProps<typeof Card> {
   onClick?: () => void;
 }
 
-export const AnimatedCard = forwardRef<HTMLDivElement, AnimatedCardProps>(
+export const AnimatedCard = React.forwardRef<HTMLDivElement, AnimatedCardProps>(
   (
     {
       hoverable = true,

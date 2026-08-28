@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Edit, Trash2, ListChecks, Loader2, Save, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -32,10 +33,10 @@ interface Questionnaire extends QuestionnaireForm {
 export default function DoctorPROBuilder() {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
-    const [isEditing, setIsEditing] = useState<string | null>(null);
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isEditing, setIsEditing] = React.useState<string | null>(null);
+    const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
-    const [formState, setFormState] = useState<QuestionnaireForm>({
+    const [formState, setFormState] = React.useState<QuestionnaireForm>({
         name: "",
         frequency: "weekly",
         is_active: true,

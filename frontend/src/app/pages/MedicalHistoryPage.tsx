@@ -1,8 +1,9 @@
+import React from 'react';
 import { motion } from "motion/react";
 import { FileText, Eye, Video, Download, Share2, Calendar, Clock, ChevronDown, AlertCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { patientAPI } from "../../lib/api";
@@ -35,7 +36,7 @@ interface MedicalRecord {
 
 export default function MedicalHistoryPage() {
     const navigate = useNavigate();
-    const [expandedId, setExpandedId] = useState<string | number | null>(null);
+    const [expandedId, setExpandedId] = React.useState<string | number | null>(null);
     const queryClient = useQueryClient();
     const { t } = useTranslation();
 

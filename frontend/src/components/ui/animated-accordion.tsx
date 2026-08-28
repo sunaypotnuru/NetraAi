@@ -18,7 +18,7 @@
  * ]} />
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronDown } from 'lucide-react';
 import { useReducedMotion } from '@/animations';
@@ -60,7 +60,7 @@ export const AnimatedAccordion: React.FC<AnimatedAccordionProps> = ({
   onChange,
   className = '',
 }) => {
-  const [internalOpenItems, setInternalOpenItems] = useState<string[]>(defaultOpen);
+  const [internalOpenItems, setInternalOpenItems] = React.useState<string[]>(defaultOpen);
   const prefersReducedMotion = useReducedMotion();
 
   const openItems = controlledOpenItems ?? internalOpenItems;

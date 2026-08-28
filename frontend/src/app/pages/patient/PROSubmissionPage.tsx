@@ -1,4 +1,5 @@
-import { useState, FormEvent, ChangeEvent } from "react";
+import React from 'react';
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,9 +35,9 @@ export default function PROSubmissionPage() {
     submitted_at: string;
   }
 
-  const [selectedQuestionnaire, setSelectedQuestionnaire] = useState<Questionnaire | null>(null);
-  const [responses, setResponses] = useState<Record<string, string>>({});
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [selectedQuestionnaire, setSelectedQuestionnaire] = React.useState<Questionnaire | null>(null);
+  const [responses, setResponses] = React.useState<Record<string, string>>({});
+  const [currentQuestionIndex, setCurrentQuestionIndex] = React.useState(0);
 
   // Fetch assigned questionnaires
   const { data: questionnaires = [], isLoading } = useQuery({

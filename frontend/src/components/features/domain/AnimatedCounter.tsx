@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import React from 'react';
+
 import { motion, useSpring, useTransform } from 'motion/react';
 
 interface AnimatedCounterProps {
@@ -16,13 +17,13 @@ export function AnimatedCounter({
 }: AnimatedCounterProps) {
   const spring = useSpring(0, { duration: duration * 1000 });
   const display = useTransform(spring, (latest) => formatter(latest));
-  const [displayText, setDisplayText] = useState("0");
+  const [displayText, setDisplayText] = React.useState("0");
 
-  useEffect(() => {
+  React.useEffect(() => {
     spring.set(value);
   }, [value, spring]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     return display.on("change", (latest) => setDisplayText(latest));
   }, [display]);
 

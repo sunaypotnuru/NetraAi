@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "motion/react";
 import { Users, Plus, Edit2, Trash2, LinkIcon } from "lucide-react";
@@ -25,17 +26,17 @@ interface TeamMember {
 export default function AdminTeamPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [editingMember, setEditingMember] = React.useState<TeamMember | null>(null);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = React.useState({
     name: "",
     role: "",
     bio: "",
     linkedin_url: "",
     is_active: true
   });
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarFile, setAvatarFile] = React.useState<File | null>(null);
 
   const { data: teamMembers, isLoading } = useQuery({
     queryKey: ["adminTeam"],

@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { motion } from "motion/react";
 import {
   ArrowLeft,
@@ -42,12 +43,12 @@ export default function MedicationDetailsPage() {
   const navigate = useNavigate();
   const { medicationId } = useParams<{ medicationId: string }>();
 
-  const [medication, setMedication] = useState<Medication | null>(null);
-  const [logs, setLogs] = useState<MedicationLog[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [chartData, setChartData] = useState<any[]>([]);
+  const [medication, setMedication] = React.useState<Medication | null>(null);
+  const [logs, setLogs] = React.useState<MedicationLog[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [chartData, setChartData] = React.useState<any[]>([]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (medicationId) {
       fetchMedicationDetails();
       fetchMedicationLogs();

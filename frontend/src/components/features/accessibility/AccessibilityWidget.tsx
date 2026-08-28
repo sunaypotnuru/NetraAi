@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import React from 'react';
+
 import { Accessibility, Type, Contrast, X, Keyboard, Eye, Palette, ZoomIn, ZoomOut, Volume2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTranslation } from "@/lib/i18n";
@@ -17,8 +18,8 @@ interface AccessibilitySettings {
 
 export function AccessibilityWidget() {
   const { t } = useTranslation();
-    const [isOpen, setIsOpen] = useState(false);
-    const [settings, setSettings] = useState<AccessibilitySettings>({
+    const [isOpen, setIsOpen] = React.useState(false);
+    const [settings, setSettings] = React.useState<AccessibilitySettings>({
         highContrast: false,
         largeText: false,
         fontSize: 100,
@@ -30,7 +31,7 @@ export function AccessibilityWidget() {
     });
 
     // Load settings from localStorage
-    useEffect(() => {
+    React.useEffect(() => {
         const saved = localStorage.getItem('accessibility-settings');
         if (saved) {
             try {
@@ -42,12 +43,12 @@ export function AccessibilityWidget() {
     }, []);
 
     // Save settings to localStorage
-    useEffect(() => {
+    React.useEffect(() => {
         localStorage.setItem('accessibility-settings', JSON.stringify(settings));
     }, [settings]);
 
     // Apply high contrast
-    useEffect(() => {
+    React.useEffect(() => {
         if (settings.highContrast) {
             document.documentElement.classList.add('high-contrast');
         } else {
@@ -56,7 +57,7 @@ export function AccessibilityWidget() {
     }, [settings.highContrast]);
 
     // Apply large text
-    useEffect(() => {
+    React.useEffect(() => {
         if (settings.largeText) {
             document.documentElement.classList.add('large-text');
         } else {
@@ -65,12 +66,12 @@ export function AccessibilityWidget() {
     }, [settings.largeText]);
 
     // Apply font size
-    useEffect(() => {
+    React.useEffect(() => {
         document.documentElement.style.fontSize = `${settings.fontSize}%`;
     }, [settings.fontSize]);
 
     // Apply color blind mode
-    useEffect(() => {
+    React.useEffect(() => {
         document.documentElement.classList.remove('protanopia', 'deuteranopia', 'tritanopia', 'monochrome');
         if (settings.colorBlindMode !== 'none') {
             document.documentElement.classList.add(settings.colorBlindMode);
@@ -78,7 +79,7 @@ export function AccessibilityWidget() {
     }, [settings.colorBlindMode]);
 
     // Apply reduced motion
-    useEffect(() => {
+    React.useEffect(() => {
         if (settings.reducedMotion) {
             document.documentElement.classList.add('reduce-motion');
         } else {
@@ -87,7 +88,7 @@ export function AccessibilityWidget() {
     }, [settings.reducedMotion]);
 
     // Apply focus indicator
-    useEffect(() => {
+    React.useEffect(() => {
         if (settings.focusIndicator) {
             document.documentElement.classList.add('enhanced-focus');
         } else {
@@ -96,7 +97,7 @@ export function AccessibilityWidget() {
     }, [settings.focusIndicator]);
 
     // Keyboard navigation
-    useEffect(() => {
+    React.useEffect(() => {
         if (!settings.keyboardNav) return;
 
         const handleKeyPress = (e: KeyboardEvent) => {

@@ -1,5 +1,5 @@
 // src/components/ui/AutoSlider.tsx
-import React, { useEffect, useState } from "react";
+import React from 'react';
 import { motion, AnimatePresence } from "framer-motion";
 
 interface AutoSliderProps {
@@ -10,9 +10,9 @@ interface AutoSliderProps {
 }
 
 const AutoSlider: React.FC<AutoSliderProps> = ({ items, duration = 4000 }) => {
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = React.useState(0);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % items.length);
     }, duration);

@@ -1,9 +1,10 @@
+import React from 'react';
 import { motion, AnimatePresence } from "motion/react";
 import { useNavigate } from "react-router";
 import { Calendar, Video, User, FileText, ChevronDown, Check, X, AlertCircle, Search, Filter, Bot, Copy, Sparkles, Loader2, ClipboardList } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PrescriptionSummary } from "@/components/features/domain/PrescriptionSummary";
@@ -15,7 +16,7 @@ import { format, isToday, isFuture } from "date-fns";
 import { useTranslation } from "../../lib/i18n";
 import { getWebSocketManager } from "../services/websocket";
 import { HeartbeatLoader } from "@/components/shared/HeartbeatLoader";
-import { useEffect } from "react";
+
 
 interface PatientProfile {
   id?: string;
@@ -58,20 +59,20 @@ export default function DoctorAppointmentsPage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-    const [expandedId, setExpandedId] = useState<string | null>(null);
-    const [filter, setFilter] = useState<"all" | "today" | "upcoming" | "waitlist">("all");
-    const [searchTerm, setSearchTerm] = useState("");
-    const [filterType, setFilterType] = useState("all");
-    const [selectedPatientForRx, setSelectedPatientForRx] = useState<DoctorAppointment | null>(null);
-    const [scribeOpen, setScribeOpen] = useState(false);
-    const [scribeNotes, setScribeNotes] = useState("");
-    const [scribeResult, setScribeResult] = useState("");
-    const [scribeLoading, setScribeLoading] = useState(false);
-    const [scribeAppointment, setScribeAppointment] = useState<DoctorAppointment | null>(null);
-    const [intakeOpen, setIntakeOpen] = useState(false);
-    const [intakeData, setIntakeData] = useState<Record<string, unknown> | null>(null);
-    const [intakeLoading, setIntakeLoading] = useState(false);
-    const [intakeAppointment, setIntakeAppointment] = useState<DoctorAppointment | null>(null);
+    const [expandedId, setExpandedId] = React.useState<string | null>(null);
+    const [filter, setFilter] = React.useState<"all" | "today" | "upcoming" | "waitlist">("all");
+    const [searchTerm, setSearchTerm] = React.useState("");
+    const [filterType, setFilterType] = React.useState("all");
+    const [selectedPatientForRx, setSelectedPatientForRx] = React.useState<DoctorAppointment | null>(null);
+    const [scribeOpen, setScribeOpen] = React.useState(false);
+    const [scribeNotes, setScribeNotes] = React.useState("");
+    const [scribeResult, setScribeResult] = React.useState("");
+    const [scribeLoading, setScribeLoading] = React.useState(false);
+    const [scribeAppointment, setScribeAppointment] = React.useState<DoctorAppointment | null>(null);
+    const [intakeOpen, setIntakeOpen] = React.useState(false);
+    const [intakeData, setIntakeData] = React.useState<Record<string, unknown> | null>(null);
+    const [intakeLoading, setIntakeLoading] = React.useState(false);
+    const [intakeAppointment, setIntakeAppointment] = React.useState<DoctorAppointment | null>(null);
 
     const openIntake = async (appointment: DoctorAppointment) => {
         setIntakeAppointment(appointment);
@@ -122,7 +123,7 @@ export default function DoctorAppointmentsPage() {
         queryFn: () => doctorAPI.getWaitlist().then((res) => res.data?.data || res.data || [])
     });
 
-    useEffect(() => {
+    React.useEffect(() => {
         const setupRealtime = async () => {
             try {
                 const manager = getWebSocketManager();

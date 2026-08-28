@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React from 'react';
+
 import { motion, AnimatePresence } from 'motion/react';
 import { MessageSquare, X, Send, Sparkles } from 'lucide-react';
 import { useAuth } from "@/app/contexts/AuthContext";
@@ -8,12 +9,12 @@ import { useTranslation } from "@/lib/i18n";
 
 export function AIAssistantWidget() {
   const { t } = useTranslation();
-    const [isOpen, setIsOpen] = useState(false);
-    const [messages, setMessages] = useState<{ role: 'ai' | 'user', text: string }[]>([
+    const [isOpen, setIsOpen] = React.useState(false);
+    const [messages, setMessages] = React.useState<{ role: 'ai' | 'user', text: string }[]>([
         { role: 'ai', text: 'Hi! I am the Netra AI Assistant. How can I help you today?' }
     ]);
-    const [inputValue, setInputValue] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const [inputValue, setInputValue] = React.useState('');
+    const [isLoading, setIsLoading] = React.useState(false);
     const { user } = useAuth();
 
     if (!user) return null; // Only show if logged in

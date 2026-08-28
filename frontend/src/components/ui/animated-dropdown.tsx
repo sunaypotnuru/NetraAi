@@ -22,7 +22,7 @@
  * />
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Check } from 'lucide-react';
 import { useReducedMotion } from '@/animations';
@@ -74,16 +74,16 @@ export const AnimatedDropdown: React.FC<AnimatedDropdownProps> = ({
   className = '',
   triggerClassName = '',
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [focusedIndex, setFocusedIndex] = React.useState(-1);
   const prefersReducedMotion = useReducedMotion();
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+  const triggerRef = React.useRef<HTMLDivElement>(null);
 
   const menuItems = items.filter((item): item is DropdownItem => item.type !== 'divider');
 
   // Close on click outside
-  useEffect(() => {
+  React.useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
         dropdownRef.current &&

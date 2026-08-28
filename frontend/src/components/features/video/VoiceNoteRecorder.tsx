@@ -1,4 +1,5 @@
-import { useState, useRef } from "react";
+import React from 'react';
+
 import { motion } from "motion/react";
 import { Mic, Square, CheckCircle, Trash2, Loader2, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,15 +15,15 @@ interface VoiceNoteProps {
 
 export default function VoiceNoteRecorder({ appointmentId, patientId, onNoteTranscribed }: VoiceNoteProps) {
     const { t } = useTranslation();
-    const [isRecording, setIsRecording] = useState(false);
-    const [transcription, setTranscription] = useState("");
-    const [isProcessing, setIsProcessing] = useState(false);
-    const [recordingTime, setRecordingTime] = useState(0);
-    const [savedNotes, setSavedNotes] = useState<string[]>([]);
+    const [isRecording, setIsRecording] = React.useState(false);
+    const [transcription, setTranscription] = React.useState("");
+    const [isProcessing, setIsProcessing] = React.useState(false);
+    const [recordingTime, setRecordingTime] = React.useState(0);
+    const [savedNotes, setSavedNotes] = React.useState<string[]>([]);
 
-    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-    const chunksRef = useRef<Blob[]>([]);
-    const timerRef = useRef<number | null>(null);
+    const mediaRecorderRef = React.useRef<MediaRecorder | null>(null);
+    const chunksRef = React.useRef<Blob[]>([]);
+    const timerRef = React.useRef<number | null>(null);
 
     const startRecording = async () => {
         try {

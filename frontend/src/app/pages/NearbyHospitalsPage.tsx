@@ -1,8 +1,9 @@
+import React from 'react';
 import { motion } from "motion/react";
 import { MapPin, Phone, Clock, Navigation, Star, List, Grid, AlertCircle, Loader, Compass, Search } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useState, useCallback, useEffect, useRef } from "react";
+
 import { useQuery } from "@tanstack/react-query";
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow, StandaloneSearchBox } from '@react-google-maps/api';
 import { toast } from "sonner";
@@ -42,12 +43,12 @@ const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: numbe
 
 export default function NearbyHospitalsPage() {
   const { t } = useTranslation();
-  const [view, setView] = useState<"list" | "grid">("list");
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [searchLocation, setSearchLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [selectedHospital, setSelectedHospital] = useState<Hospital | null>(null);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
-  const searchBoxRef = useRef<google.maps.places.SearchBox | null>(null);
+  const [view, setView] = React.useState<"list" | "grid">("list");
+  const [userLocation, setUserLocation] = React.useState<{ lat: number; lng: number } | null>(null);
+  const [searchLocation, setSearchLocation] = React.useState<{ lat: number; lng: number } | null>(null);
+  const [selectedHospital, setSelectedHospital] = React.useState<Hospital | null>(null);
+  const [map, setMap] = React.useState<google.maps.Map | null>(null);
+  const searchBoxRef = React.useRef<google.maps.places.SearchBox | null>(null);
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
@@ -55,7 +56,7 @@ export default function NearbyHospitalsPage() {
     libraries: LIBRARIES
   });
 
-  const onUnmount = useCallback(function callback() {
+  const onUnmount = React.useCallback(function callback() {
     setMap(null);
   }, []);
 
@@ -116,7 +117,7 @@ export default function NearbyHospitalsPage() {
     };
   }).sort((a, b) => (a.calculated_dist || 0) - (b.calculated_dist || 0));
 
-  const handleEnableLocation = useCallback(() => {
+  const handleEnableLocation = React.useCallback(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -140,7 +141,7 @@ export default function NearbyHospitalsPage() {
   }, [t]);
 
   // Auto-detect location on mount
-  useEffect(() => {
+  React.useEffect(() => {
     handleEnableLocation();
   }, [handleEnableLocation]);
 

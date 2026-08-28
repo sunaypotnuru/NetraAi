@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { motion } from "motion/react";
 import {
   ArrowLeft,
@@ -24,15 +25,15 @@ export default function LogGoalProgressPage() {
   const navigate = useNavigate();
   const { goalId } = useParams<{ goalId: string }>();
 
-  const [goal, setGoal] = useState<HealthGoal | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
+  const [goal, setGoal] = React.useState<HealthGoal | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [isSaving, setIsSaving] = React.useState(false);
 
   // Form state
-  const [value, setValue] = useState("");
-  const [notes, setNotes] = useState("");
+  const [value, setValue] = React.useState("");
+  const [notes, setNotes] = React.useState("");
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (goalId) {
       fetchGoalDetails();
     }

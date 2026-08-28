@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
@@ -61,9 +61,9 @@ interface DoctorProfile {
 export default function DoctorProfileSettings() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState('personal');
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState<Partial<DoctorProfile>>({});
+  const [activeTab, setActiveTab] = React.useState('personal');
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [formData, setFormData] = React.useState<Partial<DoctorProfile>>({});
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ['doctor-profile'],

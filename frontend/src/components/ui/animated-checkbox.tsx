@@ -10,8 +10,8 @@
  * - Respects reduced motion preferences
  */
 
+import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { forwardRef } from 'react';
 import { useAnimationConfig } from '@/animations';
 import { cn } from '@/lib/utils';
 import { Check } from 'lucide-react';
@@ -29,7 +29,7 @@ interface AnimatedCheckboxProps
   disableAnimations?: boolean;
 }
 
-export const AnimatedCheckbox = forwardRef<
+export const AnimatedCheckbox = React.forwardRef<
   HTMLInputElement,
   AnimatedCheckboxProps
 >(({ label, disableAnimations = false, className, id, ...props }, ref) => {

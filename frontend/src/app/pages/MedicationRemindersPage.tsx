@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import React from 'react';
+
 import { motion, AnimatePresence } from "motion/react";
 import { Pill, Plus, Clock, CalendarIcon, X, ArrowLeft, Trash2, BellRing, BellOff } from "lucide-react";
 import { useNavigate } from "react-router";
@@ -21,17 +22,17 @@ interface Medication {
 export default function MedicationRemindersPage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const [medications, setMedications] = useState<Medication[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [medications, setMedications] = React.useState<Medication[]>([]);
+    const [isLoading, setIsLoading] = React.useState(true);
 
     // Add Form State
-    const [showAddForm, setShowAddForm] = useState(false);
-    const [newName, setNewName] = useState("");
-    const [newDosage, setNewDosage] = useState("");
-    const [newFrequency, setNewFrequency] = useState("Daily");
-    const [newTime, setNewTime] = useState("");
+    const [showAddForm, setShowAddForm] = React.useState(false);
+    const [newName, setNewName] = React.useState("");
+    const [newDosage, setNewDosage] = React.useState("");
+    const [newFrequency, setNewFrequency] = React.useState("Daily");
+    const [newTime, setNewTime] = React.useState("");
 
-    const fetchMedications = useCallback(async () => {
+    const fetchMedications = React.useCallback(async () => {
         setIsLoading(true);
         try {
             const res = await patientAPI.getMedications();
@@ -46,7 +47,7 @@ export default function MedicationRemindersPage() {
         }
     }, [t]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         fetchMedications();
     }, [fetchMedications]);
 

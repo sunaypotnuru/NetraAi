@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React from 'react';
+
 import { motion } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
@@ -22,7 +23,7 @@ interface Patient {
 
 export default function AdminPatientsPage() {
     const { t } = useTranslation();
-    const [searchTerm, setSearchTerm] = useState('');
+    const [searchTerm, setSearchTerm] = React.useState('');
     const navigate = useNavigate();
 
     const { data: patients, isLoading, error } = useQuery({

@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { motion, AnimatePresence } from "motion/react";
 import {
   Pill,
@@ -26,18 +27,18 @@ export default function MedicationsListPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const [medications, setMedications] = useState<Medication[]>([]);
-  const [filteredMedications, setFilteredMedications] = useState<Medication[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "discontinued" | "completed">("all");
-  const [overallAdherence, setOverallAdherence] = useState(0);
+  const [medications, setMedications] = React.useState<Medication[]>([]);
+  const [filteredMedications, setFilteredMedications] = React.useState<Medication[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [statusFilter, setStatusFilter] = React.useState<"all" | "active" | "discontinued" | "completed">("all");
+  const [overallAdherence, setOverallAdherence] = React.useState(0);
 
-  useEffect(() => {
+  React.useEffect(() => {
     fetchMedications();
   }, []);
 
-  useEffect(() => {
+  React.useEffect(() => {
     filterMedications();
   }, [medications, searchTerm, statusFilter]);
 

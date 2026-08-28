@@ -11,7 +11,7 @@
  * - Print-optimized layout
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { FileText, Download, Printer, CheckCircle2, Loader2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -62,8 +62,8 @@ const ClinicalReportGenerator: React.FC<ClinicalReportGeneratorProps> = ({
   doctorInfo
 }) => {
   const { t } = useTranslation();
-  const [generating, setGenerating] = useState(false);
-  const [generated, setGenerated] = useState(false);
+  const [generating, setGenerating] = React.useState(false);
+  const [generated, setGenerated] = React.useState(false);
 
   const generatePDF = async () => {
     setGenerating(true);

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 
 /**
  * ECG Loading Screen
@@ -224,10 +224,10 @@ function MedicalGrid({ width, height }: { width: number; height: number }) {
 
 // Floating vitals display (HR, SpO2, BP)
 function VitalsDisplay() {
-    const [bpm, setBpm] = useState(72);
-    const [spo2, setSpo2] = useState(98);
+    const [bpm, setBpm] = React.useState(72);
+    const [spo2, setSpo2] = React.useState(98);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const id = setInterval(() => {
             setBpm(prev => {
                 const next = prev + Math.round((Math.random() - 0.5) * 4);
@@ -346,9 +346,9 @@ function PulseRing() {
 
 // Progress bar strip that slowly fills
 function ProgressBar() {
-    const [progress, setProgress] = useState(0);
+    const [progress, setProgress] = React.useState(0);
 
-    useEffect(() => {
+    React.useEffect(() => {
         let p = 0;
         const id = setInterval(() => {
             p += Math.random() * 3;
@@ -397,12 +397,12 @@ function ProgressBar() {
 
 // Main ECG loading screen component
 export function ECGLoadingScreen() {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [dims, setDims] = useState({ width: 800, height: 200 });
-    const [dots, setDots] = useState('');
+    const containerRef = React.useRef<HTMLDivElement>(null);
+    const [dims, setDims] = React.useState({ width: 800, height: 200 });
+    const [dots, setDots] = React.useState('');
 
     // Measure container width to make ECG fill screen
-    useEffect(() => {
+    React.useEffect(() => {
         const measure = () => {
             if (containerRef.current) {
                 setDims({
@@ -417,7 +417,7 @@ export function ECGLoadingScreen() {
     }, []);
 
     // Animated "..." status dots
-    useEffect(() => {
+    React.useEffect(() => {
         let count = 0;
         const id = setInterval(() => {
             count = (count + 1) % 4;

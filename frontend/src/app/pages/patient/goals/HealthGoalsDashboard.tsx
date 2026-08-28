@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { motion, AnimatePresence } from "motion/react";
 import {
   Target,
@@ -28,17 +29,17 @@ export default function HealthGoalsDashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const [goals, setGoals] = useState<HealthGoal[]>([]);
-  const [filteredGoals, setFilteredGoals] = useState<HealthGoal[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "completed" | "abandoned">("all");
+  const [goals, setGoals] = React.useState<HealthGoal[]>([]);
+  const [filteredGoals, setFilteredGoals] = React.useState<HealthGoal[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [statusFilter, setStatusFilter] = React.useState<"all" | "active" | "completed" | "abandoned">("all");
 
-  useEffect(() => {
+  React.useEffect(() => {
     fetchGoals();
   }, []);
 
-  useEffect(() => {
+  React.useEffect(() => {
     filterGoals();
   }, [goals, searchTerm, statusFilter]);
 

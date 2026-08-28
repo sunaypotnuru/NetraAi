@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { motion } from "framer-motion";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,8 +10,8 @@ import PageWrapper from "@/components/ui/PageWrapper";
 
 export default function ContactPage() {
     const { t } = useTranslation();
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [formData, setFormData] = useState({
+    const [isSubmitting, setIsSubmitting] = React.useState(false);
+    const [formData, setFormData] = React.useState({
         firstName: "",
         lastName: "",
         email: "",

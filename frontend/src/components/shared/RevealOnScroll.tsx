@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, ReactNode } from 'react';
+import React from 'react';
 
 interface RevealOnScrollProps {
   children: ReactNode;
@@ -7,10 +7,10 @@ interface RevealOnScrollProps {
 }
 
 export function RevealOnScroll({ children, className = '', delay = 0 }: RevealOnScrollProps) {
-  const [isVisible, setIsVisible] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = React.useState(false);
+  const ref = React.useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {

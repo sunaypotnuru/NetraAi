@@ -1,3 +1,4 @@
+import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, CartesianGrid } from 'recharts';
@@ -5,7 +6,7 @@ import { TrendingUp, BarChart3, Clock, Globe, AlertTriangle, Download, RefreshCc
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import { toast } from "sonner";
-import { useState } from "react";
+
 import { getRequiredApiBaseUrl, getSupabaseAccessToken } from "@/services/authSession";
 
 const COLORS = ['#0D9488', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
@@ -91,8 +92,8 @@ const DEMO_ERRORS = {
 };
 
 export function AnalyticsDashboard() {
-  const [showExportMenu, setShowExportMenu] = useState(false);
-  const [activeRange, setActiveRange] = useState<'24H' | '7D' | '30D'>('24H');
+  const [showExportMenu, setShowExportMenu] = React.useState(false);
+  const [activeRange, setActiveRange] = React.useState<'24H' | '7D' | '30D'>('24H');
   const apiBaseUrl = getRequiredApiBaseUrl();
 
   const { data: usageTrends, refetch: refetchUsage } = useQuery({

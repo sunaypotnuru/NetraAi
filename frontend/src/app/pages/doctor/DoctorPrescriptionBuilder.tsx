@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import React from 'react';
+
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
 import {
@@ -49,19 +50,19 @@ export default function DoctorPrescriptionBuilder() {
     const { user } = useAuthStore();
     const navigate = useNavigate();
 
-    const [patients, setPatients] = useState<PatientRecord[]>([]);
-    const [selectedPatientId, setSelectedPatientId] = useState<string>("");
-    const [diagnosis, setDiagnosis] = useState("");
-    const [additionalNotes, setAdditionalNotes] = useState("");
-    const [medications, setMedications] = useState<Medication[]>([
+    const [patients, setPatients] = React.useState<PatientRecord[]>([]);
+    const [selectedPatientId, setSelectedPatientId] = React.useState<string>("");
+    const [diagnosis, setDiagnosis] = React.useState("");
+    const [additionalNotes, setAdditionalNotes] = React.useState("");
+    const [medications, setMedications] = React.useState<Medication[]>([
         { name: "", dosage: "", duration: "", frequency: "OD", instructions: "", mealAdvice: 'after' }
     ]);
-    const [isGenerating, setIsGenerating] = useState(false);
-    const [doctorProfile, setDoctorProfile] = useState<DoctorProfile | null>(null);
+    const [isGenerating, setIsGenerating] = React.useState(false);
+    const [doctorProfile, setDoctorProfile] = React.useState<DoctorProfile | null>(null);
 
-    const _prescriptionRef = useRef<HTMLDivElement>(null);
+    const _prescriptionRef = React.useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const fetchData = async () => {
             try {
                 const patRes = await doctorAPI.getPatients();

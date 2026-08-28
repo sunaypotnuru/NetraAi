@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import {
     BarChart2, Users, Calendar, Scan, TrendingUp,
@@ -51,7 +51,7 @@ const DarkTooltip = ({ active, payload, label }: any) => {
 
 export default function AdminAnalyticsPage() {
     const { t } = useTranslation();
-    const [range, setRange] = useState<'7d' | '30d' | '90d'>('30d');
+    const [range, setRange] = React.useState<'7d' | '30d' | '90d'>('30d');
 
     const { data: stats, isLoading, refetch } = useQuery<AdminStats>({
         queryKey: ['adminStats'],

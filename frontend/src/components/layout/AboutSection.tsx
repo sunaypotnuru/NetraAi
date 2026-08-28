@@ -1,16 +1,17 @@
+import React from 'react';
 import { Heart, Users, Award, Zap, Star, Eye, Mic, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+
 import { useTranslation } from "@/lib/i18n";
 import { Link } from "react-router-dom";
 
 export function AboutSection() {
-  const [activeTab, setActiveTab] = useState<"anemia" | "dr" | "cataract" | "parkinsons">("anemia");
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [activeTab, setActiveTab] = React.useState<"anemia" | "dr" | "cataract" | "parkinsons">("anemia");
+  const [currentTestimonial, setCurrentTestimonial] = React.useState(0);
   const { t } = useTranslation();
 
   // Auto‑slide through model tabs every 4 seconds
-  useEffect(() => {
+  React.useEffect(() => {
     const tabs: Array<"anemia" | "dr" | "cataract" | "parkinsons"> = ["anemia", "dr", "cataract", "parkinsons"];
     const interval = setInterval(() => {
       setActiveTab((prev) => {
@@ -90,7 +91,7 @@ export function AboutSection() {
     { name: "Priya M.", role: t('home.about.role_patient', "Patient"), quote: t('home.about.testimonial_3', "I was amazed at how simple it was to book a consultation and get my scan results. The interface is beautiful and so easy to use.") }
   ];
 
-  useEffect(() => {
+  React.useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
     }, 6000);

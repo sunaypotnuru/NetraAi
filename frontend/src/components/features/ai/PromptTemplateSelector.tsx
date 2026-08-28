@@ -9,7 +9,7 @@
  * - Quick selection
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FileText, Search, ChevronRight } from 'lucide-react';
@@ -87,8 +87,8 @@ const TEMPLATES: Template[] = [
 ];
 
 export function PromptTemplateSelector({ onSelect }: PromptTemplateSelectorProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [selectedCategory, setSelectedCategory] = React.useState<string>('all');
 
   // Get unique categories
   const categories = ['all', ...Array.from(new Set(TEMPLATES.map((t) => t.category)))];

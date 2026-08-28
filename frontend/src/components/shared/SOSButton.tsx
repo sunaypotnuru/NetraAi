@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { AlertTriangle, X, Phone, Settings } from "lucide-react";
 import { patientAPI } from "@/lib/api";
 import { toast } from "sonner";
@@ -13,8 +14,8 @@ import { useTranslation } from "@/lib/i18n";
 export default function SOSButton() {
   const { t } = useTranslation();
     const navigate = useNavigate();
-    const [confirming, setConfirming] = useState(false);
-    const [firing, setFiring] = useState(false);
+    const [confirming, setConfirming] = React.useState(false);
+    const [firing, setFiring] = React.useState(false);
     const location = useLocation();
 
     // Only show on patient pages

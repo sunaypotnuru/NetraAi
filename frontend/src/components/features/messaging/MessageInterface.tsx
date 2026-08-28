@@ -12,7 +12,7 @@
  * - Reply functionality
  */
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React from 'react';
 import { messagingAPI } from '@/services/api';
 import { getWebSocketManager } from '@/services/websocket';
 import type { ConversationWithDetails, MessageWithDetails } from '@/types';
@@ -36,27 +36,27 @@ export function MessageInterface({
   onBack,
 }: MessageInterfaceProps) {
   // Refs
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const messagesContainerRef = useRef<HTMLDivElement>(null);
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const messagesEndRef = React.useRef<HTMLDivElement>(null);
+  const messagesContainerRef = React.useRef<HTMLDivElement>(null);
+  const typingTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   // State
-  const [conversation, setConversation] = useState<ConversationWithDetails | null>(null);
-  const [messages, setMessages] = useState<MessageWithDetails[]>([]);
-  const [messageInput, setMessageInput] = useState('');
-  const [replyTo, setReplyTo] = useState<MessageWithDetails | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isTyping, setIsTyping] = useState(false);
-  const [typingUsers, setTypingUsers] = useState<string[]>([]);
-  const [showScrollButton, setShowScrollButton] = useState(false);
+  const [conversation, setConversation] = React.useState<ConversationWithDetails | null>(null);
+  const [messages, setMessages] = React.useState<MessageWithDetails[]>([]);
+  const [messageInput, setMessageInput] = React.useState('');
+  const [replyTo, setReplyTo] = React.useState<MessageWithDetails | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [isLoadingMore, setIsLoadingMore] = React.useState(false);
+  const [hasMore, setHasMore] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+  const [isTyping, setIsTyping] = React.useState(false);
+  const [typingUsers, setTypingUsers] = React.useState<string[]>([]);
+  const [showScrollButton, setShowScrollButton] = React.useState(false);
 
   /**
    * Initialize conversation
    */
-  useEffect(() => {
+  React.useEffect(() => {
     loadConversation();
     loadMessages();
     connectWebSocket();
@@ -66,7 +66,7 @@ export function MessageInterface({
   /**
    * Auto-scroll to bottom on new messages
    */
-  useEffect(() => {
+  React.useEffect(() => {
     if (messages.length > 0 && !showScrollButton) {
       scrollToBottom();
     }
@@ -75,7 +75,7 @@ export function MessageInterface({
   /**
    * Handle scroll to show/hide scroll button
    */
-  useEffect(() => {
+  React.useEffect(() => {
     const container = messagesContainerRef.current;
     if (!container) return;
 
@@ -324,7 +324,7 @@ export function MessageInterface({
   /**
    * Load more messages (infinite scroll)
    */
-  const handleLoadMore = useCallback(() => {
+  const handleLoadMore = React.useCallback(() => {
     if (!isLoadingMore && hasMore && messages.length > 0) {
       const oldestMessage = messages[0];
       loadMessages(oldestMessage.created_at);

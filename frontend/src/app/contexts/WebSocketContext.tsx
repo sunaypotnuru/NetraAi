@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useRef } from 'react';
+import React from 'react';
 import { initializeWebSocketManager, getWebSocketManager, WebSocketService } from '../services/websocket';
 import { getSupabaseAccessToken } from '../services/apiClient';
 import { useAuthStore, useWebSocketStore, useNotificationStore, usePresenceStore } from '../../lib/store';
@@ -11,16 +11,16 @@ interface WebSocketContextType {
   isConnected: boolean;
 }
 
-const WebSocketContext = createContext<WebSocketContextType | null>(null);
+const WebSocketContext = React.createContext<WebSocketContextType | null>(null);
 
 export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuthStore();
   const { setStatus, setLastError } = useWebSocketStore();
   const { addNotification, soundEnabled, desktopEnabled } = useNotificationStore();
   const { updateUser, removeUser, setUsers } = usePresenceStore();
-  const managerRef = useRef<ReturnType<typeof initializeWebSocketManager> | null>(null);
+  const managerRef = React.useRef<ReturnType<typeof initializeWebSocketManager> | null>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const initialize = async () => {
       if (!user) {
         if (managerRef.current) {
@@ -117,7 +117,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     return () => {
       if (managerRef.current) {
+        console.log('[WebSocketContext] Cleaning up all connections...');
         managerRef.current.disconnectAll();
+        managerRef.current = null;
       }
     };
   }, [user, setStatus, setLastError, addNotification, updateUser, removeUser, setUsers, soundEnabled, desktopEnabled]);
@@ -151,7 +153,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 };
 
 export const useWebSocket = () => {
-  const context = useContext(WebSocketContext);
+  const context = React.useContext(WebSocketContext);
   if (!context) {
     throw new Error('useWebSocket must be used within a WebSocketProvider');
   }

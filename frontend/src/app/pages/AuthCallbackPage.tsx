@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import React from 'react';
+
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { Loader2, ShieldCheck, UserCheck, AlertTriangle } from "lucide-react";
@@ -20,10 +21,10 @@ type AuthStatus = "loading" | "error";
  */
 export default function AuthCallbackPage() {
     const navigate = useNavigate();
-    const [status, setStatus] = useState<AuthStatus>("loading");
-    const [errorMsg, setErrorMsg] = useState<string>("");
+    const [status, setStatus] = React.useState<AuthStatus>("loading");
+    const [errorMsg, setErrorMsg] = React.useState<string>("");
 
-    useEffect(() => {
+    React.useEffect(() => {
         let cancelled = false;
 
         const handleCallback = async () => {
@@ -109,7 +110,7 @@ export default function AuthCallbackPage() {
     }, [navigate]);
 
     // Auto-redirect to /login after a short delay when in error state
-    useEffect(() => {
+    React.useEffect(() => {
         if (status !== "error") return;
         const timer = setTimeout(() => {
             navigate("/login", { replace: true });

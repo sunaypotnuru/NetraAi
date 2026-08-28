@@ -11,8 +11,8 @@
  * - Respects reduced motion preferences
  */
 
+import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { forwardRef, useState } from 'react';
 import { Input } from './input';
 import { useAnimationConfig } from '@/animations';
 import { cn } from '@/lib/utils';
@@ -42,7 +42,7 @@ interface AnimatedInputProps extends React.ComponentProps<typeof Input> {
   disableAnimations?: boolean;
 }
 
-export const AnimatedInput = forwardRef<HTMLInputElement, AnimatedInputProps>(
+export const AnimatedInput = React.forwardRef<HTMLInputElement, AnimatedInputProps>(
   (
     {
       label,
@@ -57,8 +57,8 @@ export const AnimatedInput = forwardRef<HTMLInputElement, AnimatedInputProps>(
     ref
   ) => {
     const { shouldReduceMotion, getTransition } = useAnimationConfig();
-    const [isFocused, setIsFocused] = useState(false);
-    const [hasValue, setHasValue] = useState(false);
+    const [isFocused, setIsFocused] = React.useState(false);
+    const [hasValue, setHasValue] = React.useState(false);
 
     const shouldAnimate = !disableAnimations && !shouldReduceMotion;
     const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;

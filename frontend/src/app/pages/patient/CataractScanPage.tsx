@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from '@/lib/i18n';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -11,9 +11,9 @@ import { Alert } from "@/components/ui/alert";
 const CataractScanPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  const [analyzing, setAnalyzing] = useState(false);
+  const [file, setFile] = React.useState<File | null>(null);
+  const [preview, setPreview] = React.useState<string | null>(null);
+  const [analyzing, setAnalyzing] = React.useState(false);
   interface CataractResult {
     status: string;
     confidence: number;
@@ -28,10 +28,10 @@ const CataractScanPage = () => {
     }>;
   }
 
-  const [result, setResult] = useState<CataractResult | null>(null);
-  const [error, setError] = useState('');
-  const [qualityStatus, setQualityStatus] = useState<'checking' | 'good' | 'poor' | null>(null);
-  const [qualityMessage, setQualityMessage] = useState<string>('');
+  const [result, setResult] = React.useState<CataractResult | null>(null);
+  const [error, setError] = React.useState('');
+  const [qualityStatus, setQualityStatus] = React.useState<'checking' | 'good' | 'poor' | null>(null);
+  const [qualityMessage, setQualityMessage] = React.useState<string>('');
   interface ScanHistory {
     id: string;
     image_url?: string;
@@ -39,8 +39,8 @@ const CataractScanPage = () => {
     [key: string]: any;
   }
 
-  const [history, setHistory] = useState<ScanHistory[]>([]);
-  const [comparing, setComparing] = useState(false);
+  const [history, setHistory] = React.useState<ScanHistory[]>([]);
+  const [comparing, setComparing] = React.useState(false);
 
   React.useEffect(() => {
     loadHistory();
@@ -109,7 +109,6 @@ const CataractScanPage = () => {
       setQualityMessage(t("patient.scan.quality_ok", "Image ready to analyze."));
     }
   };
-
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];

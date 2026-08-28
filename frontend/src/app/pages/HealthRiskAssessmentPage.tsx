@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { motion } from "motion/react";
 import DOMPurify from 'dompurify';
 import { ShieldAlert, HeartPulse, History, ArrowLeft, Send, Activity } from "lucide-react";
@@ -20,16 +21,16 @@ interface AssessmentRecord {
 export default function HealthRiskAssessmentPage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const [history, setHistory] = useState<AssessmentRecord[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const [history, setHistory] = React.useState<AssessmentRecord[]>([]);
+    const [isLoading, setIsLoading] = React.useState(false);
     const activeTab = 'cardiovascular'; // Default assessment type
 
     // Form State
-    const [age, setAge] = useState<string>("");
-    const [gender, setGender] = useState<"male" | "female">("male");
-    const [cholesterol, setCholesterol] = useState<string>("");
-    const [smoker, setSmoker] = useState<boolean>(false);
-    const [systolicBP, setSystolicBP] = useState<string>("");
+    const [age, setAge] = React.useState<string>("");
+    const [gender, setGender] = React.useState<"male" | "female">("male");
+    const [cholesterol, setCholesterol] = React.useState<string>("");
+    const [smoker, setSmoker] = React.useState<boolean>(false);
+    const [systolicBP, setSystolicBP] = React.useState<string>("");
 
     const fetchHistory = async () => {
         try {
@@ -40,7 +41,7 @@ export default function HealthRiskAssessmentPage() {
         }
     };
 
-    useEffect(() => {
+    React.useEffect(() => {
         fetchHistory();
     }, []);
 

@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export function MFALogin() {
-  const [code, setCode] = useState('');
+  const [code, setCode] = React.useState('');
   
   return (
     <Card className="w-full max-w-md mx-auto">

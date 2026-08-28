@@ -66,9 +66,23 @@ export class WebSocketService {
 
   public disconnect() {
     if (this.socket) {
-      this.socket.close();
+      // Properly remove all event listeners before closing
+      this.socket.onopen = null;
+      this.socket.onmessage = null;
+      this.socket.onclose = null;
+      this.socket.onerror = null;
+      
+      // Close with proper code and reason
+      if (this.socket.readyState === WebSocket.OPEN) {
+        this.socket.close(1000, 'Client disconnect');
+      } else {
+        this.socket.close();
+      }
       this.socket = null;
     }
+    
+    // Clear all listeners to prevent memory leaks
+    this.listeners.clear();
   }
 
   public on(event: string, callback: WebSocketCallback) {
@@ -133,7 +147,10 @@ class WebSocketManager {
   }
 
   public disconnectAll() {
-    this.connections.forEach(conn => conn.disconnect());
+    this.connections.forEach((conn, channel) => {
+      console.log(`[WebSocketManager] Disconnecting channel: ${channel}`);
+      conn.disconnect();
+    });
     this.connections.clear();
   }
 

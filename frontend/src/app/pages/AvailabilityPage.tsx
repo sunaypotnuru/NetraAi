@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { motion } from "motion/react";
 import { Save, Check, AlertCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -23,15 +24,15 @@ type Availability = Record<string, string[]>;
 export default function AvailabilityPage() {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
-    const [availability, setAvailability] = useState<Availability>({});
-    const [selectedDay, setSelectedDay] = useState("Monday");
+    const [availability, setAvailability] = React.useState<Availability>({});
+    const [selectedDay, setSelectedDay] = React.useState("Monday");
 
     const { data: availabilityData, isLoading, error } = useQuery({
         queryKey: ['doctorAvailability'],
         queryFn: () => doctorAPI.getAvailability().then(res => res.data)
     });
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (availabilityData?.availability) {
             setAvailability(availabilityData.availability);
         }

@@ -4,7 +4,7 @@
  * Allows immediate termination of video call in emergency situations
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { videoAPI } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -19,10 +19,10 @@ export function EmergencyDisconnectButton({
   consultationId,
   onDisconnect,
 }: EmergencyDisconnectButtonProps) {
-  const [showDialog, setShowDialog] = useState(false);
-  const [selectedReason, setSelectedReason] = useState<string>('');
-  const [description, setDescription] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDialog, setShowDialog] = React.useState(false);
+  const [selectedReason, setSelectedReason] = React.useState<string>('');
+  const [description, setDescription] = React.useState('');
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const reasons = [
     { value: 'medical_emergency', label: 'Medical Emergency', severity: 'critical' },

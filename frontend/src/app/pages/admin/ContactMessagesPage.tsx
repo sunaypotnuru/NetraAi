@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import { Mail, Phone, Calendar, CheckCircle, Eye, Trash2, Archive, MessageSquare } from "lucide-react";
@@ -24,7 +25,7 @@ interface ContactMessage {
 export default function ContactMessagesPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
+  const [selectedMessage, setSelectedMessage] = React.useState<ContactMessage | null>(null);
 
   const { data: messages, isLoading } = useQuery({
     queryKey: ["contact-messages"],

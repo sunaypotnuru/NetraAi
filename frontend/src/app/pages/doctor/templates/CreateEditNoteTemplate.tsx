@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router';
@@ -70,8 +70,8 @@ export default function CreateEditNoteTemplate() {
   const queryClient = useQueryClient();
   const isEditing = Boolean(templateId);
 
-  const [activeTab, setActiveTab] = useState('editor');
-  const [template, setTemplate] = useState<NoteTemplate>({
+  const [activeTab, setActiveTab] = React.useState('editor');
+  const [template, setTemplate] = React.useState<NoteTemplate>({
     title: '',
     description: '',
     category: 'consultation',
@@ -81,9 +81,9 @@ export default function CreateEditNoteTemplate() {
     is_favorite: false
   });
 
-  const [soapContent, setSoapContent] = useState<SOAPTemplate>(SOAP_TEMPLATE);
-  const [newTag, setNewTag] = useState('');
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [soapContent, setSoapContent] = React.useState<SOAPTemplate>(SOAP_TEMPLATE);
+  const [newTag, setNewTag] = React.useState('');
+  const [hasUnsavedChanges, setHasUnsavedChanges] = React.useState(false);
 
   const { data: existingTemplate, isLoading } = useQuery({
     queryKey: ['note-template', templateId],
@@ -95,7 +95,7 @@ export default function CreateEditNoteTemplate() {
   });
 
   // Load template data when editing
-  useEffect(() => {
+  React.useEffect(() => {
     if (existingTemplate) {
       setTemplate(existingTemplate);
 
@@ -113,7 +113,7 @@ export default function CreateEditNoteTemplate() {
   }, [existingTemplate]);
 
   // Track unsaved changes
-  useEffect(() => {
+  React.useEffect(() => {
     if (existingTemplate) {
       const hasChanges = JSON.stringify(template) !== JSON.stringify(existingTemplate);
       setHasUnsavedChanges(hasChanges);

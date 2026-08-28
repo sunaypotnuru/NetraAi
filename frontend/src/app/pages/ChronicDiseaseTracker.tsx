@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React from 'react';
+
 import { motion, AnimatePresence } from 'motion/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { patientAPI } from '../../lib/api';
@@ -32,12 +33,12 @@ export default function ChronicDiseaseTracker() {
         { id: 'heart_rate', label: t('patient.tracker.heart_rate', 'Heart Rate'), icon: Activity, unit: 'bpm' }
     ];
 
-    const [activeTracker, setActiveTracker] = useState(TRACKER_TYPES[0].id);
-    const [isLogging, setIsLogging] = useState(false);
+    const [activeTracker, setActiveTracker] = React.useState(TRACKER_TYPES[0].id);
+    const [isLogging, setIsLogging] = React.useState(false);
 
     // Form state
-    const [value, setValue] = useState('');
-    const [notes, setNotes] = useState('');
+    const [value, setValue] = React.useState('');
+    const [notes, setNotes] = React.useState('');
 
     const { data: vitals, isLoading } = useQuery<VitalLog[]>({
         queryKey: ['vitals'],

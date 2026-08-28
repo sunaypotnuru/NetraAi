@@ -1,5 +1,6 @@
+import React from 'react';
 import { RouterProvider } from "react-router";
-import { useEffect } from "react";
+
 import { router } from "./routes";
 import InstallPrompt from "../components/shared/InstallPrompt";
 import ErrorBoundary from "../components/shared/ErrorBoundary";
@@ -19,7 +20,7 @@ export default function App() {
   const { fetchSettings } = useSettingsStore();
   const { theme, isSeniorMode } = useThemeStore();
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Only fetch platform settings if logged in as an admin to avoid 403 errors
     if (import.meta.env.VITE_BYPASS_AUTH !== "true") {
       if (user?.role === 'admin') {
@@ -28,7 +29,7 @@ export default function App() {
     }
   }, [fetchSettings, user?.role]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const root = document.documentElement;
     root.classList.toggle("high-contrast", highContrast);
     root.classList.toggle("large-text", largeText || fontSize === 'large' || fontSize === 'xlarge');
@@ -49,7 +50,7 @@ export default function App() {
     }
   }, [highContrast, largeText, reducedMotion, isSeniorMode, fontSize, user]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const root = document.documentElement;
     root.classList.remove('light', 'dark');
 

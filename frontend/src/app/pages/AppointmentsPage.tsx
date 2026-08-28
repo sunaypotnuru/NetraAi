@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { Calendar, Video, Clock, XCircle, AlertCircle, Download, FileText, Search, Filter } from "lucide-react";
@@ -16,7 +17,7 @@ import autoTable from "jspdf-autotable";
 import ExcelJS from "exceljs";
 import { useTranslation } from "../../lib/i18n";
 import { getWebSocketManager } from "../services/websocket";
-import { useEffect } from "react";
+
 
 interface DoctorProfile {
   name?: string;
@@ -46,8 +47,8 @@ export default function AppointmentsPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { t } = useTranslation();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState("all");
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [filterType, setFilterType] = React.useState("all");
 
   const { data: appointments, isLoading, error } = useQuery<Appointment[]>({
     queryKey: ['patientAppointments'],
@@ -59,7 +60,7 @@ export default function AppointmentsPage() {
     queryFn: () => patientAPI.getWaitlist().then((res) => res.data?.data || res.data || [])
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     const setupRealtime = async () => {
       try {
         const manager = getWebSocketManager();

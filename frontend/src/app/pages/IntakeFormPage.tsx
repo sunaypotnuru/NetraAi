@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { useParams, useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { ClipboardList, CheckCircle, ArrowLeft, Loader2 } from "lucide-react";
@@ -29,13 +30,13 @@ export default function IntakeFormPage() {
     const { specialty, appointmentId } = useParams<{ specialty: string; appointmentId: string }>();
     const navigate = useNavigate();
 
-    const [schema, setSchema] = useState<IntakeFormSchema | null>(null);
-    const [responses, setResponses] = useState<Record<string, string | number | boolean | string[]>>({});
-    const [loading, setLoading] = useState(true);
-    const [submitting, setSubmitting] = useState(false);
-    const [submitted, setSubmitted] = useState(false);
+    const [schema, setSchema] = React.useState<IntakeFormSchema | null>(null);
+    const [responses, setResponses] = React.useState<Record<string, string | number | boolean | string[]>>({});
+    const [loading, setLoading] = React.useState(true);
+    const [submitting, setSubmitting] = React.useState(false);
+    const [submitted, setSubmitted] = React.useState(false);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (!specialty) return;
         
         const loadForm = async () => {

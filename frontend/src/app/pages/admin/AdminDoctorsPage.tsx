@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React from 'react';
+
 import { motion } from 'motion/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from "@/lib/i18n";
@@ -23,8 +24,8 @@ interface Doctor {
 
 export default function AdminDoctorsPage() {
     const { t } = useTranslation();
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filter, setFilter] = useState<'all' | 'approved' | 'pending' | 'rejected'>('all');
+    const [searchTerm, setSearchTerm] = React.useState('');
+    const [filter, setFilter] = React.useState<'all' | 'approved' | 'pending' | 'rejected'>('all');
     const queryClient = useQueryClient();
 
     const { data: doctors, isLoading, error } = useQuery({

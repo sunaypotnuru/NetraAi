@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { motion, AnimatePresence } from "motion/react";
 import { HelpCircle, ChevronDown, Search, Users, Shield, CreditCard, Stethoscope, Smartphone } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
@@ -12,9 +13,9 @@ interface FAQ {
 
 export default function FAQPage() {
   const { t } = useTranslation();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [selectedCategory, setSelectedCategory] = React.useState("all");
+  const [openIndex, setOpenIndex] = React.useState<number | null>(null);
 
   const categories = [
     { id: "all", name: t('faq.categories.all', 'All'), icon: HelpCircle },

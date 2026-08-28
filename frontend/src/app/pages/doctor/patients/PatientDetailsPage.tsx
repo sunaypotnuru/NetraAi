@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router';
@@ -19,7 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { useEffect } from 'react';
+
 import { toast } from 'sonner';
 import { useWebSocket } from '@/app/contexts/WebSocketContext';
 import { doctorAPI } from '@/lib/api';
@@ -56,10 +56,10 @@ export default function PatientDetailsPage() {
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
   const { send } = useWebSocket();
-  const [activeTab, setActiveTab] = useState('overview');
-  const [collaborators, setCollaborators] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = React.useState('overview');
+  const [collaborators, setCollaborators] = React.useState<any[]>([]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const setupCollaboration = async () => {
       try {
         const manager = getWebSocketManager();
@@ -144,7 +144,7 @@ export default function PatientDetailsPage() {
     enabled: !!patientId
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     const setupRealtime = async () => {
       try {
         const manager = getWebSocketManager();

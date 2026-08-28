@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { Upload, Activity, AlertCircle, ArrowLeft, ShieldCheck, Stethoscope, HeartPulse } from "lucide-react";
@@ -18,11 +19,11 @@ interface AnemiaResult {
 }
 
 export default function AnemiaDetectionPage() {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [result, setResult] = useState<AnemiaResult | null>(null);
-  const [qualityStatus, setQualityStatus] = useState<'checking' | 'good' | 'poor' | null>(null);
-  const [qualityMessage, setQualityMessage] = useState<string>('');
+  const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
+  const [result, setResult] = React.useState<AnemiaResult | null>(null);
+  const [qualityStatus, setQualityStatus] = React.useState<'checking' | 'good' | 'poor' | null>(null);
+  const [qualityMessage, setQualityMessage] = React.useState<string>('');
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { t } = useTranslation();

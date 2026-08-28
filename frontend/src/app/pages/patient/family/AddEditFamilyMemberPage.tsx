@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React from 'react';
+
 import { motion } from "motion/react";
 import {
   ArrowLeft,
@@ -34,18 +35,18 @@ export default function AddEditFamilyMemberPage() {
   const { memberId } = useParams<{ memberId?: string }>();
   const isEditMode = !!memberId;
 
-  const [isLoading, setIsLoading] = useState(isEditMode);
-  const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = React.useState(isEditMode);
+  const [isSaving, setIsSaving] = React.useState(false);
 
   // Form state
-  const [name, setName] = useState("");
-  const [relationship, setRelationship] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState<Date>(new Date());
-  const [gender, setGender] = useState("Male");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [canViewRecords, setCanViewRecords] = useState(false);
-  const [canBookAppointments, setCanBookAppointments] = useState(false);
+  const [name, setName] = React.useState("");
+  const [relationship, setRelationship] = React.useState("");
+  const [dateOfBirth, setDateOfBirth] = React.useState<Date>(new Date());
+  const [gender, setGender] = React.useState("Male");
+  const [phone, setPhone] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [canViewRecords, setCanViewRecords] = React.useState(false);
+  const [canBookAppointments, setCanBookAppointments] = React.useState(false);
 
   const relationshipOptions = [
     { value: "Parent", label: t('patient.family.rel_parent', "Parent"), icon: "👨‍👩‍👦" },
@@ -56,7 +57,7 @@ export default function AddEditFamilyMemberPage() {
     { value: "Other", label: t('patient.family.rel_other', "Other"), icon: "👤" }
   ];
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (isEditMode && memberId) {
       fetchMemberDetails();
     }

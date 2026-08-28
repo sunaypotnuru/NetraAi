@@ -11,7 +11,7 @@
  * - Messaging analytics
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'motion/react';
 import { Card } from '@/components/ui/card';
@@ -38,7 +38,7 @@ import {
 } from 'lucide-react';
 
 export function HealthcareAnalyticsDashboard() {
-  const [dateRange, setDateRange] = useState({
+  const [dateRange, setDateRange] = React.useState({
     start_date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
     end_date: new Date().toISOString(),
   });

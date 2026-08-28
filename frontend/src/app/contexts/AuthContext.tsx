@@ -1,4 +1,4 @@
-import { createContext, useContext, ReactNode, useEffect, useState } from 'react';
+import React from 'react';
 import { useAuthStore } from '../../lib/store';
 
 export type Role = 'patient' | 'doctor' | 'admin' | null;
@@ -17,19 +17,19 @@ interface AuthContextType {
     logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
 
 /**
  * AuthProvider is now a thin wrapper over useAuthStore (Zustand).
  * This ensures ProtectedRoute, AdminRoute, and NavbarMain all read
  * from the SAME single source of truth — no split-brain issues.
  */
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { user: storeUser, loading: storeLoading, loadUser } = useAuthStore();
-    const [isInitialized, setIsInitialized] = useState(false);
+    const [isInitialized, setIsInitialized] = React.useState(false);
 
     // Initialize user session on app startup
-    useEffect(() => {
+    React.useEffect(() => {
         loadUser().finally(() => {
             setIsInitialized(true);
         });
@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const useAuth = () => {
-    const context = useContext(AuthContext);
+    const context = React.useContext(AuthContext);
     if (context === undefined) {
         throw new Error('useAuth must be used within an AuthProvider');
     }

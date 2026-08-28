@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import React from 'react';
+
 import { motion } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from "@/lib/i18n";
@@ -28,13 +29,13 @@ interface ScansResponse {
 
 export default function AdminScansPage() {
     const { t } = useTranslation();
-    const [searchTerm, setSearchTerm] = useState('');
-    const [riskFilter, setRiskFilter] = useState('All');
-    const [page, setPage] = useState(1);
+    const [searchTerm, setSearchTerm] = React.useState('');
+    const [riskFilter, setRiskFilter] = React.useState('All');
+    const [page, setPage] = React.useState(1);
     const limit = 20;
 
     // Reset page on filter change
-    useEffect(() => {
+    React.useEffect(() => {
         setPage(1);
     }, [searchTerm, riskFilter]);
 

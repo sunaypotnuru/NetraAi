@@ -1,3 +1,4 @@
+import React from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Sparkles, Save, X } from "lucide-react";
@@ -5,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { clinicalNoteSchema, type ClinicalNoteValues } from "@/lib/schemas";
 import SOAPEditor from "./SOAPEditor";
-import { useState } from "react";
+
 import { aiAPI } from "@/lib/api";
 import { toast } from "sonner";
 import { useTranslation } from "@/lib/i18n";
@@ -28,7 +29,7 @@ export default function ClinicalNoteForm({
   isSubmitting = false,
 }: ClinicalNoteFormProps) {
   const { t } = useTranslation();
-  const [isAIEnhancing, setIsAIEnhancing] = useState(false);
+  const [isAIEnhancing, setIsAIEnhancing] = React.useState(false);
 
   const form = useForm<ClinicalNoteValues>({
     resolver: zodResolver(clinicalNoteSchema),

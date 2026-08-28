@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
@@ -66,9 +66,9 @@ interface NotificationSettings {
 export default function DoctorNotificationSettings() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState('channels');
-  const [localSettings, setLocalSettings] = useState<Partial<NotificationSettings>>({});
-  const [hasChanges, setHasChanges] = useState(false);
+  const [activeTab, setActiveTab] = React.useState('channels');
+  const [localSettings, setLocalSettings] = React.useState<Partial<NotificationSettings>>({});
+  const [hasChanges, setHasChanges] = React.useState(false);
 
   const { data: remoteSettings, isLoading } = useQuery({
     queryKey: ['doctor-notification-settings'],

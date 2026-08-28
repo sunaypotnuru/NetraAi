@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { motion } from "motion/react";
 import { Search, FileText, FileSignature, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -11,10 +12,10 @@ import { AnimatePresence } from 'motion/react';
 
 export default function SemanticSearchPage() {
   const { t } = useTranslation();
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<{documents: Array<{title: string; description?: string; similarity: number}>, soap_notes: Array<{created_at: string; assessment?: string; plan?: string; similarity: number}>}>({ documents: [], soap_notes: [] });
-  const [loading, setLoading] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
+  const [query, setQuery] = React.useState("");
+  const [results, setResults] = React.useState<{documents: Array<{title: string; description?: string; similarity: number}>, soap_notes: Array<{created_at: string; assessment?: string; plan?: string; similarity: number}>}>({ documents: [], soap_notes: [] });
+  const [loading, setLoading] = React.useState(false);
+  const [hasSearched, setHasSearched] = React.useState(false);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();

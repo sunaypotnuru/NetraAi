@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import React from 'react';
+
 import { useThemeStore } from "@/lib/themeStore";
 
 /**
@@ -7,12 +8,12 @@ import { useThemeStore } from "@/lib/themeStore";
  * Respects prefers-reduced-motion.
  */
 export function FuturisticBackground() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const { theme } = useThemeStore();
-  const [isDark, setIsDark] = useState(false);
-  const rafRef = useRef<number>(0);
+  const [isDark, setIsDark] = React.useState(false);
+  const rafRef = React.useRef<number>(0);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const updateTheme = () => {
       if (theme === "system") {
         const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -31,7 +32,7 @@ export function FuturisticBackground() {
     }
   }, [theme]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReduced) return;
 

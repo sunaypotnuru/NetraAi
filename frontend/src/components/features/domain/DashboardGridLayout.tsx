@@ -1,4 +1,5 @@
-import { ReactNode } from 'react';
+import React from 'react';
+
 import GridLayout, { Layout } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-grid-layout/css/resizable.css';

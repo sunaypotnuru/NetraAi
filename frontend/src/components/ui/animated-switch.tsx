@@ -10,8 +10,8 @@
  * - Respects reduced motion preferences
  */
 
+import React from 'react';
 import { motion } from 'motion/react';
-import { forwardRef } from 'react';
 import { useAnimationConfig, animationTokens } from '@/animations';
 import { cn } from '@/lib/utils';
 
@@ -33,7 +33,7 @@ interface AnimatedSwitchProps
   disableAnimations?: boolean;
 }
 
-export const AnimatedSwitch = forwardRef<HTMLInputElement, AnimatedSwitchProps>(
+export const AnimatedSwitch = React.forwardRef<HTMLInputElement, AnimatedSwitchProps>(
   (
     {
       label,

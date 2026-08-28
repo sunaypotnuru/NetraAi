@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import {
@@ -33,15 +34,15 @@ interface ExercisePayload {
 export default function DoctorExercisesPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [editingId, setEditingId] = React.useState<string | null>(null);
 
   // Form State
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [difficulty, setDifficulty] = useState("beginner");
-  const [duration, setDuration] = useState(60);
-  const [selectedJoints, setSelectedJoints] = useState<string[]>([]);
+  const [name, setName] = React.useState("");
+  const [description, setDescription] = React.useState("");
+  const [difficulty, setDifficulty] = React.useState("beginner");
+  const [duration, setDuration] = React.useState(60);
+  const [selectedJoints, setSelectedJoints] = React.useState<string[]>([]);
 
   const JOINT_OPTIONS = [
     t("doctor.exercises.joint_left_shoulder", "LEFT_SHOULDER"),

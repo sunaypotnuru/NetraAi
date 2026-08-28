@@ -16,7 +16,7 @@
  * </AnimatedTooltip>
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useReducedMotion } from '@/animations';
 import { animationTokens } from '@/animations/tokens';
@@ -41,12 +41,12 @@ export const AnimatedTooltip: React.FC<AnimatedTooltipProps> = ({
   delay = 200,
   className = '',
 }) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [actualPosition, setActualPosition] = useState(position);
+  const [isVisible, setIsVisible] = React.useState(false);
+  const [actualPosition, setActualPosition] = React.useState(position);
   const prefersReducedMotion = useReducedMotion();
-  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  const triggerRef = useRef<HTMLDivElement>(null);
-  const tooltipRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = React.useRef<NodeJS.Timeout | undefined>(undefined);
+  const triggerRef = React.useRef<HTMLDivElement>(null);
+  const tooltipRef = React.useRef<HTMLDivElement>(null);
 
   const showTooltip = () => {
     timeoutRef.current = setTimeout(() => {
@@ -99,14 +99,14 @@ export const AnimatedTooltip: React.FC<AnimatedTooltipProps> = ({
     setActualPosition(newPosition);
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (isVisible) {
       updatePosition();
     }
      
   }, [isVisible]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);

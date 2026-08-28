@@ -23,7 +23,7 @@
  * </AnimatedDrawer>
  */
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X } from 'lucide-react';
 import { useReducedMotion } from '@/animations';
@@ -96,11 +96,11 @@ export const AnimatedDrawer: React.FC<AnimatedDrawerProps> = ({
   className = '',
 }) => {
   const prefersReducedMotion = useReducedMotion();
-  const drawerRef = useRef<HTMLDivElement>(null);
-  const previousActiveElement = useRef<HTMLElement | null>(null);
+  const drawerRef = React.useRef<HTMLDivElement>(null);
+  const previousActiveElement = React.useRef<HTMLElement | null>(null);
 
   // Lock body scroll when drawer is open
-  useEffect(() => {
+  React.useEffect(() => {
     if (isOpen) {
       previousActiveElement.current = document.activeElement as HTMLElement;
       document.body.style.overflow = 'hidden';
@@ -123,7 +123,7 @@ export const AnimatedDrawer: React.FC<AnimatedDrawerProps> = ({
   }, [isOpen]);
 
   // Handle escape key
-  useEffect(() => {
+  React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
         onClose();

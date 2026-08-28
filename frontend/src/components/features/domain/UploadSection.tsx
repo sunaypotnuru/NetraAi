@@ -1,13 +1,14 @@
+import React from 'react';
 import { motion } from "motion/react";
 import { Upload, Camera, FileImage } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+
 import { useTranslation } from "@/lib/i18n";
 
 export function UploadSection() {
   const { t } = useTranslation();
-  const [isDragging, setIsDragging] = useState(false);
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = React.useState(false);
+  const [uploadedImage, setUploadedImage] = React.useState<string | null>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();

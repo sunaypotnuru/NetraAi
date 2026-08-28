@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * AnimatedToast Component
  * 
@@ -12,7 +13,7 @@
  */
 
 import { motion, AnimatePresence } from 'motion/react';
-import { useEffect, useState } from 'react';
+
 import { useAnimationConfig } from '@/animations';
 import { cn } from '@/lib/utils';
 import { X, CheckCircle2, AlertCircle, AlertTriangle, Info } from 'lucide-react';
@@ -64,11 +65,11 @@ export function AnimatedToast({
   position = 'top',
 }: AnimatedToastProps) {
   const { shouldReduceMotion, getTransition } = useAnimationConfig();
-  const [isPaused, setIsPaused] = useState(false);
+  const [isPaused, setIsPaused] = React.useState(false);
   const Icon = toastIcons[toast.type];
 
   // Auto-dismiss logic
-  useEffect(() => {
+  React.useEffect(() => {
     if (toast.type === 'error' || isPaused) return;
 
     const duration = toast.duration || 5000;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
@@ -54,13 +54,13 @@ interface BlogsResponse {
 export default function AdminBlogsPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('created_at');
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [statusFilter, setStatusFilter] = React.useState('all');
+  const [sortBy, setSortBy] = React.useState('created_at');
+  const [isFormOpen, setIsFormOpen] = React.useState(false);
+  const [editingId, setEditingId] = React.useState<string | null>(null);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = React.useState({
     title: '',
     content: '',
     excerpt: '',
@@ -73,7 +73,7 @@ export default function AdminBlogsPage() {
     slug: ''
   });
 
-  const [newTag, setNewTag] = useState('');
+  const [newTag, setNewTag] = React.useState('');
 
   // API call to get blogs using centralized blogsAPI
   const { data: blogsData, isLoading, refetch } = useQuery({
@@ -237,8 +237,6 @@ export default function AdminBlogsPage() {
   const total = blogs.length;
   const total_published = blogs.filter(b => b.published !== false).length;
   const total_drafts = blogs.filter(b => b.published === false).length;
-
-
 
   return (
     <div className="min-h-screen pt-3 pb-12 px-6 bg-white dark:bg-[#0B0F1A]">

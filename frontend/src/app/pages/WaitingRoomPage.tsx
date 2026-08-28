@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+import React from 'react';
+
 import { useParams, useNavigate } from 'react-router';
 import { motion } from 'motion/react';
 import {
@@ -20,20 +21,20 @@ export default function WaitingRoomPage() {
     const { t } = useTranslation();
     const { appointmentId } = useParams();
     const navigate = useNavigate();
-    const [symptoms, setSymptoms] = useState('');
-    const [submittingIntake, setSubmittingIntake] = useState(false);
-    const [intakeDone, setIntakeDone] = useState(false);
+    const [symptoms, setSymptoms] = React.useState('');
+    const [submittingIntake, setSubmittingIntake] = React.useState(false);
+    const [intakeDone, setIntakeDone] = React.useState(false);
 
     // Camera/mic test
-    const videoRef = useRef<HTMLVideoElement>(null);
-    const [cameraOn, setCameraOn] = useState(false);
-    const [micOn, setMicOn] = useState(false);
-    const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
+    const videoRef = React.useRef<HTMLVideoElement>(null);
+    const [cameraOn, setCameraOn] = React.useState(false);
+    const [micOn, setMicOn] = React.useState(false);
+    const [mediaStream, setMediaStream] = React.useState<MediaStream | null>(null);
 
     // Queue and countdown
-    const [queuePos, setQueuePos] = useState(Math.floor(Math.random() * 3) + 1);
-    const [waitTime, setWaitTime] = useState(queuePos * 5 * 60);
-    const [isCallReady, setIsCallReady] = useState(false);
+    const [queuePos, setQueuePos] = React.useState(Math.floor(Math.random() * 3) + 1);
+    const [waitTime, setWaitTime] = React.useState(queuePos * 5 * 60);
+    const [isCallReady, setIsCallReady] = React.useState(false);
 
     // Doctor info (mocked — in production fetch from appointment details)
     const doctor = {
@@ -43,16 +44,16 @@ export default function WaitingRoomPage() {
         avatar: null,
     };
 
-    useEffect(() => {
+    React.useEffect(() => {
         const timer = setInterval(() => setWaitTime(w => (w > 0 ? w - 1 : 0)), 1000);
         return () => clearInterval(timer);
     }, []);
 
     const { isConnected, connect } = useWebSocket();
-    const socketHandled = useRef(false);
+    const socketHandled = React.useRef(false);
 
     // Real-time subscription for waiting queue updates
-    useEffect(() => {
+    React.useEffect(() => {
         if (!appointmentId) return;
 
         const fetchQueueStatus = async () => {
@@ -122,7 +123,7 @@ export default function WaitingRoomPage() {
         };
     }, [appointmentId, t, connect]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         return () => {
             // Clean up media stream on unmount
             mediaStream?.getTracks().forEach(t => t.stop());

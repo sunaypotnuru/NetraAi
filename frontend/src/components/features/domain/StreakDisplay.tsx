@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import React from 'react';
+
 import { Flame, Trophy, Calendar, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,10 +20,10 @@ interface StreakDisplayProps {
 
 export default function StreakDisplay({ userId, compact = false }: StreakDisplayProps) {
   const { t } = useTranslation();
-  const [streakData, setStreakData] = useState<StreakData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [streakData, setStreakData] = React.useState<StreakData | null>(null);
+  const [loading, setLoading] = React.useState(true);
 
-  useEffect(() => {
+  React.useEffect(() => {
     fetchStreakData();
   }, [userId]);
 

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React from 'react';
+
 import { motion, AnimatePresence } from 'motion/react';
 import { StaggerContainer, StaggerItem, ScaleIn, FadeIn } from "@/animations";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -56,8 +57,8 @@ export default function DoctorVerificationPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [verificationNotes, setVerificationNotes] = useState('');
-  const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
+  const [verificationNotes, setVerificationNotes] = React.useState('');
+  const [selectedDocument, setSelectedDocument] = React.useState<string | null>(null);
 
   // Fetch doctor details
   const { data: doctor, isLoading } = useQuery({

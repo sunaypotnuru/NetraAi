@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { useParams, useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { FileText, Eye, Video, Activity, Loader2, ChevronDown, Plus, Download, AlertCircle, ArrowLeft, Clock, Sparkles } from "lucide-react";
@@ -53,10 +54,10 @@ export default function PatientTimelineView() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const [expandedId, setExpandedId] = useState<string | number | null>(null);
-    const [isAddNoteOpen, setIsAddNoteOpen] = useState(false);
-    const [newNote, setNewNote] = useState({ content: "", note_type: "soap", is_ai_generated: false });
-    const [isAIEnhancing, setIsAIEnhancing] = useState(false);
+    const [expandedId, setExpandedId] = React.useState<string | number | null>(null);
+    const [isAddNoteOpen, setIsAddNoteOpen] = React.useState(false);
+    const [newNote, setNewNote] = React.useState({ content: "", note_type: "soap", is_ai_generated: false });
+    const [isAIEnhancing, setIsAIEnhancing] = React.useState(false);
 
     // Fetch patient info
     const { data: patient, isLoading: loadingPatient } = useQuery<PatientDetails>({

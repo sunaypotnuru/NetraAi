@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React from 'react';
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -28,15 +29,15 @@ interface AdvancedSearchModalProps {
 
 export default function AdvancedSearchModal({ open, onClose, onResults }: AdvancedSearchModalProps) {
   const { t } = useTranslation();
-  const [query, setQuery] = useState('');
-  const [entityType, setEntityType] = useState<string>('');
-  const [status, setStatus] = useState<string>('');
-  const [category, setCategory] = useState<string>('');
-  const [dateFrom, setDateFrom] = useState<Date>();
-  const [dateTo, setDateTo] = useState<Date>();
-  const [sortBy, setSortBy] = useState('created_at');
-  const [sortOrder, setSortOrder] = useState('desc');
-  const [loading, setLoading] = useState(false);
+  const [query, setQuery] = React.useState('');
+  const [entityType, setEntityType] = React.useState<string>('');
+  const [status, setStatus] = React.useState<string>('');
+  const [category, setCategory] = React.useState<string>('');
+  const [dateFrom, setDateFrom] = React.useState<Date>();
+  const [dateTo, setDateTo] = React.useState<Date>();
+  const [sortBy, setSortBy] = React.useState('created_at');
+  const [sortOrder, setSortOrder] = React.useState('desc');
+  const [loading, setLoading] = React.useState(false);
 
   const handleSearch = async () => {
     setLoading(true);

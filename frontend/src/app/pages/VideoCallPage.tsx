@@ -1,5 +1,6 @@
+import React from 'react';
 /// <reference types="vite/client" />
-import { useEffect, useState, useCallback, useRef } from "react";
+
 import { useParams, useNavigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import { LiveKitRoom, VideoConference, RoomAudioRenderer, useLocalParticipant } from "@livekit/components-react";
@@ -55,40 +56,40 @@ export default function VideoCallPage() {
   const { user } = useAuthStore();
   const isDoctor = user?.role === 'doctor';
 
-  const [token, setToken] = useState("");
-  const [isMockMode, setIsMockMode] = useState(false);
+  const [token, setToken] = React.useState("");
+  const [isMockMode, setIsMockMode] = React.useState(false);
   const serverUrl = import.meta.env.VITE_LIVEKIT_URL || "wss://netrai-consult-b4c4xk1c.livekit.cloud";
 
   // Simulated Media State for Mock Mode
-  const localVideoRef = useRef<HTMLVideoElement>(null);
-  const [localCamOn, setLocalCamOn] = useState(true);
-  const [localMicOn, setLocalMicOn] = useState(true);
-  const [screenSharingMock, setScreenSharingMock] = useState(false);
+  const localVideoRef = React.useRef<HTMLVideoElement>(null);
+  const [localCamOn, setLocalCamOn] = React.useState(true);
+  const [localMicOn, setLocalMicOn] = React.useState(true);
+  const [screenSharingMock, setScreenSharingMock] = React.useState(false);
 
   // Panel States
-  const [activePanel, setActivePanel] = useState<'chat' | 'participants' | 'scribe' | 'whiteboard' | 'history' | 'notes' | null>(null);
-  const [showSettings, setShowSettings] = useState(false);
+  const [activePanel, setActivePanel] = React.useState<'chat' | 'participants' | 'scribe' | 'whiteboard' | 'history' | 'notes' | null>(null);
+  const [showSettings, setShowSettings] = React.useState(false);
 
   // Translation States
-  const [translationActive, setTranslationActive] = useState(false);
-  const [myLanguage, setMyLanguage] = useState(isDoctor ? 'en' : 'hi');
-  const [transcripts] = useState<TranscriptionMessage[]>([]);
+  const [translationActive, setTranslationActive] = React.useState(false);
+  const [myLanguage, setMyLanguage] = React.useState(isDoctor ? 'en' : 'hi');
+  const [transcripts] = React.useState<TranscriptionMessage[]>([]);
 
   // Recording States
-  const [isRecording, setIsRecording] = useState(false);
-  const [egressId, setEgressId] = useState<string | null>(null);
-  const [isTogglingRecord, setIsTogglingRecord] = useState(false);
-  const [showRecordingConsent, setShowRecordingConsent] = useState(false);
-  const [recordingConsentGiven, setRecordingConsentGiven] = useState(false);
+  const [isRecording, setIsRecording] = React.useState(false);
+  const [egressId, setEgressId] = React.useState<string | null>(null);
+  const [isTogglingRecord, setIsTogglingRecord] = React.useState(false);
+  const [showRecordingConsent, setShowRecordingConsent] = React.useState(false);
+  const [recordingConsentGiven, setRecordingConsentGiven] = React.useState(false);
 
   // Notes and History
-  const [clinicalNotes, setClinicalNotes] = useState("");
-  const [savingNotes, setSavingNotes] = useState(false);
-  const [notesSaved, setNotesSaved] = useState(false);
+  const [clinicalNotes, setClinicalNotes] = React.useState("");
+  const [savingNotes, setSavingNotes] = React.useState(false);
+  const [notesSaved, setNotesSaved] = React.useState(false);
 
-  const [connectionState, setConnectionState] = useState<'connecting' | 'ready' | 'failed'>('connecting');
+  const [connectionState, setConnectionState] = React.useState<'connecting' | 'ready' | 'failed'>('connecting');
 
-  const fetchToken = useCallback(async () => {
+  const fetchToken = React.useCallback(async () => {
     if (!user || !appointmentId) return;
     try {
       const res = await videoAPI.getToken(appointmentId, user.name || "Guest");
@@ -111,13 +112,13 @@ export default function VideoCallPage() {
     }
   }, [user, appointmentId]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!user || !appointmentId) return;
     fetchToken();
   }, [user, appointmentId, fetchToken]);
 
   // Setup WebRTC local stream when in mock mode
-  useEffect(() => {
+  React.useEffect(() => {
     if (isMockMode && localCamOn && localVideoRef.current) {
       navigator.mediaDevices.getUserMedia({ video: true, audio: localMicOn })
         .then((stream) => {

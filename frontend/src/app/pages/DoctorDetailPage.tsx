@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React from 'react';
+
 import { useParams, useNavigate } from "react-router";
 import { motion } from "motion/react";
 import {
@@ -25,9 +26,9 @@ export default function DoctorDetailPage() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>("");
-  const [isProcessingPayment, _setIsProcessingPayment] = useState(false);
+  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(new Date());
+  const [selectedTimeSlot, setSelectedTimeSlot] = React.useState<string>("");
+  const [isProcessingPayment, _setIsProcessingPayment] = React.useState(false);
 
   // ── Fetch doctor via backend API (handles both real DB + mock fallback) ──
   const { data: doctor, isLoading } = useQuery({

@@ -1,3 +1,4 @@
+import React from 'react';
 import { Outlet, NavLink, useLocation } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -7,7 +8,7 @@ import {
 
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/store';
-import { useState, useEffect } from 'react';
+
 import { useNavigate } from 'react-router';
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
@@ -18,12 +19,12 @@ import Breadcrumb from '@/components/shared/Breadcrumb';
 export default function AdminLayout() {
     const { t } = useTranslation();
     const location = useLocation();
-    const [sidebarOpen, setSidebarOpen] = useState(true);
-    const [isMobile, setIsMobile] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = React.useState(true);
+    const [isMobile, setIsMobile] = React.useState(false);
     const { signOut } = useAuthStore();
     const navigate = useNavigate();
 
-    useEffect(() => {
+    React.useEffect(() => {
         const checkMobile = () => {
             setIsMobile(window.innerWidth < 1024);
             setSidebarOpen(window.innerWidth >= 1024);

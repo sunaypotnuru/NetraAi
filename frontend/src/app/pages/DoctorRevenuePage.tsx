@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React from 'react';
+
 import { useTranslation } from '../../lib/i18n';
 import { motion } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
@@ -11,7 +12,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 export default function DoctorRevenuePage() {
     const { t } = useTranslation();
-    const [timeFilter, setTimeFilter] = useState('month');
+    const [timeFilter, setTimeFilter] = React.useState('month');
 
     const { data: revenueData, isLoading, error } = useQuery({
         queryKey: ['doctorRevenue', timeFilter],

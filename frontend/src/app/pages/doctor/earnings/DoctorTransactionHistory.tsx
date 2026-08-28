@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
@@ -54,13 +54,13 @@ interface TransactionResponse {
 
 export default function DoctorTransactionHistory() {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [typeFilter, setTypeFilter] = useState('all');
-  const [paymentMethodFilter, setPaymentMethodFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('date');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [selectedDateRange, setSelectedDateRange] = useState<{from: Date, to: Date} | undefined>();
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [statusFilter, setStatusFilter] = React.useState('all');
+  const [typeFilter, setTypeFilter] = React.useState('all');
+  const [paymentMethodFilter, setPaymentMethodFilter] = React.useState('all');
+  const [sortBy, setSortBy] = React.useState('date');
+  const [sortOrder, setSortOrder] = React.useState<'asc' | 'desc'>('desc');
+  const [selectedDateRange, setSelectedDateRange] = React.useState<{from: Date, to: Date} | undefined>();
 
   const { data: transactionData, isLoading, isError, refetch } = useQuery({
     queryKey: ['doctor-transactions', statusFilter, typeFilter, paymentMethodFilter, sortBy, sortOrder, selectedDateRange],
