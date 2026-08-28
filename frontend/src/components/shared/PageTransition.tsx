@@ -11,7 +11,7 @@ import { motion } from 'motion/react';
 
 
 interface PageTransitionProps {
-  children: ReactNode;
+  children: React.ReactNode;
   className?: string;
 }
 

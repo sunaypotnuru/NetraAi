@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface RevealOnScrollProps {
-  children: ReactNode;
+  children: React.ReactNode;
   className?: string;
   delay?: number;
 }

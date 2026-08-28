@@ -12,7 +12,7 @@ import { animationTokens } from '../tokens';
 import { useAnimationConfig } from '../hooks/useReducedMotion';
 
 interface FadeInProps {
-  children: ReactNode;
+  children: React.ReactNode;
   /**
    * Delay before animation starts (in seconds)
    * @default 0

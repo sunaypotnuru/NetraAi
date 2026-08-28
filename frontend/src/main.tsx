@@ -34,9 +34,9 @@ window.addEventListener('unhandledrejection', (event) => {
 // Handle resource loading errors (CDN failures, CORS issues)
 window.addEventListener('error', (event) => {
   if (event.target && event.target !== window) {
-    const target = event.target as HTMLElement;
+    const target = event.target as HTMLScriptElement | HTMLLinkElement | HTMLImageElement;
     if (target.tagName === 'SCRIPT' || target.tagName === 'LINK' || target.tagName === 'IMG') {
-      console.warn('External resource failed to load:', target.src || target.href);
+      console.warn('External resource failed to load:', (target as HTMLScriptElement | HTMLImageElement).src || (target as HTMLLinkElement).href);
       // Don't break the app for external resource failures
       event.preventDefault();
     }

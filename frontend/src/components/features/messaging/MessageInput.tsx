@@ -35,7 +35,7 @@ export default function MessageInput({
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     // Enter to send, Shift+Enter for new line
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();

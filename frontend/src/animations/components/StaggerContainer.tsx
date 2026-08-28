@@ -12,7 +12,7 @@ import { animationTokens } from '../tokens';
 import { useAnimationConfig } from '../hooks/useReducedMotion';
 
 interface StaggerContainerProps {
-  children: ReactNode;
+  children: React.ReactNode;
   /**
    * Stagger delay between children
    * @default 'normal'
@@ -117,7 +117,7 @@ export function StaggerContainer({
  * Automatically inherits stagger animation from parent.
  */
 interface StaggerItemProps {
-  children: ReactNode;
+  children: React.ReactNode;
   className?: string;
 }
 

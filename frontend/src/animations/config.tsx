@@ -11,7 +11,7 @@ import { MotionConfig } from 'motion/react';
 import { animationTokens } from './tokens';
 
 interface AnimationProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 /**

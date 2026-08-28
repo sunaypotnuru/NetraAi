@@ -12,7 +12,7 @@ import { animationTokens } from '../tokens';
 import { useAnimationConfig } from '../hooks/useReducedMotion';
 
 interface ScrollRevealProps {
-  children: ReactNode;
+  children: React.ReactNode;
   /**
    * Animation direction
    * @default 'up'

@@ -65,7 +65,7 @@ export default function PROSubmissionPage() {
     onError: () => toast.error(t("patient.pro.submit_error", "Failed to submit questionnaire"))
   });
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!selectedQuestionnaire) return;
@@ -193,7 +193,7 @@ export default function PROSubmissionPage() {
                         min="1"
                         max="10"
                         value={responses[currentQuestion.id] || ""}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => setResponses({ ...responses, [currentQuestion.id]: e.target.value })}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setResponses({ ...responses, [currentQuestion.id]: e.target.value })}
                         placeholder={t("patient.pro.placeholder_number", "Enter a number from 1 to 10")}
                         className="text-lg p-6 text-center font-bold bg-white/60 dark:bg-slate-950/60 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 rounded-xl transition-all"
                       />
@@ -231,7 +231,7 @@ export default function PROSubmissionPage() {
                   {currentQuestion.type === 'text' && (
                     <Textarea
                       value={responses[currentQuestion.id] || ""}
-                      onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setResponses({ ...responses, [currentQuestion.id]: e.target.value })}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setResponses({ ...responses, [currentQuestion.id]: e.target.value })}
                       placeholder={t("patient.pro.placeholder_text", "Type your answer here...")}
                       rows={6}
                       className="text-lg bg-white/60 dark:bg-slate-950/60 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 rounded-xl transition-all"
@@ -254,7 +254,7 @@ export default function PROSubmissionPage() {
                             name={currentQuestion.id}
                             value={option}
                             checked={responses[currentQuestion.id] === option}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => setResponses({ ...responses, [currentQuestion.id]: e.target.value })}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setResponses({ ...responses, [currentQuestion.id]: e.target.value })}
                             className="w-5 h-5 text-blue-500 focus:ring-blue-500/30 border-slate-300 dark:border-white/10"
                           />
                           <span className="text-lg font-medium">{option}</span>

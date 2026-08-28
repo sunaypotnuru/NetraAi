@@ -12,21 +12,21 @@ import ErrorBoundary from "../components/shared/ErrorBoundary";
 import { ECGLoadingScreen } from "../components/shared/ECGLoadingScreen";
 import ProtectedRoute from "../components/features/domain/ProtectedRoute";
 
-// Helper to wrap lazy components with Suspense and auto-recovery for chunk errors
+// Helper to wrap React.lazy components with React.Suspense and auto-recovery for chunk errors
 const withSuspense = (LazyComp: React.LazyExoticComponent<any>) => {
     const Wrapped: React.FC<any> = (props) => (
         <ErrorBoundary>
-            <Suspense fallback={<ECGLoadingScreen />}>
+            <React.Suspense fallback={<ECGLoadingScreen />}>
                 <LazyComp {...props} />
-            </Suspense>
+            </React.Suspense>
         </ErrorBoundary>
     );
     return Wrapped;
 };
 
-// Error-resilient lazy loader to handle version mismatches/chunk load errors
-const lazyWithRetry = (componentImport: () => Promise<{ default: ComponentType<any> }>) =>
-    lazy(async () => {
+// Error-resilient React.lazy loader to handle version mismatches/chunk load errors
+const lazyWithRetry = (componentImport: () => Promise<{ default: React.ComponentType<any> }>) =>
+    React.lazy(async () => {
         try {
             return await componentImport();
         } catch (error: any) {

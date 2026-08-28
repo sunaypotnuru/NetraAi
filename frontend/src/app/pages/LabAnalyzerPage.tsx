@@ -47,7 +47,7 @@ export default function LabAnalyzerPage() {
         }
     });
 
-    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const selected = e.target.files[0];
             if (selected.size > 10 * 1024 * 1024) {

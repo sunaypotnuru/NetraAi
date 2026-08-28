@@ -12,7 +12,7 @@ import { animationTokens } from '../tokens';
 import { useAnimationConfig } from '../hooks/useReducedMotion';
 
 interface SlideInProps {
-  children: ReactNode;
+  children: React.ReactNode;
   /**
    * Direction to slide from
    * @default 'bottom'

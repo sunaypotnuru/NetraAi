@@ -4,7 +4,7 @@ import { useAuth } from '@/app/contexts/AuthContext';
 
 import { ECGLoadingScreen } from '@/components/shared/ECGLoadingScreen';
 
-const AdminRoute = ({ children }: { children: ReactNode }) => {
+const AdminRoute = ({ children }: { children: React.ReactNode }) => {
     const { user, isLoading } = useAuth();
 
     if (isLoading) {

@@ -12,7 +12,7 @@ import { animationTokens } from '../tokens';
 import { useAnimationConfig } from '../hooks/useReducedMotion';
 
 interface ScaleInProps {
-  children: ReactNode;
+  children: React.ReactNode;
   /**
    * Initial scale value
    * @default 0.95

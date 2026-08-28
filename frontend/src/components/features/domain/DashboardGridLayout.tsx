@@ -8,7 +8,7 @@ interface DashboardGridLayoutProps {
   layout: Layout[];
   onLayoutChange: (layout: Layout[]) => void;
   isCustomizing: boolean;
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export default function DashboardGridLayout({

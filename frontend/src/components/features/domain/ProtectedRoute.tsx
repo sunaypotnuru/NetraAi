@@ -5,7 +5,7 @@ import { useAuth } from '@/app/contexts/AuthContext';
 import { ECGLoadingScreen } from '@/components/shared/ECGLoadingScreen';
 
 interface ProtectedRouteProps {
-    children?: ReactNode;
+    children?: React.ReactNode;
     allowedRoles?: ('patient' | 'doctor' | 'admin')[];
 }
 
