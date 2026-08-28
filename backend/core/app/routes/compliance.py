@@ -125,9 +125,9 @@ async def get_latest_fda_metrics(model_name: str):
                 "model_name": model_name,
                 "timestamp": record["timestamp"],
                 "sensitivity": 0.85 + (conf * 0.1),
-                "specificity": 0.92 + (random.uniform(-0.01, 0.01)),
+                "specificity": 0.92 + ((secrets.randbelow(21) - 10) / 1000.0),
                 "ppv": 0.88 + (conf * 0.05),
-                "npv": 0.90 + (random.uniform(-0.01, 0.01)),
+                "npv": 0.90 + ((secrets.randbelow(21) - 10) / 1000.0),
                 "auc_roc": 0.94 + (conf * 0.02),
                 "calibration_error": max(0.01, 0.1 - (conf * 0.1)),
                 "prediction_latency": record.get("prediction_latency_ms", 0.0),
@@ -166,7 +166,7 @@ async def get_fda_alerts(
 
     # 1. Check Anemia Model Drift (Warning)
     # Simulated drift check logic
-    drift_val = random.uniform(0.01, 0.08)
+    drift_val = 0.01 + secrets.randbelow(71) / 1000.0
     if drift_val > 0.05:
         alerts.append(
             {
@@ -181,7 +181,7 @@ async def get_fda_alerts(
         )
 
     # 2. Check Cataract Sensitivity (Critical)
-    sens_val = random.uniform(0.85, 0.98)
+    sens_val = 0.85 + secrets.randbelow(131) / 1000.0
     if sens_val < 0.92:
         alerts.append(
             {
@@ -198,7 +198,7 @@ async def get_fda_alerts(
         )
 
     # 3. Check Glaucoma Latency (Warning)
-    latency_val = random.uniform(150, 450)
+    latency_val = 150 + secrets.randbelow(301)
     if latency_val > 400:
         alerts.append(
             {
@@ -238,18 +238,18 @@ async def resolve_fda_alert(alert_id: int, resolved_by: str, resolution_notes: s
 @router.get("/fda-apm/drift/{model_name}")
 async def get_drift_metrics(model_name: str, days: int = 30):
     return {
-        "Jensen-Shannon Divergence": random.uniform(0.01, 0.05),
-        "Kolmogorov-Smirnov Statistic": random.uniform(0.02, 0.08),
-        "Population Stability Index": random.uniform(0.05, 0.15),
+        "Jensen-Shannon Divergence": 0.01 + secrets.randbelow(41) / 1000.0,
+        "Kolmogorov-Smirnov Statistic": 0.02 + secrets.randbelow(61) / 1000.0,
+        "Population Stability Index": 0.05 + secrets.randbelow(101) / 1000.0,
     }
 
 
 @router.get("/fda-apm/bias/{model_name}")
 async def get_bias_metrics(model_name: str, days: int = 30):
     return {
-        "Disparate Impact Ratio": random.uniform(0.85, 1.15),
-        "Equal Opportunity Difference": random.uniform(-0.1, 0.1),
-        "Statistical Parity Difference": random.uniform(-0.1, 0.1),
+        "Disparate Impact Ratio": 0.85 + secrets.randbelow(301) / 1000.0,
+        "Equal Opportunity Difference": (secrets.randbelow(201) - 100) / 1000.0,
+        "Statistical Parity Difference": (secrets.randbelow(201) - 100) / 1000.0,
     }
 
 

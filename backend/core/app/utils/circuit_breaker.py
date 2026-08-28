@@ -367,6 +367,6 @@ async def call_anemia_model_with_protection(image_data: bytes):
 
 # Get metrics
 metrics = await anemia_breaker.get_metrics()
-print(f"Circuit state: {metrics['state']}")
-print(f"Failure rate: {metrics['failure_rate']}%")
+logger.info(f"Circuit state: {metrics['state']}")
+logger.info(f"Failure rate: {metrics['failure_rate']}%")
 """
