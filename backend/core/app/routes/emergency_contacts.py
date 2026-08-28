@@ -9,7 +9,7 @@ from typing import List, Optional
 import logging
 from datetime import datetime
 
-from app.core.dependencies import get_current_user, get_current_patient
+from app.core.security import get_current_user, get_current_patient
 from app.core.supabase_client import supabase
 from app.core.schemas import TokenPayload
 from app.utils.validators import validate_phone
