@@ -17,7 +17,7 @@ export default function ModelsPage() {
       path: "/patient/scan",
       color: "#0D9488",
       bg: "#F0FDFA",
-      status: "primary",
+      status: "deployed",
       accuracy: "90%"
     },
     {
@@ -28,7 +28,7 @@ export default function ModelsPage() {
       path: "/patient/cataract-scan",
       color: "#8B5CF6",
       bg: "#FAF5FF",
-      status: "active",
+      status: "deployed",
       accuracy: "95%"
     },
     {
@@ -39,7 +39,7 @@ export default function ModelsPage() {
       path: "/patient/dr-scan",
       color: "#3B82F6",
       bg: "#EEF2FF",
-      status: "active",
+      status: "deployed",
       accuracy: "95%"
     },
     {
@@ -50,7 +50,7 @@ export default function ModelsPage() {
       path: "/patient/mental-health",
       color: "#EC4899",
       bg: "#FDF2F8",
-      status: "active",
+      status: "deployed",
       accuracy: "88%"
     },
     {
@@ -61,7 +61,7 @@ export default function ModelsPage() {
       path: "/patient/parkinsons-voice",
       color: "#F59E0B",
       bg: "#FFFBEB",
-      status: "active",
+      status: "training",
       accuracy: "85-92%"
     }
   ];
@@ -112,12 +112,15 @@ export default function ModelsPage() {
                 </div>
 
                 {/* Status Badge */}
-                {model.status === "primary" && (
-                  <span className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-3 self-start"
-                    style={{ backgroundColor: `${model.color}20`, color: model.color }}>
-                    ⭐ {t("models.status.primary", "Primary")}
+                {model.status === "deployed" ? (
+                  <span className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-3 self-start bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400">
+                    {t("models.status.deployed", "Deployed")}
                   </span>
-                )}
+                ) : model.status === "training" ? (
+                  <span className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-3 self-start bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400">
+                    {t("models.status.training", "Training")}
+                  </span>
+                ) : null}
 
                 {/* Title */}
                 <h3 className="text-foreground text-xl leading-tight mb-2">

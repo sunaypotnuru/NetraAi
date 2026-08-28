@@ -87,7 +87,10 @@ export default defineConfig({
           // ── MUI (large, only used on some pages) ──────────────────
           if (id.includes('node_modules/@mui')) return 'mui';
 
-          // ── Everything else (React, Radix, router, forms, etc.) ───
+          // ⚠️ Everything else (React, Radix, router, forms, etc.) ⚠️
+          if (id.includes('node_modules/@radix-ui')) return 'radix';
+          if (id.match(/\/node_modules\/react(-dom|-router-dom)?\//)) return 'react';
+
           // Kept together in 'vendor' to avoid chunk-initialization
           // race conditions (e.g. React.forwardRef undefined).
           return 'vendor';
