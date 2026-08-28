@@ -1,12 +1,3 @@
----
-title: Netra Core Api
-emoji: 🚀
-colorFrom: red
-colorTo: red
-sdk: docker
-pinned: false
----
-
 # 🏥 HealthSight AI — Next-Generation Preventive Telemedicine Platform
 
 > **Complete telemedicine ecosystem with 5 AI models, video consultations, EHR integration & clinical decision support. Healthcare redefined.**
