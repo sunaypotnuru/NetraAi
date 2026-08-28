@@ -97,7 +97,9 @@ async def get_dashboard(current_user: TokenPayload = Depends(get_current_patient
             }
             try:
                 # Use upsert to prevent race condition errors
-                supabase.table("profiles_patient").upsert(new_profile, on_conflict="id").execute()
+                supabase.table("profiles_patient").upsert(
+                    new_profile, on_conflict="id"
+                ).execute()
             except Exception as insert_err:
                 logger.warning(f"Could not upsert profile: {insert_err}")
                 # Try to fetch again in case another request created it
@@ -337,7 +339,7 @@ async def upload_scan(
             "hemoglobin_level": None,
             "recommendation": "AI analysis unavailable. Image saved for manual review by healthcare provider.",
             "is_fallback": True,
-            "fallback_reason": "AI service not available"
+            "fallback_reason": "AI service not available",
         }
 
         try:
@@ -362,7 +364,9 @@ async def upload_scan(
                     logger.error(
                         f"AI Service returned error: {ai_response.status_code}"
                     )
-                    ai_result["fallback_reason"] = f"AI service error: {ai_response.status_code}"
+                    ai_result["fallback_reason"] = (
+                        f"AI service error: {ai_response.status_code}"
+                    )
         except httpx.TimeoutException:
             logger.error("AI Service timeout - using fallback result")
             ai_result["fallback_reason"] = "AI service timeout (30s)"
@@ -426,7 +430,9 @@ async def upload_scan(
             hb_value = float(scan_data["hemoglobin_estimate"])
             if hb_value < 7 or hb_value > 20:
                 # Medical range for hemoglobin: 7-20 g/dL
-                logger.warning(f"Hemoglobin value {hb_value} outside medical range, setting to None")
+                logger.warning(
+                    f"Hemoglobin value {hb_value} outside medical range, setting to None"
+                )
                 scan_data["hemoglobin_estimate"] = None
 
         db_res = supabase.table("scans").insert(scan_data).execute()
@@ -542,7 +548,9 @@ async def schedule_appointment(
                     appt.scheduled_at.replace("Z", "+00:00")
                 )
             except ValueError:
-                raise HTTPException(status_code=400, detail="Invalid date format for scheduled_at")
+                raise HTTPException(
+                    status_code=400, detail="Invalid date format for scheduled_at"
+                )
         elif hasattr(appt.scheduled_at, "isoformat"):
             scheduled_at = appt.scheduled_at
         else:
@@ -574,7 +582,9 @@ async def schedule_appointment(
                 record_achievement_progress(current_user.sub, "CONSULTATION_READY", 1)
             )
         except Exception as achievement_error:
-            logger.warning(f"Achievement recording failed for CONSULTATION_READY: {achievement_error}")
+            logger.warning(
+                f"Achievement recording failed for CONSULTATION_READY: {achievement_error}"
+            )
 
         return result
     except AppointmentConflictError as e:
@@ -677,9 +687,13 @@ async def reschedule_appointment(
         # Parse new date
         if isinstance(new_date, str):
             try:
-                new_scheduled_at = datetime.fromisoformat(new_date.replace("Z", "+00:00"))
+                new_scheduled_at = datetime.fromisoformat(
+                    new_date.replace("Z", "+00:00")
+                )
             except ValueError:
-                raise HTTPException(status_code=400, detail="Invalid date format for scheduled_at")
+                raise HTTPException(
+                    status_code=400, detail="Invalid date format for scheduled_at"
+                )
         else:
             new_scheduled_at = new_date
 
@@ -687,11 +701,11 @@ async def reschedule_appointment(
         now = datetime.now(timezone.utc)
         if new_scheduled_at.tzinfo is None:
             new_scheduled_at = new_scheduled_at.replace(tzinfo=timezone.utc)
-        
+
         if new_scheduled_at < now:
             raise HTTPException(
-                status_code=400, 
-                detail="Cannot reschedule to a past date. Please select a future date and time."
+                status_code=400,
+                detail="Cannot reschedule to a past date. Please select a future date and time.",
             )
 
         # Use appointment service
@@ -993,7 +1007,9 @@ async def update_profile(
                 record_achievement_progress(current_user.sub, "PROFILE_BUILDER", 1)
             )
         except Exception as achievement_error:
-            logger.warning(f"Achievement recording failed for PROFILE_BUILDER: {achievement_error}")
+            logger.warning(
+                f"Achievement recording failed for PROFILE_BUILDER: {achievement_error}"
+            )
 
         return {"success": True, "data": res.data[0]}
     except HTTPException:
@@ -1117,7 +1133,9 @@ async def get_risk_assessment(
 
 
 @router.get("/family-members")
-async def get_patient_family_members(current_user: TokenPayload = Depends(get_current_patient)):
+async def get_patient_family_members(
+    current_user: TokenPayload = Depends(get_current_patient),
+):
     """Get all family members (dependents) under this patient account."""
     try:
         # Query the family_members table (not profiles_patient)
@@ -1184,7 +1202,9 @@ async def add_patient_family_member(
 
 
 @router.get("/medications")
-async def get_patient_medications(current_user: TokenPayload = Depends(get_current_patient)):
+async def get_patient_medications(
+    current_user: TokenPayload = Depends(get_current_patient),
+):
     """Get active medication reminders for patient."""
     try:
         res = (
@@ -1533,28 +1553,34 @@ async def trigger_emergency_sos(
                         message = client.messages.create(
                             body=sms_body, from_=settings.TWILIO_PHONE_NUMBER, to=phone
                         )
-                        sms_results.append({
-                            "phone": phone,
-                            "status": message.status,
-                            "sid": message.sid,
-                            "success": True
-                        })
-                        logger.info(f"SOS SMS sent to {phone}: {message.sid} (status: {message.status})")
+                        sms_results.append(
+                            {
+                                "phone": phone,
+                                "status": message.status,
+                                "sid": message.sid,
+                                "success": True,
+                            }
+                        )
+                        logger.info(
+                            f"SOS SMS sent to {phone}: {message.sid} (status: {message.status})"
+                        )
                     except Exception as sms_err:
-                        sms_results.append({
-                            "phone": phone,
-                            "status": "failed",
-                            "error": str(sms_err),
-                            "success": False
-                        })
+                        sms_results.append(
+                            {
+                                "phone": phone,
+                                "status": "failed",
+                                "error": str(sms_err),
+                                "success": False,
+                            }
+                        )
                         logger.error(f"Failed to send SOS SMS to {phone}: {sms_err}")
-                
+
                 # Check if at least one SMS was sent successfully
                 successful_sms = [r for r in sms_results if r.get("success")]
                 if not successful_sms:
                     raise HTTPException(
                         status_code=503,
-                        detail="Failed to send SMS to any emergency contacts. Please call emergency services directly."
+                        detail="Failed to send SMS to any emergency contacts. Please call emergency services directly.",
                     )
             else:
                 logger.warning(

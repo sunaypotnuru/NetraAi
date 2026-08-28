@@ -12,9 +12,12 @@ from datetime import datetime
 from typing import Dict, List, Optional, Any, BinaryIO
 from uuid import uuid4
 import os
+import logging
 
 from app.db.schema import Tables, Col
 from app.services.supabase import supabase
+
+logger = logging.getLogger(__name__)
 
 
 class DocumentService:
@@ -238,7 +241,9 @@ class DocumentService:
 
                 self.supabase.storage.from_(self.storage_bucket).remove([file_path])
             except Exception as e:
-                logger.warning(f"Failed to delete file from storage: {file_path}. Error: {e}")
+                logger.warning(
+                    f"Failed to delete file from storage: {file_path}. Error: {e}"
+                )
                 # Continue even if storage deletion fails
 
         # Delete from database

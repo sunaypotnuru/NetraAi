@@ -47,9 +47,7 @@ async def update_admin_settings(
 
 
 @router.get("/stats")
-async def get_platform_stats(
-    current_user: TokenPayload = Depends(get_current_admin)
-):
+async def get_platform_stats(current_user: TokenPayload = Depends(get_current_admin)):
     """Platform wide statistics overview using Supabase REST API."""
     try:
         from datetime import timedelta
@@ -69,11 +67,21 @@ async def get_platform_stats(
             logger.warning(f"Non-critical data fetch failed: {e}")
 
         try:
-            r = supabase.table("users").select("id", count="exact").eq("role", "doctor").execute()
+            r = (
+                supabase.table("users")
+                .select("id", count="exact")
+                .eq("role", "doctor")
+                .execute()
+            )
             if r.count is not None and r.count > 0:
                 doctor_count = r.count
             else:
-                r2 = supabase.table("profiles_doctor").select("id", count="exact").eq("is_verified", True).execute()
+                r2 = (
+                    supabase.table("profiles_doctor")
+                    .select("id", count="exact")
+                    .eq("is_verified", True)
+                    .execute()
+                )
                 doctor_count = r2.count if (r2.count and r2.count > 0) else 1
         except Exception as e:
             logger.warning(f"Failed to get doctor count: {e}")
@@ -92,13 +100,23 @@ async def get_platform_stats(
             logger.warning(f"Non-critical data fetch failed: {e}")
 
         try:
-            r = supabase.table("appointments").select("id", count="exact").eq("status", "completed").execute()
+            r = (
+                supabase.table("appointments")
+                .select("id", count="exact")
+                .eq("status", "completed")
+                .execute()
+            )
             completed_count = r.count or 0
         except Exception as e:
             logger.warning(f"Non-critical data fetch failed: {e}")
 
         try:
-            r = supabase.table("appointments").select("id", count="exact").eq("status", "pending").execute()
+            r = (
+                supabase.table("appointments")
+                .select("id", count="exact")
+                .eq("status", "pending")
+                .execute()
+            )
             _ = r.count or 0  # noqa: F841
         except Exception as e:
             logger.warning(f"Non-critical data fetch failed: {e}")
@@ -106,16 +124,30 @@ async def get_platform_stats(
         # 2. Growth data â€” build from current totals across current year months
         user_total = patient_count + doctor_count
         current_month_num = datetime.now().month
-        all_months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        all_months = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+        ]
         growth_data = []
         for i, month in enumerate(all_months[:current_month_num]):
             ratio = (i + 1) / current_month_num
-            growth_data.append({
-                "name": month,
-                "users": int(user_total * ratio),
-                "scans": int(scan_count * ratio),
-            })
+            growth_data.append(
+                {
+                    "name": month,
+                    "users": int(user_total * ratio),
+                    "scans": int(scan_count * ratio),
+                }
+            )
 
         # 3. Weekly appointment trends via Supabase REST
         appointments_weekly = []
@@ -131,10 +163,9 @@ async def get_platform_stats(
                     .lt("created_at", next_day_str)
                     .execute()
                 )
-                appointments_weekly.append({
-                    "name": day.strftime("%a"),
-                    "count": cnt_r.count or 0
-                })
+                appointments_weekly.append(
+                    {"name": day.strftime("%a"), "count": cnt_r.count or 0}
+                )
         except Exception as trend_err:
             logger.warning(f"Could not build weekly trends: {trend_err}")
 
@@ -148,9 +179,15 @@ async def get_platform_stats(
                 .limit(5)
                 .execute()
             )
-            patient_ids = list(set(
-                [a.get("patient_id") for a in latest_appts.data or [] if a.get("patient_id")]
-            ))
+            patient_ids = list(
+                set(
+                    [
+                        a.get("patient_id")
+                        for a in latest_appts.data or []
+                        if a.get("patient_id")
+                    ]
+                )
+            )
             patient_map = {}
             if patient_ids:
                 try:
@@ -166,13 +203,15 @@ async def get_platform_stats(
 
             for appt in latest_appts.data or []:
                 name = patient_map.get(appt.get("patient_id"), "Unknown Patient")
-                recent_activity.append({
-                    "id": str(uuid.uuid4())[:8],
-                    "user": name,
-                    "action": f"Booked an appointment (Status: {appt.get('status', 'unknown')})",
-                    "time": "Recently",
-                    "type": "appointment",
-                })
+                recent_activity.append(
+                    {
+                        "id": str(uuid.uuid4())[:8],
+                        "user": name,
+                        "action": f"Booked an appointment (Status: {appt.get('status', 'unknown')})",
+                        "time": "Recently",
+                        "type": "appointment",
+                    }
+                )
         except Exception as act_err:
             logger.warning(f"Could not load recent activity: {act_err}")
 
@@ -186,15 +225,17 @@ async def get_platform_stats(
             "recent_activity": recent_activity,
             "analytics_summary": {
                 "new_users_30d": user_total,
-                "completion_rate": round((completed_count / appt_count * 100), 1) if appt_count > 0 else 0,
-                "avg_appointments_day": round(appt_count / 30, 1)
-            }
+                "completion_rate": (
+                    round((completed_count / appt_count * 100), 1)
+                    if appt_count > 0
+                    else 0
+                ),
+                "avg_appointments_day": round(appt_count / 30, 1),
+            },
         }
     except Exception as e:
         logger.error(f"Error in get_platform_stats: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
-
 
 
 @router.get("/doctors/pending")
@@ -216,15 +257,15 @@ async def verify_doctor(
     id: str, payload: dict, current_user: TokenPayload = Depends(get_current_admin)
 ):
     """Approve or revoke a doctor's profile verification.
-    
+
     Both approve (verified=true) and reject/revoke (verified=false) update
-    the is_verified flag and verification_status. Profiles are never deleted 
+    the is_verified flag and verification_status. Profiles are never deleted
     from this endpoint to prevent accidental data loss and foreign-key constraint failures.
     """
     status_payload = payload.get("verification_status")
     verified_payload = payload.get("verified")
     notes_payload = payload.get("verification_notes")
-    
+
     if verified_payload is not None:
         verified = bool(verified_payload)
         status = "approved" if verified else "rejected"
@@ -235,29 +276,18 @@ async def verify_doctor(
         verified = True
         status = "approved"
 
-    update_data = {
-        "is_verified": verified,
-        "verification_status": status
-    }
+    update_data = {"is_verified": verified, "verification_status": status}
     if notes_payload is not None:
         update_data["verification_notes"] = notes_payload
 
-    res = (
-        supabase.table("profiles_doctor")
-        .update(update_data)
-        .eq("id", id)
-        .execute()
-    )
+    res = supabase.table("profiles_doctor").update(update_data).eq("id", id).execute()
     if not res.data:
         raise HTTPException(status_code=404, detail="Doctor not found.")
     return res.data[0]
 
 
-
 @router.get("/message-contacts")
-async def get_message_contacts(
-    current_user: TokenPayload = Depends(get_current_admin)
-):
+async def get_message_contacts(current_user: TokenPayload = Depends(get_current_admin)):
     """
     Lightweight endpoint that returns all platform users (patients + doctors)
     with only the fields needed for the messaging 'New Conversation' dialog.
@@ -355,12 +385,14 @@ async def get_auth_metadata_batch(user_ids: list[str]) -> Dict[str, Any]:
 async def get_all_patients(
     page: int = Query(1, ge=1),
     limit: int = Query(50, ge=1, le=100),
-    current_user: TokenPayload = Depends(get_current_admin)
+    current_user: TokenPayload = Depends(get_current_admin),
 ):
     """List all patient profiles with enriched auth metadata."""
     try:
         # 1. Get total count
-        count_res = supabase.table("profiles_patient").select("id", count="exact").execute()
+        count_res = (
+            supabase.table("profiles_patient").select("id", count="exact").execute()
+        )
         total = count_res.count or 0
 
         # 2. Get paginated profiles
@@ -392,7 +424,7 @@ async def get_all_patients(
             "patients": enriched_patients,
             "total": total,
             "page": page,
-            "limit": limit
+            "limit": limit,
         }
     except Exception as e:
         logger.error(f"Error in get_all_patients: {e}")
@@ -454,7 +486,7 @@ async def get_patient_detail(
 async def get_all_doctors(
     page: int = Query(1, ge=1),
     limit: int = Query(50, ge=1, le=100),
-    current_user: TokenPayload = Depends(get_current_admin)
+    current_user: TokenPayload = Depends(get_current_admin),
 ):
     """List all doctor profiles with enriched auth metadata."""
     try:
@@ -497,7 +529,7 @@ async def get_all_doctors(
             "doctors": enriched_doctors,
             "total": total,
             "page": page,
-            "limit": limit
+            "limit": limit,
         }
     except Exception as e:
         logger.error(f"Error in get_all_doctors: {e}")
@@ -555,7 +587,7 @@ async def get_all_appointments(
     status: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
-    current_user: TokenPayload = Depends(get_current_admin)
+    current_user: TokenPayload = Depends(get_current_admin),
 ):
     """List all platform appointments using Supabase REST API."""
     try:
@@ -575,24 +607,42 @@ async def get_all_appointments(
 
         # Enrich appointments with patient and doctor details in Python (avoid schema join cache errors)
         if appointments:
-            patient_ids = list(set([a["patient_id"] for a in appointments if a.get("patient_id")]))
-            doctor_ids = list(set([a["doctor_id"] for a in appointments if a.get("doctor_id")]))
+            patient_ids = list(
+                set([a["patient_id"] for a in appointments if a.get("patient_id")])
+            )
+            doctor_ids = list(
+                set([a["doctor_id"] for a in appointments if a.get("doctor_id")])
+            )
 
             patients_map = {}
             if patient_ids:
                 try:
-                    pats_res = supabase.table("profiles_patient").select("id, full_name, email").in_("id", patient_ids).execute()
+                    pats_res = (
+                        supabase.table("profiles_patient")
+                        .select("id, full_name, email")
+                        .in_("id", patient_ids)
+                        .execute()
+                    )
                     patients_map = {p["id"]: p for p in pats_res.data or []}
                 except Exception as pat_err:
-                    logger.warning(f"Could not load profiles_patient in appointments enrich: {pat_err}")
+                    logger.warning(
+                        f"Could not load profiles_patient in appointments enrich: {pat_err}"
+                    )
 
             doctors_map = {}
             if doctor_ids:
                 try:
-                    docs_res = supabase.table("profiles_doctor").select("id, full_name, specialty, consultation_fee").in_("id", doctor_ids).execute()
+                    docs_res = (
+                        supabase.table("profiles_doctor")
+                        .select("id, full_name, specialty, consultation_fee")
+                        .in_("id", doctor_ids)
+                        .execute()
+                    )
                     doctors_map = {d["id"]: d for d in docs_res.data or []}
                 except Exception as doc_err:
-                    logger.warning(f"Could not load profiles_doctor in appointments enrich: {doc_err}")
+                    logger.warning(
+                        f"Could not load profiles_doctor in appointments enrich: {doc_err}"
+                    )
 
             for a in appointments:
                 a["profiles_patient"] = patients_map.get(a.get("patient_id"), {})
@@ -602,13 +652,16 @@ async def get_all_appointments(
         if search:
             search_lower = search.lower()
             appointments = [
-                a for a in appointments if
-                search_lower in (a.get("profiles_patient", {}).get("full_name") or "").lower() or
-                search_lower in (a.get("profiles_doctor", {}).get("full_name") or "").lower() or
-                search_lower in (a.get("type") or "").lower() or
-                search_lower in str(a.get("id")).lower()
+                a
+                for a in appointments
+                if search_lower
+                in (a.get("profiles_patient", {}).get("full_name") or "").lower()
+                or search_lower
+                in (a.get("profiles_doctor", {}).get("full_name") or "").lower()
+                or search_lower in (a.get("type") or "").lower()
+                or search_lower in str(a.get("id")).lower()
             ]
-            total = len(appointments) # Re-adjust total for filtered view
+            total = len(appointments)  # Re-adjust total for filtered view
 
         return {
             "appointments": appointments,
@@ -618,10 +671,16 @@ async def get_all_appointments(
             "total_pages": (total + limit - 1) // limit if total > 0 else 0,
             "stats": {
                 "total": total,
-                "pending": len([a for a in appointments if a.get("status") == "pending"]),
-                "completed": len([a for a in appointments if a.get("status") == "completed"]),
-                "cancelled": len([a for a in appointments if a.get("status") == "cancelled"]),
-            }
+                "pending": len(
+                    [a for a in appointments if a.get("status") == "pending"]
+                ),
+                "completed": len(
+                    [a for a in appointments if a.get("status") == "completed"]
+                ),
+                "cancelled": len(
+                    [a for a in appointments if a.get("status") == "cancelled"]
+                ),
+            },
         }
     except Exception as e:
         logger.error(f"Failed to fetch appointments: {e}")
@@ -691,7 +750,7 @@ async def get_all_scans(
     risk: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
-    current_user: TokenPayload = Depends(get_current_admin)
+    current_user: TokenPayload = Depends(get_current_admin),
 ):
     """List all AI scans performed on the platform using Supabase REST API."""
     try:
@@ -708,14 +767,23 @@ async def get_all_scans(
 
         # Enrich scans with patient info (avoid schema join cache errors)
         if scans:
-            patient_ids = list(set([s["patient_id"] for s in scans if s.get("patient_id")]))
+            patient_ids = list(
+                set([s["patient_id"] for s in scans if s.get("patient_id")])
+            )
             patients_map = {}
             if patient_ids:
                 try:
-                    pats_res = supabase.table("profiles_patient").select("id, full_name").in_("id", patient_ids).execute()
+                    pats_res = (
+                        supabase.table("profiles_patient")
+                        .select("id, full_name")
+                        .in_("id", patient_ids)
+                        .execute()
+                    )
                     patients_map = {p["id"]: p for p in pats_res.data or []}
                 except Exception as pat_err:
-                    logger.warning(f"Could not load profiles_patient in scans enrich: {pat_err}")
+                    logger.warning(
+                        f"Could not load profiles_patient in scans enrich: {pat_err}"
+                    )
 
             for s in scans:
                 s["profiles_patient"] = patients_map.get(s.get("patient_id"), {})
@@ -730,24 +798,28 @@ async def get_all_scans(
                 # Risk filter
                 prediction = str(s.get("prediction", "")).lower()
                 severity = str(s.get("severity", "")).lower()
-                if risk_lower and not (risk_lower in prediction or risk_lower in severity):
+                if risk_lower and not (
+                    risk_lower in prediction or risk_lower in severity
+                ):
                     continue
 
                 # Search filter
-                patient_name = str(s.get("profiles_patient", {}).get("full_name") or "").lower()
+                patient_name = str(
+                    s.get("profiles_patient", {}).get("full_name") or ""
+                ).lower()
                 scan_id = str(s.get("id", "")).lower()
 
                 if search_lower and not (
-                    search_lower in patient_name or
-                    search_lower in prediction or
-                    search_lower in scan_id
+                    search_lower in patient_name
+                    or search_lower in prediction
+                    or search_lower in scan_id
                 ):
                     continue
 
                 filtered_scans.append(s)
 
             scans = filtered_scans
-            total = len(scans) # Re-adjust total for filtered view
+            total = len(scans)  # Re-adjust total for filtered view
 
         return {
             "scans": scans,
@@ -757,9 +829,17 @@ async def get_all_scans(
             "total_pages": (total + limit - 1) // limit if total > 0 else 0,
             "stats": {
                 "total": total,
-                "high_risk": len([s for s in scans if "high" in str(s.get("prediction", "")).lower()]),
-                "normal": len([s for s in scans if "normal" in str(s.get("prediction", "")).lower()]),
-            }
+                "high_risk": len(
+                    [s for s in scans if "high" in str(s.get("prediction", "")).lower()]
+                ),
+                "normal": len(
+                    [
+                        s
+                        for s in scans
+                        if "normal" in str(s.get("prediction", "")).lower()
+                    ]
+                ),
+            },
         }
     except Exception as e:
         logger.error(f"Error fetching scans: {e}")
@@ -824,9 +904,10 @@ async def get_all_users(
         if search:
             search_lower = search.lower()
             user_list = [
-                u for u in user_list if
-                search_lower in (u.get("full_name") or "").lower() or
-                search_lower in (u.get("email") or "").lower()
+                u
+                for u in user_list
+                if search_lower in (u.get("full_name") or "").lower()
+                or search_lower in (u.get("email") or "").lower()
             ]
 
         # Sorting
@@ -848,7 +929,7 @@ async def get_all_users(
 
         # Pagination
         offset = (page - 1) * limit
-        paginated_users = user_list[offset:offset + limit]
+        paginated_users = user_list[offset : offset + limit]
 
         # Enrich with auth metadata (batch fetch)
         user_ids = [u["id"] for u in paginated_users if "id" in u]
@@ -872,7 +953,7 @@ async def get_all_users(
                 "total": total,
                 "patients": len([u for u in user_list if u.get("role") == "patient"]),
                 "doctors": len([u for u in user_list if u.get("role") == "doctor"]),
-            }
+            },
         }
     except Exception as e:
         logger.error(f"Failed to fetch users: {e}")
@@ -1077,7 +1158,7 @@ async def get_all_reviews(
     rating: Optional[int] = Query(None, ge=1, le=5),
     page: int = Query(1, ge=1),
     limit: int = Query(50, ge=1, le=100),
-    current_user: TokenPayload = Depends(get_current_admin)
+    current_user: TokenPayload = Depends(get_current_admin),
 ):
     """Get all ratings and reviews from patients with improved filtering, pagination and global stats."""
     try:
@@ -1105,28 +1186,49 @@ async def get_all_reviews(
                 "total_pages": (total + limit - 1) // limit if total > 0 else 0,
                 "stats": {
                     "average_rating": 0,
-                    "rating_distribution": {str(i): 0 for i in range(1, 6)}
-                }
+                    "rating_distribution": {str(i): 0 for i in range(1, 6)},
+                },
             }
 
         # 3. Batch fetch related data for the slice
-        patient_ids = list(set([s["patient_id"] for s in surveys_slice if s.get("patient_id")]))
-        doctor_ids = list(set([s["doctor_id"] for s in surveys_slice if s.get("doctor_id")]))
-        appointment_ids = list(set([s["appointment_id"] for s in surveys_slice if s.get("appointment_id")]))
+        patient_ids = list(
+            set([s["patient_id"] for s in surveys_slice if s.get("patient_id")])
+        )
+        doctor_ids = list(
+            set([s["doctor_id"] for s in surveys_slice if s.get("doctor_id")])
+        )
+        appointment_ids = list(
+            set([s["appointment_id"] for s in surveys_slice if s.get("appointment_id")])
+        )
 
         patient_map = {}
         if patient_ids:
-            p_res = supabase.table("profiles_patient").select("id, full_name, email").in_("id", patient_ids).execute()
+            p_res = (
+                supabase.table("profiles_patient")
+                .select("id, full_name, email")
+                .in_("id", patient_ids)
+                .execute()
+            )
             patient_map = {p["id"]: p for p in p_res.data or []}
 
         doctor_map = {}
         if doctor_ids:
-            d_res = supabase.table("profiles_doctor").select("id, full_name, specialty").in_("id", doctor_ids).execute()
+            d_res = (
+                supabase.table("profiles_doctor")
+                .select("id, full_name, specialty")
+                .in_("id", doctor_ids)
+                .execute()
+            )
             doctor_map = {d["id"]: d for d in d_res.data or []}
 
         appointment_map = {}
         if appointment_ids:
-            a_res = supabase.table("appointments").select("id, scheduled_at, type, status").in_("id", appointment_ids).execute()
+            a_res = (
+                supabase.table("appointments")
+                .select("id, scheduled_at, type, status")
+                .in_("id", appointment_ids)
+                .execute()
+            )
             appointment_map = {a["id"]: a for a in a_res.data or []}
 
         # 4. Enrich
@@ -1136,20 +1238,22 @@ async def get_all_reviews(
             doctor = doctor_map.get(survey["doctor_id"], {})
             appointment = appointment_map.get(survey.get("appointment_id"), {})
 
-            enriched_ratings.append({
-                "id": survey.get("id"),
-                "patient_id": survey.get("patient_id"),
-                "doctor_id": survey.get("doctor_id"),
-                "appointment_id": survey.get("appointment_id"),
-                "rating": survey.get("rating", 0),
-                "review": survey.get("response", ""),
-                "created_at": survey.get("answered_at"),
-                "patient_name": patient.get("full_name", "Unknown Patient"),
-                "patient_email": patient.get("email"),
-                "doctor_name": doctor.get("full_name", "Unknown Doctor"),
-                "doctor_specialty": doctor.get("specialty"),
-                "appointment": appointment if appointment else None,
-            })
+            enriched_ratings.append(
+                {
+                    "id": survey.get("id"),
+                    "patient_id": survey.get("patient_id"),
+                    "doctor_id": survey.get("doctor_id"),
+                    "appointment_id": survey.get("appointment_id"),
+                    "rating": survey.get("rating", 0),
+                    "review": survey.get("response", ""),
+                    "created_at": survey.get("answered_at"),
+                    "patient_name": patient.get("full_name", "Unknown Patient"),
+                    "patient_email": patient.get("email"),
+                    "doctor_name": doctor.get("full_name", "Unknown Doctor"),
+                    "doctor_specialty": doctor.get("specialty"),
+                    "appointment": appointment if appointment else None,
+                }
+            )
 
         # 5. Calculate global stats from ALL matches
         all_ratings = [s.get("rating", 0) for s in all_surveys]
@@ -1167,8 +1271,8 @@ async def get_all_reviews(
             "total_pages": (total + limit - 1) // limit if total > 0 else 0,
             "stats": {
                 "average_rating": round(avg_rating, 1),
-                "rating_distribution": distribution
-            }
+                "rating_distribution": distribution,
+            },
         }
     except Exception as e:
         logger.error(f"Error fetching reviews: {e}")
@@ -1247,7 +1351,9 @@ async def create_team_member(
             try:
                 supabase.storage.create_bucket("avatars", options={"public": True})
             except Exception as e:
-                logger.warning(f"Non-critical data fetch failed: {e}")  # Bucket may already exist
+                logger.warning(
+                    f"Non-critical data fetch failed: {e}"
+                )  # Bucket may already exist
             supabase.storage.from_("avatars").upload(
                 path=unique_name,
                 file=contents,
@@ -1303,7 +1409,9 @@ async def update_team_member(
             try:
                 supabase.storage.create_bucket("avatars", options={"public": True})
             except Exception as e:
-                logger.warning(f"Non-critical data fetch failed: {e}")  # Bucket may already exist
+                logger.warning(
+                    f"Non-critical data fetch failed: {e}"
+                )  # Bucket may already exist
             supabase.storage.from_("avatars").upload(
                 path=unique_name,
                 file=contents,
@@ -1369,17 +1477,31 @@ async def get_all_payments(
         all_payments = res.data or []
 
         # 2. Batch fetch patient and doctor names for all potential matches
-        patient_ids = list(set([p["patient_id"] for p in all_payments if p.get("patient_id")]))
-        doctor_ids = list(set([p["doctor_id"] for p in all_payments if p.get("doctor_id")]))
+        patient_ids = list(
+            set([p["patient_id"] for p in all_payments if p.get("patient_id")])
+        )
+        doctor_ids = list(
+            set([p["doctor_id"] for p in all_payments if p.get("doctor_id")])
+        )
 
         patient_map = {}
         if patient_ids:
-            p_res = supabase.table("profiles_patient").select("id, full_name").in_("id", patient_ids).execute()
+            p_res = (
+                supabase.table("profiles_patient")
+                .select("id, full_name")
+                .in_("id", patient_ids)
+                .execute()
+            )
             patient_map = {p["id"]: p["full_name"] for p in p_res.data or []}
 
         doctor_map = {}
         if doctor_ids:
-            d_res = supabase.table("profiles_doctor").select("id, full_name").in_("id", doctor_ids).execute()
+            d_res = (
+                supabase.table("profiles_doctor")
+                .select("id, full_name")
+                .in_("id", doctor_ids)
+                .execute()
+            )
             doctor_map = {d["id"]: d["full_name"] for d in d_res.data or []}
 
         # 3. Enrich and Filter
@@ -1390,10 +1512,12 @@ async def get_all_payments(
 
             if search:
                 search_lower = search.lower()
-                if (search_lower in p["patient_name"].lower() or
-                    search_lower in p["doctor_name"].lower() or
-                    search_lower in (p.get("razorpay_payment_id") or "").lower() or
-                    search_lower in (p.get("razorpay_order_id") or "").lower()):
+                if (
+                    search_lower in p["patient_name"].lower()
+                    or search_lower in p["doctor_name"].lower()
+                    or search_lower in (p.get("razorpay_payment_id") or "").lower()
+                    or search_lower in (p.get("razorpay_order_id") or "").lower()
+                ):
                     enriched_payments.append(p)
             else:
                 enriched_payments.append(p)
@@ -1407,9 +1531,17 @@ async def get_all_payments(
 
         # 5. Global Stats from ALL matches
         stats = {
-            "total_revenue": sum(p.get("amount", 0) for p in enriched_payments if p.get("status") == "success"),
-            "successful": len([p for p in enriched_payments if p.get("status") == "success"]),
-            "pending": len([p for p in enriched_payments if p.get("status") == "pending"]),
+            "total_revenue": sum(
+                p.get("amount", 0)
+                for p in enriched_payments
+                if p.get("status") == "success"
+            ),
+            "successful": len(
+                [p for p in enriched_payments if p.get("status") == "success"]
+            ),
+            "pending": len(
+                [p for p in enriched_payments if p.get("status") == "pending"]
+            ),
         }
 
         return {
@@ -1418,7 +1550,7 @@ async def get_all_payments(
             "page": page,
             "limit": limit,
             "total_pages": (total + limit - 1) // limit if total > 0 else 0,
-            "stats": stats
+            "stats": stats,
         }
     except Exception as e:
         logger.error(f"Failed to fetch payments: {e}")
@@ -1617,17 +1749,31 @@ async def get_all_refunds(
         refunds = res.data or []
 
         # 2. Batch fetch patient names and payment info for all potential matches
-        patient_ids = list(set([r["patient_id"] for r in refunds if r.get("patient_id")]))
-        payment_ids = list(set([r["payment_id"] for r in refunds if r.get("payment_id")]))
+        patient_ids = list(
+            set([r["patient_id"] for r in refunds if r.get("patient_id")])
+        )
+        payment_ids = list(
+            set([r["payment_id"] for r in refunds if r.get("payment_id")])
+        )
 
         patient_map = {}
         if patient_ids:
-            p_res = supabase.table("profiles_patient").select("id, full_name").in_("id", patient_ids).execute()
+            p_res = (
+                supabase.table("profiles_patient")
+                .select("id, full_name")
+                .in_("id", patient_ids)
+                .execute()
+            )
             patient_map = {p["id"]: p["full_name"] for p in p_res.data or []}
 
         payment_map = {}
         if payment_ids:
-            py_res = supabase.table("payments").select("id, razorpay_payment_id, razorpay_order_id").in_("id", payment_ids).execute()
+            py_res = (
+                supabase.table("payments")
+                .select("id, razorpay_payment_id, razorpay_order_id")
+                .in_("id", payment_ids)
+                .execute()
+            )
             payment_map = {py["id"]: py for py in py_res.data or []}
 
         # 3. Enrich and Filter
@@ -1638,12 +1784,23 @@ async def get_all_refunds(
 
             if search:
                 search_lower = search.lower()
-                if (search_lower in r["patient_name"].lower() or
-                    search_lower in (r.get("reason") or "").lower() or
-                    (r["payment_info"] and (
-                        search_lower in (r["payment_info"].get("razorpay_payment_id") or "").lower() or
-                        search_lower in (r["payment_info"].get("razorpay_order_id") or "").lower()
-                    ))):
+                if (
+                    search_lower in r["patient_name"].lower()
+                    or search_lower in (r.get("reason") or "").lower()
+                    or (
+                        r["payment_info"]
+                        and (
+                            search_lower
+                            in (
+                                r["payment_info"].get("razorpay_payment_id") or ""
+                            ).lower()
+                            or search_lower
+                            in (
+                                r["payment_info"].get("razorpay_order_id") or ""
+                            ).lower()
+                        )
+                    )
+                ):
                     enriched_refunds.append(r)
             else:
                 enriched_refunds.append(r)
@@ -1662,10 +1819,18 @@ async def get_all_refunds(
             "limit": limit,
             "total_pages": (total + limit - 1) // limit if total > 0 else 0,
             "stats": {
-                "total_refunded": sum(r.get("amount", 0) for r in enriched_refunds if r.get("status") == "approved"),
-                "processed": len([r for r in enriched_refunds if r.get("status") == "approved"]),
-                "pending": len([r for r in enriched_refunds if r.get("status") == "pending"]),
-            }
+                "total_refunded": sum(
+                    r.get("amount", 0)
+                    for r in enriched_refunds
+                    if r.get("status") == "approved"
+                ),
+                "processed": len(
+                    [r for r in enriched_refunds if r.get("status") == "approved"]
+                ),
+                "pending": len(
+                    [r for r in enriched_refunds if r.get("status") == "pending"]
+                ),
+            },
         }
     except Exception as e:
         logger.error(f"Failed to fetch refunds: {e}")

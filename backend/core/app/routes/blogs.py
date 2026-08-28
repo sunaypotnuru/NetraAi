@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from typing import List, Optional, Dict, Any
+from typing import List, Optional
 from datetime import datetime, timezone
 import uuid
 import logging
@@ -78,15 +78,19 @@ DEFAULT_BLOGS = [
 async def get_blogs(
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0),
-    category: Optional[str] = None
+    category: Optional[str] = None,
 ):
     """Fetch all blog posts with fallback to curated defaults if DB is unpopulated."""
     try:
         query = supabase.table("blogs").select("*")
         if category and category != "all":
             query = query.eq("category", category)
-        
-        res = query.order("created_at", desc=True).range(offset, offset + limit - 1).execute()
+
+        res = (
+            query.order("created_at", desc=True)
+            .range(offset, offset + limit - 1)
+            .execute()
+        )
         data = res.data or []
 
         if not data:
@@ -121,8 +125,7 @@ async def get_blog(id: str):
 
 @router.post("/", response_model=BlogResponse)
 async def create_blog(
-    blog: BlogCreate, 
-    current_user: TokenPayload = Depends(get_current_admin)
+    blog: BlogCreate, current_user: TokenPayload = Depends(get_current_admin)
 ):
     """Create a new blog post (Admin only)."""
     try:
@@ -153,9 +156,7 @@ async def create_blog(
 
 @router.put("/{id}", response_model=BlogResponse)
 async def update_blog(
-    id: str, 
-    blog: BlogCreate, 
-    current_user: TokenPayload = Depends(get_current_admin)
+    id: str, blog: BlogCreate, current_user: TokenPayload = Depends(get_current_admin)
 ):
     """Update an existing blog post (Admin only)."""
     try:
@@ -176,10 +177,7 @@ async def update_blog(
 
 
 @router.delete("/{id}")
-async def delete_blog(
-    id: str, 
-    current_user: TokenPayload = Depends(get_current_admin)
-):
+async def delete_blog(id: str, current_user: TokenPayload = Depends(get_current_admin)):
     """Delete a blog post (Admin only)."""
     try:
         supabase.table("blogs").delete().eq("id", id).execute()

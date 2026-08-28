@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 def register_exception_handlers(app: FastAPI) -> None:
     """
     Register all custom exception handlers with the FastAPI application.
-    
+
     Args:
         app: FastAPI application instance
     """
@@ -32,7 +32,7 @@ def register_exception_handlers(app: FastAPI) -> None:
     ) -> JSONResponse:
         """
         Handle all custom NetraAI exceptions.
-        
+
         Converts custom exceptions to JSON responses with proper status codes
         and logs the error for monitoring.
         """
@@ -46,7 +46,7 @@ def register_exception_handlers(app: FastAPI) -> None:
                 "method": request.method,
             },
         )
-        
+
         return JSONResponse(
             status_code=exc.status_code,
             content=exc.to_dict(),
@@ -58,7 +58,7 @@ def register_exception_handlers(app: FastAPI) -> None:
     ) -> JSONResponse:
         """
         Handle standard HTTP exceptions.
-        
+
         Converts FastAPI/Starlette HTTP exceptions to consistent JSON format.
         """
         logger.warning(
@@ -69,7 +69,7 @@ def register_exception_handlers(app: FastAPI) -> None:
                 "method": request.method,
             },
         )
-        
+
         return JSONResponse(
             status_code=exc.status_code,
             content={
@@ -85,18 +85,20 @@ def register_exception_handlers(app: FastAPI) -> None:
     ) -> JSONResponse:
         """
         Handle Pydantic validation errors.
-        
+
         Converts validation errors into user-friendly JSON responses.
         """
         errors = []
         for error in exc.errors():
             field_path = " -> ".join(str(loc) for loc in error["loc"])
-            errors.append({
-                "field": field_path,
-                "message": error["msg"],
-                "type": error["type"],
-            })
-        
+            errors.append(
+                {
+                    "field": field_path,
+                    "message": error["msg"],
+                    "type": error["type"],
+                }
+            )
+
         logger.warning(
             f"Validation error: {len(errors)} field(s)",
             extra={
@@ -105,7 +107,7 @@ def register_exception_handlers(app: FastAPI) -> None:
                 "method": request.method,
             },
         )
-        
+
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={
@@ -121,7 +123,7 @@ def register_exception_handlers(app: FastAPI) -> None:
     ) -> JSONResponse:
         """
         Catch-all handler for unexpected exceptions.
-        
+
         Logs the full exception and returns a generic error response
         to avoid leaking sensitive information.
         """
@@ -133,7 +135,7 @@ def register_exception_handlers(app: FastAPI) -> None:
                 "method": request.method,
             },
         )
-        
+
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={
@@ -152,13 +154,13 @@ def create_error_response(
 ) -> JSONResponse:
     """
     Helper function to create standardized error responses.
-    
+
     Args:
         error_type: Type/name of the error
         message: Human-readable error message
         status_code: HTTP status code
         details: Additional error context
-        
+
     Returns:
         JSONResponse with standardized error format
     """

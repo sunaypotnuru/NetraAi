@@ -46,14 +46,17 @@ class VideoConsultationService:
                 "recording_enabled": False,
                 "recording_consent_given": False,
                 "emergency_disconnect": False,
-                "created_at": datetime.utcnow().isoformat()
+                "created_at": datetime.utcnow().isoformat(),
             }
 
             result = supabase.table("video_consultations").insert(entry).execute()
 
             if not result.data:
                 logger.error("Failed to insert video consultation into Supabase")
-                return {"success": False, "error": "Failed to create session database entry"}
+                return {
+                    "success": False,
+                    "error": "Failed to create session database entry",
+                }
 
             consultation = result.data[0]
             logger.info(f"Created video consultation session: {session_id}")
@@ -101,8 +104,16 @@ class VideoConsultationService:
                 "id": str(consultation["id"]),
                 "session_id": consultation["session_id"],
                 "appointment_id": consultation.get("appointment_id"),
-                "doctor_id": str(consultation["doctor_id"]) if consultation.get("doctor_id") else None,
-                "patient_id": str(consultation["patient_id"]) if consultation.get("patient_id") else None,
+                "doctor_id": (
+                    str(consultation["doctor_id"])
+                    if consultation.get("doctor_id")
+                    else None
+                ),
+                "patient_id": (
+                    str(consultation["patient_id"])
+                    if consultation.get("patient_id")
+                    else None
+                ),
                 "status": consultation.get("status"),
                 "started_at": consultation.get("started_at"),
                 "ended_at": consultation.get("ended_at"),
@@ -154,10 +165,12 @@ class VideoConsultationService:
             if consultation.get("status") == "waiting":
                 update_result = (
                     supabase.table("video_consultations")
-                    .update({
-                        "status": "active",
-                        "started_at": datetime.utcnow().isoformat()
-                    })
+                    .update(
+                        {
+                            "status": "active",
+                            "started_at": datetime.utcnow().isoformat(),
+                        }
+                    )
                     .eq("session_id", session_id)
                     .execute()
                 )
@@ -207,7 +220,9 @@ class VideoConsultationService:
             logger.error(f"Error leaving session: {str(e)}")
             return {"success": False, "error": str(e)}
 
-    def end_session(self, session_id: str, user_id: Optional[str] = None) -> Dict[str, Any]:
+    def end_session(
+        self, session_id: str, user_id: Optional[str] = None
+    ) -> Dict[str, Any]:
         """
         End a video consultation session
 
@@ -243,19 +258,20 @@ class VideoConsultationService:
         if consultation.get("status") == "active":
             ended_at_dt = datetime.utcnow()
 
-            updates = {
-                "status": "completed",
-                "ended_at": ended_at_dt.isoformat()
-            }
+            updates = {"status": "completed", "ended_at": ended_at_dt.isoformat()}
 
             # Calculate duration
             started_at_str = consultation.get("started_at")
             if started_at_str:
-                started_at_dt = datetime.fromisoformat(started_at_str.replace("Z", "+00:00")).replace(tzinfo=None)
+                started_at_dt = datetime.fromisoformat(
+                    started_at_str.replace("Z", "+00:00")
+                ).replace(tzinfo=None)
                 duration = (ended_at_dt - started_at_dt).total_seconds()
                 updates["duration_seconds"] = int(duration)
 
-            supabase.table("video_consultations").update(updates).eq("id", consultation["id"]).execute()
+            supabase.table("video_consultations").update(updates).eq(
+                "id", consultation["id"]
+            ).execute()
 
     def get_active_sessions(
         self, user_id: Optional[str] = None
@@ -270,7 +286,9 @@ class VideoConsultationService:
             List of active sessions
         """
         try:
-            query = supabase.table("video_consultations").select("*").eq("status", "active")
+            query = (
+                supabase.table("video_consultations").select("*").eq("status", "active")
+            )
 
             if user_id:
                 query = query.or_(f"doctor_id.eq.{user_id},patient_id.eq.{user_id}")
@@ -284,17 +302,21 @@ class VideoConsultationService:
                 duration = 0
                 started_at = c.get("started_at")
                 if started_at:
-                    started_at_dt = datetime.fromisoformat(started_at.replace("Z", "+00:00")).replace(tzinfo=None)
+                    started_at_dt = datetime.fromisoformat(
+                        started_at.replace("Z", "+00:00")
+                    ).replace(tzinfo=None)
                     duration = int((datetime.utcnow() - started_at_dt).total_seconds())
 
-                active_sessions.append({
-                    "id": str(c["id"]),
-                    "session_id": c["session_id"],
-                    "doctor_id": str(c.get("doctor_id")),
-                    "patient_id": str(c.get("patient_id")),
-                    "started_at": started_at,
-                    "duration_seconds": duration,
-                })
+                active_sessions.append(
+                    {
+                        "id": str(c["id"]),
+                        "session_id": c["session_id"],
+                        "doctor_id": str(c.get("doctor_id")),
+                        "patient_id": str(c.get("patient_id")),
+                        "started_at": started_at,
+                        "duration_seconds": duration,
+                    }
+                )
 
             return active_sessions
 
@@ -313,7 +335,12 @@ class VideoConsultationService:
             Status string or None if not found
         """
         try:
-            result = supabase.table("video_consultations").select("status").eq("session_id", session_id).execute()
+            result = (
+                supabase.table("video_consultations")
+                .select("status")
+                .eq("session_id", session_id)
+                .execute()
+            )
             if result.data:
                 return {"success": True, "status": result.data[0].get("status")}
             return {"success": False, "error": f"Session {session_id} not found"}
@@ -348,30 +375,37 @@ class VideoConsultationService:
 
             doctor = None
             if doc_id:
-                doc_res = supabase.table("profiles_doctor").select("*").eq("id", doc_id).execute()
+                doc_res = (
+                    supabase.table("profiles_doctor")
+                    .select("*")
+                    .eq("id", doc_id)
+                    .execute()
+                )
                 if doc_res.data:
                     d = doc_res.data[0]
                     doctor = {
                         "id": str(d.get("id")),
                         "name": d.get("full_name") or d.get("email"),
-                        "specialty": d.get("specialty")
+                        "specialty": d.get("specialty"),
                     }
 
             patient = None
             if pat_id:
-                pat_res = supabase.table("profiles_patient").select("*").eq("id", pat_id).execute()
+                pat_res = (
+                    supabase.table("profiles_patient")
+                    .select("*")
+                    .eq("id", pat_id)
+                    .execute()
+                )
                 if pat_res.data:
                     p = pat_res.data[0]
                     patient = {
                         "id": str(p.get("id")),
                         "name": p.get("full_name") or p.get("email"),
-                        "age": None
+                        "age": None,
                     }
 
-            return {
-                "doctor": doctor,
-                "patient": patient
-            }
+            return {"doctor": doctor, "patient": patient}
 
         except Exception as e:
             logger.error(f"Error getting session participants: {str(e)}")
@@ -399,10 +433,17 @@ class VideoConsultationService:
             if recording_url:
                 updates["recording_url"] = recording_url
 
-            result = supabase.table("video_consultations").update(updates).eq("session_id", session_id).execute()
+            result = (
+                supabase.table("video_consultations")
+                .update(updates)
+                .eq("session_id", session_id)
+                .execute()
+            )
 
             if result.data:
-                logger.info(f"Recording status updated for session {session_id}: {recording_enabled}")
+                logger.info(
+                    f"Recording status updated for session {session_id}: {recording_enabled}"
+                )
                 return True
             return False
 
@@ -425,7 +466,11 @@ class VideoConsultationService:
             List of past consultations
         """
         try:
-            query = supabase.table("video_consultations").select("*").in_("status", ["completed", "cancelled", "emergency_ended"])
+            query = (
+                supabase.table("video_consultations")
+                .select("*")
+                .in_("status", ["completed", "cancelled", "emergency_ended"])
+            )
 
             if user_role == "doctor":
                 query = query.eq("doctor_id", user_id)
@@ -458,6 +503,7 @@ class VideoConsultationService:
 # ==================== SERVICE INSTANCE ====================
 
 _video_consultation_service = None
+
 
 def get_video_consultation_service() -> VideoConsultationService:
     """Get or create video consultation service instance"""

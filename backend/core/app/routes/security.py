@@ -124,24 +124,31 @@ async def get_security_logs(
 
 @router.post("/sessions/{user_id}/terminate")
 async def force_terminate_user_sessions(
-    user_id: str,
-    current_user: TokenPayload = Depends(get_current_admin)
+    user_id: str, current_user: TokenPayload = Depends(get_current_admin)
 ):
     """Admin endpoint to force terminate all sessions of a user."""
     try:
         from app.services.session_service import get_session_service
+
         session_service = get_session_service()
-        count = await session_service.terminate_all_user_sessions(user_id, reason="admin_forced")
+        count = await session_service.terminate_all_user_sessions(
+            user_id, reason="admin_forced"
+        )
 
         # Log this administrative action to audit trail
         try:
-            supabase.table("audit_trail").insert({
-                "action": "admin_session_terminated",
-                "event_category": "security",
-                "status": "success",
-                "details": {"terminated_user_id": user_id, "admin_user_id": current_user.sub},
-                "timestamp": datetime.now().isoformat()
-            }).execute()
+            supabase.table("audit_trail").insert(
+                {
+                    "action": "admin_session_terminated",
+                    "event_category": "security",
+                    "status": "success",
+                    "details": {
+                        "terminated_user_id": user_id,
+                        "admin_user_id": current_user.sub,
+                    },
+                    "timestamp": datetime.now().isoformat(),
+                }
+            ).execute()
         except Exception as audit_err:
             logger.debug(f"Audit log insertion skipped: {audit_err}")
 

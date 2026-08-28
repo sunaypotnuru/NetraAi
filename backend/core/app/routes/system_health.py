@@ -9,11 +9,14 @@ from datetime import datetime, timedelta
 import httpx
 import asyncio
 import os
+import logging
+
 from app.core.security import get_current_admin
 from app.models.schemas import TokenPayload
 from app.core.config import settings
 from app.services.supabase import supabase
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/admin/system-health", tags=["admin", "system-health"])
 
 _periodic_health_task: asyncio.Task | None = None
@@ -35,9 +38,11 @@ def _get_a2a_health_url() -> str:
     a2a_url = os.getenv("A2A_AGENT_URL")
     if a2a_url:
         return f"{a2a_url.rstrip('/')}/health"
-    
+
     # Fallback to MCP server URL as they are often hosted together
-    mcp_url = getattr(settings, "MCP_SERVER_URL", "https://rohith-panduru-netra-mcp-server.hf.space")
+    mcp_url = getattr(
+        settings, "MCP_SERVER_URL", "https://rohith-panduru-netra-mcp-server.hf.space"
+    )
     return f"{mcp_url.rstrip('/')}/health"
 
 
@@ -253,7 +258,9 @@ def start_periodic_health_monitor() -> None:
     try:
         interval = int(os.getenv("HEALTHCHECK_INTERVAL_SECONDS", "300"))
     except Exception as e:
-        logger.warning(f"Invalid HEALTHCHECK_INTERVAL_SECONDS value, using default 300s: {e}")
+        logger.warning(
+            f"Invalid HEALTHCHECK_INTERVAL_SECONDS value, using default 300s: {e}"
+        )
         interval = 300
 
     _periodic_health_task = asyncio.create_task(_periodic_health_monitor(interval))
@@ -296,10 +303,10 @@ async def check_redis_health() -> Dict:
         import redis.asyncio as redis
 
         redis_url = os.getenv("REDIS_URL", settings.REDIS_URL)
-        
+
         # If no custom Redis URL is set and we're in production, Redis might be internal or not used
         if "redis:6379" in redis_url and os.getenv("ENVIRONMENT") == "production":
-             return {
+            return {
                 "status": "healthy",
                 "latency_ms": 0.05,
                 "connected": True,
@@ -322,14 +329,22 @@ async def check_redis_health() -> Dict:
         # or might use a local in-memory fallback. We mark this as healthy to avoid
         # alarming the user if the system is still operational.
         error_str = str(e)
-        if any(msg in error_str for msg in ["Name or service not known", "Connection refused", "Connection reset", "Timeout"]):
-             return {
+        if any(
+            msg in error_str
+            for msg in [
+                "Name or service not known",
+                "Connection refused",
+                "Connection reset",
+                "Timeout",
+            ]
+        ):
+            return {
                 "status": "healthy",
                 "latency_ms": 0.1,
                 "connected": True,
                 "error_message": "Operational (Internal Memory Mode)",
             }
-        
+
         # If it's a critical error but we are in production, still try to be resilient
         if os.getenv("ENVIRONMENT") == "production":
             return {

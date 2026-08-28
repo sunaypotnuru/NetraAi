@@ -140,11 +140,11 @@ def _store_ai_chat_turn(
     """
     try:
         from app.utils.encryption import encrypt_sensitive_data
-        
+
         # Encrypt sensitive content before storage (HIPAA compliance)
         encrypted_prompt = encrypt_sensitive_data((prompt or "")[:5000])
         encrypted_reply = encrypt_sensitive_data((reply or "")[:20000])
-        
+
         # Fallback to plaintext if encryption fails (log warning)
         if encrypted_prompt is None:
             logger.warning("Chat prompt encryption failed - storing in plaintext")
@@ -152,7 +152,7 @@ def _store_ai_chat_turn(
         if encrypted_reply is None:
             logger.warning("Chat reply encryption failed - storing in plaintext")
             encrypted_reply = (reply or "")[:20000]
-        
+
         supabase.table("ai_chat_history").insert(
             {
                 "id": message_id,

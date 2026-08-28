@@ -148,14 +148,17 @@ async def call_next_patient_legacy(
                     "message": "The doctor is ready for your consultation. Please join the call now.",
                     "payload": {
                         "appointment_id": next_patient["appointment_id"],
-                        "action": "join_call"
-                    }
+                        "action": "join_call",
+                    },
                 },
-                next_patient["patient_id"]
+                next_patient["patient_id"],
             )
         except Exception as ws_error:
             import logging
-            logging.getLogger(__name__).error(f"Failed to send WebSocket notification: {ws_error}")
+
+            logging.getLogger(__name__).error(
+                f"Failed to send WebSocket notification: {ws_error}"
+            )
 
         return {
             "message": "Patient called successfully",
@@ -492,14 +495,17 @@ async def call_next_patient(
                     "message": "The doctor is ready for your consultation. Please join the call now.",
                     "payload": {
                         "appointment_id": result.get("consultation_id"),
-                        "action": "join_call"
-                    }
+                        "action": "join_call",
+                    },
                 },
-                patient_id
+                patient_id,
             )
     except Exception as ws_error:
         import logging
-        logging.getLogger(__name__).error(f"Failed to send WebSocket notification: {ws_error}")
+
+        logging.getLogger(__name__).error(
+            f"Failed to send WebSocket notification: {ws_error}"
+        )
 
     return result
 

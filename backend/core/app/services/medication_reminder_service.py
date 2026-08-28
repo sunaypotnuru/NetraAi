@@ -28,12 +28,18 @@ class MedicationReminderService:
             return medication
 
         # Ensure medication_name is populated from name
-        name_val = medication.get(Col.Medications.NAME) or medication.get("medication_name")
+        name_val = medication.get(Col.Medications.NAME) or medication.get(
+            "medication_name"
+        )
         medication["medication_name"] = name_val
         medication["name"] = name_val
 
         # Ensure reminder_times/time_slots are synchronized
-        times_val = medication.get(Col.Medications.REMINDER_TIMES) or medication.get("time_slots") or []
+        times_val = (
+            medication.get(Col.Medications.REMINDER_TIMES)
+            or medication.get("time_slots")
+            or []
+        )
         medication["reminder_times"] = times_val
         medication["time_slots"] = times_val
 
@@ -76,10 +82,10 @@ class MedicationReminderService:
             Col.Medications.FREQUENCY: mapped_data.get("frequency"),
             Col.Medications.START_DATE: mapped_data.get("start_date"),
             Col.Medications.END_DATE: mapped_data.get("end_date"),
-            Col.Medications.REMINDER_TIMES: mapped_data.get(Col.Medications.REMINDER_TIMES, []),
-            Col.Medications.REMINDER_ENABLED: mapped_data.get(
-                "reminder_enabled", True
+            Col.Medications.REMINDER_TIMES: mapped_data.get(
+                Col.Medications.REMINDER_TIMES, []
             ),
+            Col.Medications.REMINDER_ENABLED: mapped_data.get("reminder_enabled", True),
             Col.Medications.IS_ACTIVE: True,
             Col.Medications.ADHERENCE_RATE: 0.0,
             Col.Medications.CREATED_AT: datetime.now().isoformat(),
@@ -148,7 +154,11 @@ class MedicationReminderService:
         query = query.range(offset, offset + limit - 1)
 
         response = query.execute()
-        meds = [self._map_medication(med) for med in response.data] if response.data else []
+        meds = (
+            [self._map_medication(med) for med in response.data]
+            if response.data
+            else []
+        )
 
         return {
             "medications": meds,

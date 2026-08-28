@@ -128,7 +128,11 @@ class FamilyAccountService:
             Col.FamilyMembers.PRIMARY_USER_ID: primary_user_id,
             Col.FamilyMembers.MEMBER_USER_ID: member_user_id,
             Col.FamilyMembers.NAME: member_name,
-            Col.FamilyMembers.RELATIONSHIP: member_data["relationship"].lower() if member_data.get("relationship") else "other",
+            Col.FamilyMembers.RELATIONSHIP: (
+                member_data["relationship"].lower()
+                if member_data.get("relationship")
+                else "other"
+            ),
             Col.FamilyMembers.CAN_VIEW_RECORDS: member_data.get(
                 "can_view_records", False
             ),

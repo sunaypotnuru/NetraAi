@@ -73,13 +73,18 @@ class RateLimitingMiddleware(BaseHTTPMiddleware):
         import sys
 
         # Skip health checks, docs, or test environment requests from rate limiting
-        if request.url.path in [
-            "/api/v1/health",
-            "/api/v1/health/detailed",
-            "/docs",
-            "/openapi.json",
-            "/",
-        ] or os.getenv("ALLOW_MOCK_RESPONSES") == "true" or "pytest" in sys.modules:
+        if (
+            request.url.path
+            in [
+                "/api/v1/health",
+                "/api/v1/health/detailed",
+                "/docs",
+                "/openapi.json",
+                "/",
+            ]
+            or os.getenv("ALLOW_MOCK_RESPONSES") == "true"
+            or "pytest" in sys.modules
+        ):
             response = await call_next(request)
             for header, value in SECURITY_HEADERS.items():
                 response.headers[header] = value

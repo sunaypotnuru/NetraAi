@@ -90,8 +90,12 @@ def _generate_mock_fda_metrics(model_name: str, hours: int):
             {
                 "model_name": model_name,
                 "timestamp": ts.isoformat() + "Z",
-                "sensitivity": max(0.7, base_sens + (secrets.randbelow(31) - 15) / 1000.0),
-                "specificity": max(0.7, base_sens + (secrets.randbelow(31) - 15) / 1000.0),
+                "sensitivity": max(
+                    0.7, base_sens + (secrets.randbelow(31) - 15) / 1000.0
+                ),
+                "specificity": max(
+                    0.7, base_sens + (secrets.randbelow(31) - 15) / 1000.0
+                ),
                 "ppv": max(0.7, base_sens + (secrets.randbelow(41) - 20) / 1000.0),
                 "npv": max(0.8, base_sens + (secrets.randbelow(21) - 10) / 1000.0),
                 "auc_roc": max(0.8, base_sens + (secrets.randbelow(21) - 10) / 1000.0),
@@ -355,7 +359,10 @@ async def get_iec_phases():
                 "name": "5.1 Software Development Planning",
                 "status": "Completed",
                 "progress": 100,
-                "artifacts": ["Software Development Plan v2.1", "Risk Management Plan v1.4"],
+                "artifacts": [
+                    "Software Development Plan v2.1",
+                    "Risk Management Plan v1.4",
+                ],
             },
             {
                 "id": "PH-02",
@@ -390,7 +397,10 @@ async def get_iec_phases():
                 "name": "5.6 Integration & Integration Testing",
                 "status": "In Progress",
                 "progress": 90,
-                "artifacts": ["FastAPI Core Integration Tests", "Supabase Client Verification"],
+                "artifacts": [
+                    "FastAPI Core Integration Tests",
+                    "Supabase Client Verification",
+                ],
             },
             {
                 "id": "PH-07",
@@ -523,35 +533,57 @@ async def get_complaints(
 
         if complaints:
             # Batch fetch related categories and subcategories to minimize queries and prevent N+1 queries
-            category_ids = list(set(c["category_id"] for c in complaints if c.get("category_id")))
-            subcategory_ids = list(set(c["subcategory_id"] for c in complaints if c.get("subcategory_id")))
+            category_ids = list(
+                set(c["category_id"] for c in complaints if c.get("category_id"))
+            )
+            subcategory_ids = list(
+                set(c["subcategory_id"] for c in complaints if c.get("subcategory_id"))
+            )
 
             categories_map = {}
             if category_ids:
-                cat_res = supabase.table("complaint_categories").select("id, category_name").in_("id", category_ids).execute()
+                cat_res = (
+                    supabase.table("complaint_categories")
+                    .select("id, category_name")
+                    .in_("id", category_ids)
+                    .execute()
+                )
                 categories_map = {cat["id"]: cat for cat in (cat_res.data or [])}
 
             subcategories_map = {}
             if subcategory_ids:
-                subcat_res = supabase.table("complaint_subcategories").select("id, subcategory_name").in_("id", subcategory_ids).execute()
-                subcategories_map = {subcat["id"]: subcat for subcat in (subcat_res.data or [])}
+                subcat_res = (
+                    supabase.table("complaint_subcategories")
+                    .select("id, subcategory_name")
+                    .in_("id", subcategory_ids)
+                    .execute()
+                )
+                subcategories_map = {
+                    subcat["id"]: subcat for subcat in (subcat_res.data or [])
+                }
 
             for c in complaints:
                 # Submitter details are already captured in submitter_name / submitter_email columns
                 c["reporter"] = {
                     "full_name": c.get("submitter_name") or "Anonymous",
-                    "email": c.get("submitter_email") or "anonymous@netra-ai.com"
+                    "email": c.get("submitter_email") or "anonymous@netra-ai.com",
                 }
-                
+
                 cat_id = c.get("category_id")
                 if cat_id and cat_id in categories_map:
-                    c["category"] = {"category_name": categories_map[cat_id].get("category_name")}
+                    c["category"] = {
+                        "category_name": categories_map[cat_id].get("category_name")
+                    }
                 else:
                     c["category"] = {"category_name": c.get("category", "General")}
 
                 subcat_id = c.get("subcategory_id")
                 if subcat_id and subcat_id in subcategories_map:
-                    c["subcategory"] = {"subcategory_name": subcategories_map[subcat_id].get("subcategory_name")}
+                    c["subcategory"] = {
+                        "subcategory_name": subcategories_map[subcat_id].get(
+                            "subcategory_name"
+                        )
+                    }
                 else:
                     c["subcategory"] = {"subcategory_name": "General"}
 
@@ -591,8 +623,9 @@ async def create_complaint(data: dict, current_user=Depends(get_current_user)):
     """Create a new clinical grievance (Reporter-linked)."""
     try:
         import uuid
+
         ticket_id = f"TKT-{str(uuid.uuid4())[:8].upper()}"
-        
+
         new_complaint = {
             "ticket_id": ticket_id,
             "reporter_id": current_user.get("sub"),

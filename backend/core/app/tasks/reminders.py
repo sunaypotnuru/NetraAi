@@ -64,13 +64,24 @@ async def check_and_send_24h_reminders():
         for appt in appointments:
             try:
                 # Attempt to atomically claim the reminder (mitigates multi-worker race condition)
-                update_res = supabase.table("appointments").update(
-                    {"reminder_24h_sent": True, "reminder_24h_sent_at": now.isoformat()}
-                ).eq("id", appt["id"]).is_("reminder_24h_sent", "null").execute()
-                
+                update_res = (
+                    supabase.table("appointments")
+                    .update(
+                        {
+                            "reminder_24h_sent": True,
+                            "reminder_24h_sent_at": now.isoformat(),
+                        }
+                    )
+                    .eq("id", appt["id"])
+                    .is_("reminder_24h_sent", "null")
+                    .execute()
+                )
+
                 # If no rows updated, it means another worker already claimed it
                 if not update_res.data:
-                    logger.debug(f"Appointment {appt['id']} already processed for 24h reminder")
+                    logger.debug(
+                        f"Appointment {appt['id']} already processed for 24h reminder"
+                    )
                     continue
 
                 try:
@@ -134,18 +145,31 @@ async def check_and_send_1h_reminders():
         for appt in appointments:
             try:
                 # Attempt to atomically claim the reminder
-                update_res = supabase.table("appointments").update(
-                    {"reminder_1h_sent": True, "reminder_1h_sent_at": now.isoformat()}
-                ).eq("id", appt["id"]).is_("reminder_1h_sent", "null").execute()
-                
+                update_res = (
+                    supabase.table("appointments")
+                    .update(
+                        {
+                            "reminder_1h_sent": True,
+                            "reminder_1h_sent_at": now.isoformat(),
+                        }
+                    )
+                    .eq("id", appt["id"])
+                    .is_("reminder_1h_sent", "null")
+                    .execute()
+                )
+
                 if not update_res.data:
-                    logger.debug(f"Appointment {appt['id']} already processed for 1h reminder")
+                    logger.debug(
+                        f"Appointment {appt['id']} already processed for 1h reminder"
+                    )
                     continue
 
                 try:
                     # Send reminder
                     status = await reminder_service.send_1h_reminder(appt["id"])
-                    logger.info(f"1h reminder sent: id={appt['id']}, sms={status['sms']}")
+                    logger.info(
+                        f"1h reminder sent: id={appt['id']}, sms={status['sms']}"
+                    )
                 except Exception as e:
                     # Rollback the update
                     supabase.table("appointments").update(

@@ -7,7 +7,14 @@ PHASE 3 ENHANCEMENTS:
 - PDF/Excel export for enterprise-ready reports
 """
 
-from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect, status, HTTPException
+from fastapi import (
+    APIRouter,
+    Depends,
+    WebSocket,
+    WebSocketDisconnect,
+    status,
+    HTTPException,
+)
 from fastapi.responses import StreamingResponse
 from typing import Dict, List, Optional
 from datetime import datetime
@@ -207,38 +214,46 @@ async def get_mcp_tool_metrics() -> List[Dict]:
     """Get metrics for all MCP tools."""
     # QUERY: Use optimized tool performance view
     response = supabase.table("vw_mcp_tool_performance").select("*").execute()
-    db_metrics = {row["tool_name"]: row for row in response.data} if response.data else {}
-    
+    db_metrics = (
+        {row["tool_name"]: row for row in response.data} if response.data else {}
+    )
+
     tool_metrics = []
     for tool in MCP_TOOLS:
         db_row = db_metrics.get(tool["name"])
-        
+
         if db_row:
-            tool_metrics.append({
-                "name": tool["name"],
-                "description": tool["description"],
-                "category": tool["category"],
-                "icon": tool["icon"],
-                "status": "healthy" if db_row["success_rate"] >= 0.95 else "degraded",
-                "calls": db_row["total_calls"],
-                "avg_latency_ms": db_row["avg_latency_ms"],
-                "success_rate": db_row["success_rate"],
-                "last_used": db_row["last_used"]
-            })
+            tool_metrics.append(
+                {
+                    "name": tool["name"],
+                    "description": tool["description"],
+                    "category": tool["category"],
+                    "icon": tool["icon"],
+                    "status": (
+                        "healthy" if db_row["success_rate"] >= 0.95 else "degraded"
+                    ),
+                    "calls": db_row["total_calls"],
+                    "avg_latency_ms": db_row["avg_latency_ms"],
+                    "success_rate": db_row["success_rate"],
+                    "last_used": db_row["last_used"],
+                }
+            )
         else:
             # Fallback for tools with no logs yet
-            tool_metrics.append({
-                "name": tool["name"],
-                "description": tool["description"],
-                "category": tool["category"],
-                "icon": tool["icon"],
-                "status": "unknown",
-                "calls": 0,
-                "avg_latency_ms": 0.0,
-                "success_rate": 0.0,
-                "last_used": None
-            })
-            
+            tool_metrics.append(
+                {
+                    "name": tool["name"],
+                    "description": tool["description"],
+                    "category": tool["category"],
+                    "icon": tool["icon"],
+                    "status": "unknown",
+                    "calls": 0,
+                    "avg_latency_ms": 0.0,
+                    "success_rate": 0.0,
+                    "last_used": None,
+                }
+            )
+
     return tool_metrics
 
 
@@ -277,7 +292,8 @@ async def get_mcp_health(current_user: TokenPayload = Depends(get_current_admin)
 
     # Calculate overall success rate
     success_rate = (
-        sum(tool["success_rate"] * tool["calls"] for tool in tool_metrics) / total_invocations
+        sum(tool["success_rate"] * tool["calls"] for tool in tool_metrics)
+        / total_invocations
         if total_invocations > 0
         else 1.0
     )
@@ -408,7 +424,7 @@ async def test_mcp_tool(
 
             if response.status_code == 200:
                 result_data = response.json()
-                
+
                 # Log execution to audit system
                 audit_manager.add_log(
                     tool_name=tool_name,
@@ -418,8 +434,10 @@ async def test_mcp_tool(
                     details={
                         "test_mode": True,
                         "arguments": sample_data,
-                        "result_summary": str(result_data)[:500] if result_data else "None"
-                    }
+                        "result_summary": (
+                            str(result_data)[:500] if result_data else "None"
+                        ),
+                    },
                 )
 
                 return {
@@ -441,8 +459,8 @@ async def test_mcp_tool(
                     details={
                         "test_mode": True,
                         "error": f"MCP Server returned status {response.status_code}",
-                        "response_text": response.text[:500] if response.text else None
-                    }
+                        "response_text": response.text[:500] if response.text else None,
+                    },
                 )
 
                 return {
@@ -479,7 +497,7 @@ async def test_mcp_tool(
             status="FAILED",
             patient_id="UNKNOWN",
             latency_ms=0,
-            details={"error": error_msg, "error_type": type(e).__name__}
+            details={"error": error_msg, "error_type": type(e).__name__},
         )
         return {
             "status": "failed",
@@ -618,25 +636,33 @@ async def get_usage_trends(
         # QUERY: Use optimized hourly view
         response = supabase.table("vw_mcp_usage_trends_hourly").select("*").execute()
         hours = response.data if response.data else []
-        
+
         # Rename keys to match expected response if necessary
         # View uses: hour_label, total_invocations, anemia, cataract, dr, mental_health, parkinsons, fhir
         formatted_hours = []
         for h in hours:
-            formatted_hours.append({
-                "hour": h["hour_label"],
-                "total_invocations": h["total_invocations"],
-                "anemia": h["anemia"],
-                "cataract": h["cataract"],
-                "dr": h["dr"],
-                "mental_health": h["mental_health"],
-                "parkinsons": h["parkinsons"],
-                "fhir": h["fhir"]
-            })
+            formatted_hours.append(
+                {
+                    "hour": h["hour_label"],
+                    "total_invocations": h["total_invocations"],
+                    "anemia": h["anemia"],
+                    "cataract": h["cataract"],
+                    "dr": h["dr"],
+                    "mental_health": h["mental_health"],
+                    "parkinsons": h["parkinsons"],
+                    "fhir": h["fhir"],
+                }
+            )
 
         if not formatted_hours:
             # Fallback for empty DB
-            return {"timeframe": timeframe, "data": [], "total_invocations": 0, "peak_hour": "00:00", "timestamp": datetime.now().isoformat()}
+            return {
+                "timeframe": timeframe,
+                "data": [],
+                "total_invocations": 0,
+                "peak_hour": "00:00",
+                "timestamp": datetime.now().isoformat(),
+            }
 
         total = sum(h["total_invocations"] for h in formatted_hours)
         peak = max(formatted_hours, key=lambda x: x["total_invocations"])
@@ -647,31 +673,41 @@ async def get_usage_trends(
             "total_invocations": total,
             "peak_hour": peak["hour"],
             "peak_invocations": peak["total_invocations"],
-            "avg_per_hour": round(total / len(formatted_hours), 2) if formatted_hours else 0,
+            "avg_per_hour": (
+                round(total / len(formatted_hours), 2) if formatted_hours else 0
+            ),
             "timestamp": datetime.now().isoformat(),
         }
 
     elif timeframe in ["7d", "30d"]:
         # QUERY: Use optimized daily view
         limit = 7 if timeframe == "7d" else 30
-        response = supabase.table("vw_mcp_usage_trends_daily").select("*").order("day_label", desc=True).limit(limit).execute()
+        response = (
+            supabase.table("vw_mcp_usage_trends_daily")
+            .select("*")
+            .order("day_label", desc=True)
+            .limit(limit)
+            .execute()
+        )
         days_data = response.data if response.data else []
-        
+
         # Reverse to get chronological order
         days_data.reverse()
-        
+
         formatted_days = []
         for d in days_data:
-            formatted_days.append({
-                "day": d["day_label"],
-                "total_invocations": d["total_invocations"],
-                "anemia": d["anemia"],
-                "cataract": d["cataract"],
-                "dr": d["dr"],
-                "mental_health": d["mental_health"],
-                "parkinsons": d["parkinsons"],
-                "fhir": d["fhir"]
-            })
+            formatted_days.append(
+                {
+                    "day": d["day_label"],
+                    "total_invocations": d["total_invocations"],
+                    "anemia": d["anemia"],
+                    "cataract": d["cataract"],
+                    "dr": d["dr"],
+                    "mental_health": d["mental_health"],
+                    "parkinsons": d["parkinsons"],
+                    "fhir": d["fhir"],
+                }
+            )
 
         total = sum(d["total_invocations"] for d in formatted_days)
 
@@ -679,7 +715,9 @@ async def get_usage_trends(
             "timeframe": timeframe,
             "data": formatted_days,
             "total_invocations": total,
-            "avg_per_day": round(total / len(formatted_days), 2) if formatted_days else 0,
+            "avg_per_day": (
+                round(total / len(formatted_days), 2) if formatted_days else 0
+            ),
             "timestamp": datetime.now().isoformat(),
         }
 
@@ -701,22 +739,30 @@ async def get_success_rates(current_user: TokenPayload = Depends(get_current_adm
     # QUERY: Use optimized performance view
     response = supabase.table("vw_mcp_tool_performance").select("*").execute()
     perf_data = response.data if response.data else []
-    
+
     formatted_tools = []
     for p in perf_data:
         # Match expected UI labels
-        tool_display_name = p["tool_name"].replace("_tool", "").replace("_", " ").title()
-        
-        formatted_tools.append({
-            "tool": tool_display_name,
-            "category": "Diagnostics" if "screen" in p["tool_name"] or "detect" in p["tool_name"] else "Analysis",
-            "success_rate": p["success_rate"],
-            "total_calls": p["total_calls"],
-            "successful_calls": p["successful_calls"],
-            "failed_calls": p["failed_calls"],
-            "avg_latency_ms": p["avg_latency_ms"],
-            "last_used": p["last_used"]
-        })
+        tool_display_name = (
+            p["tool_name"].replace("_tool", "").replace("_", " ").title()
+        )
+
+        formatted_tools.append(
+            {
+                "tool": tool_display_name,
+                "category": (
+                    "Diagnostics"
+                    if "screen" in p["tool_name"] or "detect" in p["tool_name"]
+                    else "Analysis"
+                ),
+                "success_rate": p["success_rate"],
+                "total_calls": p["total_calls"],
+                "successful_calls": p["successful_calls"],
+                "failed_calls": p["failed_calls"],
+                "avg_latency_ms": p["avg_latency_ms"],
+                "last_used": p["last_used"],
+            }
+        )
 
     if not formatted_tools:
         return {
@@ -728,7 +774,9 @@ async def get_success_rates(current_user: TokenPayload = Depends(get_current_adm
             "timestamp": datetime.now().isoformat(),
         }
 
-    overall_success = sum(t["success_rate"] for t in formatted_tools) / len(formatted_tools)
+    overall_success = sum(t["success_rate"] for t in formatted_tools) / len(
+        formatted_tools
+    )
 
     return {
         "tools": formatted_tools,
@@ -758,7 +806,7 @@ async def get_latency_distribution(
     # QUERY: Use optimized latency stats view
     response = supabase.table("vw_mcp_latency_stats").select("*").execute()
     stats = response.data[0] if response.data else None
-    
+
     if not stats or stats["total_requests"] == 0:
         return {
             "buckets": [],
@@ -773,14 +821,30 @@ async def get_latency_distribution(
     # For buckets, we'll still need some raw data or a more complex view.
     # Since we want to avoid massive data transfer, we'll use a simplified bucket representation
     # or a separate query for bucket counts.
-    
+
     # Simplified histogram (can be improved with a dedicated SQL function if needed)
     return {
         "buckets": [
-            {"range": "0-200ms", "count": stats["total_requests"] // 2, "percentage": 50.0},
-            {"range": "200-500ms", "count": stats["total_requests"] // 3, "percentage": 33.3},
-            {"range": "500-1000ms", "count": stats["total_requests"] // 10, "percentage": 10.0},
-            {"range": "1000ms+", "count": stats["total_requests"] // 15, "percentage": 6.7},
+            {
+                "range": "0-200ms",
+                "count": stats["total_requests"] // 2,
+                "percentage": 50.0,
+            },
+            {
+                "range": "200-500ms",
+                "count": stats["total_requests"] // 3,
+                "percentage": 33.3,
+            },
+            {
+                "range": "500-1000ms",
+                "count": stats["total_requests"] // 10,
+                "percentage": 10.0,
+            },
+            {
+                "range": "1000ms+",
+                "count": stats["total_requests"] // 15,
+                "percentage": 6.7,
+            },
         ],
         "percentiles": {
             "p50": round(stats["p50"], 2),
@@ -816,7 +880,7 @@ async def get_geographic_distribution(
         # Count from database
         response = supabase.table("audit_logs").select("id", count="exact").execute()
         total_requests = response.count if hasattr(response, "count") else 0
-        
+
         return {
             "regions": [
                 {
@@ -881,25 +945,35 @@ async def get_error_breakdown(current_user: TokenPayload = Depends(get_current_a
     # QUERY: Use optimized error breakdown view
     response = supabase.table("vw_mcp_error_breakdown").select("*").execute()
     error_data = response.data if response.data else []
-    
+
     total_errors = sum(e["count"] for e in error_data)
-    
+
     formatted_errors = []
     for e in error_data:
-        severity = "high" if e["error_type"] in ["Internal Server Error", "Database Error"] else "medium"
-        
-        formatted_errors.append({
-            "type": e["error_type"],
-            "count": e["count"],
-            "percentage": round((e["count"] / total_errors) * 100, 2) if total_errors else 0,
-            "severity": severity
-        })
+        severity = (
+            "high"
+            if e["error_type"] in ["Internal Server Error", "Database Error"]
+            else "medium"
+        )
+
+        formatted_errors.append(
+            {
+                "type": e["error_type"],
+                "count": e["count"],
+                "percentage": (
+                    round((e["count"] / total_errors) * 100, 2) if total_errors else 0
+                ),
+                "severity": severity,
+            }
+        )
 
     return {
         "error_types": formatted_errors,
         "total_errors": total_errors,
-        "most_common_error": formatted_errors[0]["type"] if formatted_errors else "None",
-        "error_rate": 0, # Could calculate this if we join with total calls
+        "most_common_error": (
+            formatted_errors[0]["type"] if formatted_errors else "None"
+        ),
+        "error_rate": 0,  # Could calculate this if we join with total calls
         "timestamp": datetime.now().isoformat(),
     }
 
@@ -911,13 +985,12 @@ async def get_error_breakdown(current_user: TokenPayload = Depends(get_current_a
 
 @router.post("/log")
 async def report_tool_execution(
-    data: Dict, 
-    current_user: TokenPayload = Depends(get_current_admin)
+    data: Dict, current_user: TokenPayload = Depends(get_current_admin)
 ):
     """
     Endpoint for external services (like A2A Agent) to report tool execution.
     This ensures all activity is captured in the analytics system.
-    
+
     Required fields in data:
     - tool_name: str
     - status: str (SUCCESS, ERROR, FAILED)
@@ -930,22 +1003,22 @@ async def report_tool_execution(
     patient_id = data.get("patient_id", "UNKNOWN")
     latency_ms = data.get("latency_ms", 0)
     details = data.get("details", {})
-    
+
     if not tool_name:
         raise HTTPException(status_code=400, detail="tool_name is required")
-        
+
     log_entry = audit_manager.add_log(
         tool_name=tool_name,
         status=status,
         patient_id=patient_id,
         latency_ms=latency_ms,
-        details=details
+        details=details,
     )
-    
+
     return {
         "status": "logged",
         "log_id": log_entry.get("id"),
-        "timestamp": log_entry.get("timestamp")
+        "timestamp": log_entry.get("timestamp"),
     }
 
 
@@ -979,7 +1052,7 @@ class AuditLogManager:
                 .limit(50)
                 .execute()
             )
-            
+
             if response.data:
                 # Transform DB format to match expected WebSocket format
                 for log in reversed(response.data):
@@ -1061,7 +1134,9 @@ class AuditLogManager:
                 user_id=None,  # System-level call
                 action=f"MCP Tool: {tool_name}",
                 resource_type=f"{tool_name}_tool",
-                resource_id=patient_id if patient_id and patient_id != "DEMO_001" else None,
+                resource_id=(
+                    patient_id if patient_id and patient_id != "DEMO_001" else None
+                ),
                 details={
                     **(details or {}),
                     "latency_ms": round(latency_ms, 2),
@@ -1424,7 +1499,11 @@ async def export_audit_logs_pdf(
     - PDF file with audit logs
     """
     # Query logs from database
-    query = supabase.table("audit_logs").select("*").filter("resource_type", "like", "%_tool")
+    query = (
+        supabase.table("audit_logs")
+        .select("*")
+        .filter("resource_type", "like", "%_tool")
+    )
 
     if tool_name:
         query = query.eq("resource_type", tool_name)
@@ -1437,18 +1516,20 @@ async def export_audit_logs_pdf(
 
     response = query.order("created_at", desc=True).limit(1000).execute()
     db_logs = response.data if response.data else []
-    
+
     # Map DB format
     logs = []
     for log in db_logs:
-        logs.append({
-            "timestamp": log["created_at"],
-            "tool_name": log["resource_type"],
-            "status": log["status"].upper(),
-            "patient_id": log["resource_id"] or "UNKNOWN",
-            "latency_ms": (log.get("details") or {}).get("latency_ms", 0),
-            "event_type": "tool_execution"
-        })
+        logs.append(
+            {
+                "timestamp": log["created_at"],
+                "tool_name": log["resource_type"],
+                "status": log["status"].upper(),
+                "patient_id": log["resource_id"] or "UNKNOWN",
+                "latency_ms": (log.get("details") or {}).get("latency_ms", 0),
+                "event_type": "tool_execution",
+            }
+        )
 
     try:
         pdf_generator = PDFReportGenerator()
@@ -1491,7 +1572,11 @@ async def export_audit_logs_excel(
     - Excel file with audit logs
     """
     # Query logs from database
-    query = supabase.table("audit_logs").select("*").filter("resource_type", "like", "%_tool")
+    query = (
+        supabase.table("audit_logs")
+        .select("*")
+        .filter("resource_type", "like", "%_tool")
+    )
 
     if tool_name:
         query = query.eq("resource_type", tool_name)
@@ -1504,18 +1589,20 @@ async def export_audit_logs_excel(
 
     response = query.order("created_at", desc=True).limit(1000).execute()
     db_logs = response.data if response.data else []
-    
+
     # Map DB format
     logs = []
     for log in db_logs:
-        logs.append({
-            "timestamp": log["created_at"],
-            "tool_name": log["resource_type"],
-            "status": log["status"].upper(),
-            "patient_id": log["resource_id"] or "UNKNOWN",
-            "latency_ms": (log.get("details") or {}).get("latency_ms", 0),
-            "event_type": "tool_execution"
-        })
+        logs.append(
+            {
+                "timestamp": log["created_at"],
+                "tool_name": log["resource_type"],
+                "status": log["status"].upper(),
+                "patient_id": log["resource_id"] or "UNKNOWN",
+                "latency_ms": (log.get("details") or {}).get("latency_ms", 0),
+                "event_type": "tool_execution",
+            }
+        )
 
     try:
         excel_generator = ExcelReportGenerator()

@@ -344,7 +344,9 @@ async def delete_document(
             try:
                 supabase.storage.from_("documents").remove([storage_path])
             except Exception as e:
-                logger.warning(f"Failed to delete document from storage: {storage_path}. Error: {e}")
+                logger.warning(
+                    f"Failed to delete document from storage: {storage_path}. Error: {e}"
+                )
                 # Non-fatal; proceed with DB deletion
 
         del_res = supabase.table("documents").delete().eq("id", document_id).execute()

@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 audio_buffers: Dict[str, bytearray] = {}
 background_tasks = set()
 
+
 def _run_transcription_sync(ulaw_path: str, wav_path: str) -> str:
     """Synchronous CPU/IO intensive task to be run in a thread"""
     subprocess.run(
@@ -52,6 +53,7 @@ def _run_transcription_sync(ulaw_path: str, wav_path: str) -> str:
     segments, info = model.transcribe(wav_path, beam_size=5)
     return " ".join([segment.text for segment in segments])
 
+
 async def finalize_transcription(call_sid: str):
     """Offline background task to convert uLAW to WAV via ffmpeg and transcribe with Whisper."""
     if call_sid not in audio_buffers:
@@ -76,9 +78,11 @@ async def finalize_transcription(call_sid: str):
             ulaw_path = f.name
 
         wav_path = ulaw_path.replace(".ulaw", ".wav")
-        
+
         # Run blocking FFMPEG and WhisperModel transcription in a separate thread
-        transcript = await asyncio.to_thread(_run_transcription_sync, ulaw_path, wav_path)
+        transcript = await asyncio.to_thread(
+            _run_transcription_sync, ulaw_path, wav_path
+        )
 
         if transcript:
             supabase.table("voice_call_logs").update({"transcript": transcript}).eq(
@@ -521,10 +525,9 @@ async def websocket_endpoint(websocket: WebSocket):
             )
 
             done, pending = await asyncio.wait(
-                [task_tw, task_oai],
-                return_when=asyncio.FIRST_COMPLETED
+                [task_tw, task_oai], return_when=asyncio.FIRST_COMPLETED
             )
-            
+
             for task in pending:
                 task.cancel()
                 try:

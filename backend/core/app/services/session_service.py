@@ -259,7 +259,12 @@ class SessionService:
                 .execute()
             )
 
-            if not result or not hasattr(result, "data") or not result.data or not result.data.get("is_active"):
+            if (
+                not result
+                or not hasattr(result, "data")
+                or not result.data
+                or not result.data.get("is_active")
+            ):
                 return None
 
             expires_at = datetime.fromisoformat(
@@ -339,7 +344,10 @@ class SessionService:
             return False
 
     async def terminate_all_user_sessions(
-        self, user_id: str, except_session: Optional[str] = None, reason: str = "user_logout_all"
+        self,
+        user_id: str,
+        except_session: Optional[str] = None,
+        reason: str = "user_logout_all",
     ) -> int:
         """
         Terminate all sessions for a user.
@@ -375,8 +383,14 @@ class SessionService:
 
             result = query.execute()
 
-            count = len(result.data) if result and hasattr(result, "data") and result.data else 0
-            logger.info(f"Terminated {count} sessions for user: {user_id[:8]}*** reason: {reason}")
+            count = (
+                len(result.data)
+                if result and hasattr(result, "data") and result.data
+                else 0
+            )
+            logger.info(
+                f"Terminated {count} sessions for user: {user_id[:8]}*** reason: {reason}"
+            )
 
             return count
 
@@ -409,7 +423,11 @@ class SessionService:
                 .execute()
             )
 
-            count = len(result.data) if result and hasattr(result, "data") and result.data else 0
+            count = (
+                len(result.data)
+                if result and hasattr(result, "data") and result.data
+                else 0
+            )
 
             if count > 0:
                 logger.info(f"Cleaned up {count} expired sessions")

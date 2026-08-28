@@ -23,9 +23,11 @@ else:
     key_source = (
         "SUPABASE_SERVICE_KEY"
         if settings.SUPABASE_SERVICE_KEY
-        else "SUPABASE_SERVICE_ROLE_KEY"
-        if settings.SUPABASE_SERVICE_ROLE_KEY
-        else "ENV_VAR"
+        else (
+            "SUPABASE_SERVICE_ROLE_KEY"
+            if settings.SUPABASE_SERVICE_ROLE_KEY
+            else "ENV_VAR"
+        )
     )
     logger.info("Supabase service key loaded from %s.", key_source)
 

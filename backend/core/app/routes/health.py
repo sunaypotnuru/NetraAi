@@ -8,7 +8,9 @@ from datetime import datetime, timezone
 import time
 import psutil
 import os
+import logging
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/health", tags=["health"])
 
 _start_time = time.time()

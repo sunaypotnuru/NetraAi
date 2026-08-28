@@ -13,6 +13,9 @@ from fastapi.responses import StreamingResponse
 from typing import Optional, List
 from pydantic import BaseModel, Field
 from io import BytesIO
+from datetime import datetime
+from uuid import uuid4
+import logging
 
 from app.core.security import get_current_user
 from app.models.schemas import TokenPayload
@@ -20,7 +23,9 @@ from app.services.medication_reminder_service import get_medication_reminder_ser
 from app.services.health_goals_service import get_health_goals_service
 from app.services.family_account_service import get_family_account_service
 from app.services.document_service import get_document_service
+from app.services.supabase import supabase
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/patient", tags=["Patient Portal"])
 
 
@@ -124,7 +129,8 @@ class DocumentShare(BaseModel):
 
 @router.post("/medications")
 async def create_medication(
-    medication_data: MedicationCreate, current_user: TokenPayload = Depends(get_current_user)
+    medication_data: MedicationCreate,
+    current_user: TokenPayload = Depends(get_current_user),
 ):
     """Create a medication reminder"""
     service = get_medication_reminder_service()
@@ -225,7 +231,8 @@ async def delete_medication(
 
 @router.post("/medication-logs")
 async def log_medication(
-    log_data: MedicationLogCreate, current_user: TokenPayload = Depends(get_current_user)
+    log_data: MedicationLogCreate,
+    current_user: TokenPayload = Depends(get_current_user),
 ):
     """Log medication intake"""
     service = get_medication_reminder_service()
@@ -263,7 +270,8 @@ async def get_medication_logs(
 
 @router.get("/medication-adherence")
 async def get_medication_adherence(
-    medication_id: Optional[str] = None, current_user: TokenPayload = Depends(get_current_user)
+    medication_id: Optional[str] = None,
+    current_user: TokenPayload = Depends(get_current_user),
 ):
     """Get medication adherence statistics"""
     service = get_medication_reminder_service()
@@ -314,7 +322,9 @@ async def get_health_goals(
 
 
 @router.get("/health-goals/{goal_id}")
-async def get_health_goal(goal_id: str, current_user: TokenPayload = Depends(get_current_user)):
+async def get_health_goal(
+    goal_id: str, current_user: TokenPayload = Depends(get_current_user)
+):
     """Get a single health goal"""
     service = get_health_goals_service()
     goal = await service.get_goal(goal_id=goal_id, patient_id=current_user.sub)
@@ -358,7 +368,8 @@ async def delete_health_goal(
 
 @router.post("/goal-progress")
 async def log_goal_progress(
-    progress_data: GoalProgressCreate, current_user: TokenPayload = Depends(get_current_user)
+    progress_data: GoalProgressCreate,
+    current_user: TokenPayload = Depends(get_current_user),
 ):
     """Log progress for a health goal"""
     service = get_health_goals_service()
@@ -487,7 +498,9 @@ async def remove_family_member(
 
 
 @router.get("/family-dashboard")
-async def get_family_health_dashboard(current_user: TokenPayload = Depends(get_current_user)):
+async def get_family_health_dashboard(
+    current_user: TokenPayload = Depends(get_current_user),
+):
     """Get family health dashboard"""
     service = get_family_account_service()
     dashboard = await service.get_family_health_dashboard(
@@ -564,7 +577,9 @@ async def get_documents(
 
 
 @router.get("/documents/categories")
-async def get_document_categories(current_user: TokenPayload = Depends(get_current_user)):
+async def get_document_categories(
+    current_user: TokenPayload = Depends(get_current_user),
+):
     """Get document categories with counts"""
     service = get_document_service()
     categories = await service.get_document_categories(patient_id=current_user.sub)
@@ -573,7 +588,9 @@ async def get_document_categories(current_user: TokenPayload = Depends(get_curre
 
 
 @router.get("/documents/statistics")
-async def get_document_statistics(current_user: TokenPayload = Depends(get_current_user)):
+async def get_document_statistics(
+    current_user: TokenPayload = Depends(get_current_user),
+):
     """Get document storage statistics"""
     service = get_document_service()
     statistics = await service.get_storage_statistics(patient_id=current_user.sub)
@@ -599,7 +616,9 @@ async def get_document(
 
 @router.put("/documents/{document_id}")
 async def update_document(
-    document_id: str, update_data: dict, current_user: TokenPayload = Depends(get_current_user)
+    document_id: str,
+    update_data: dict,
+    current_user: TokenPayload = Depends(get_current_user),
 ):
     """Update document metadata"""
     service = get_document_service()
@@ -646,7 +665,9 @@ async def share_document(
 
     # Send message attachment to doctor chat thread
     try:
-        doc_title = share_data.title or (doc.get("title") if doc else "Medical Document")
+        doc_title = share_data.title or (
+            doc.get("title") if doc else "Medical Document"
+        )
         notes_text = f"\n\nNotes: {share_data.notes}" if share_data.notes else ""
         msg_body = f"📄 [Shared Document] {doc_title}{notes_text}\n\nThis document has been shared with your doctor portal."
 
@@ -667,13 +688,17 @@ async def share_document(
 
 @router.post("/documents/{document_id}/share")
 async def share_document_by_id(
-    document_id: str, share_data: dict, current_user: TokenPayload = Depends(get_current_user)
+    document_id: str,
+    share_data: dict,
+    current_user: TokenPayload = Depends(get_current_user),
 ):
     """Share document with doctor using document_id path parameter"""
     service = get_document_service()
     doctor_id = share_data.get("doctor_id") or share_data.get("doctorId") or ""
     notes = share_data.get("notes")
-    title = share_data.get("title") or share_data.get("documentTitle") or "Medical Document"
+    title = (
+        share_data.get("title") or share_data.get("documentTitle") or "Medical Document"
+    )
     doc = None
     try:
         doc = await service.share_document(
@@ -700,23 +725,11 @@ async def share_document_by_id(
         except Exception as msg_err:
             logger.warning(f"Failed to create chat attachment message: {msg_err}")
 
-    return doc or {"status": "shared", "document_id": document_id, "doctor_id": doctor_id}
-
-
-@router.post("/documents/{document_id}/share")
-async def share_document_by_id(
-    document_id: str, share_data: dict, current_user: TokenPayload = Depends(get_current_user)
-):
-    """Share document with doctor using document_id path parameter"""
-    service = get_document_service()
-    doctor_id = share_data.get("doctor_id") or share_data.get("doctorId")
-    document = await service.share_document(
-        document_id=document_id,
-        patient_id=current_user.sub,
-        doctor_id=doctor_id,
-    )
-
-    return document
+    return doc or {
+        "status": "shared",
+        "document_id": document_id,
+        "doctor_id": doctor_id,
+    }
 
 
 @router.post("/documents/{document_id}/unshare")
@@ -767,6 +780,7 @@ async def download_document(
 
 
 # --- MEDICATIONS ALIASES ---
+
 
 @router.get("/medications/{medication_id}/logs")
 async def get_medication_specific_logs(
@@ -823,6 +837,7 @@ async def update_medication_reminders(
 
 # --- HEALTH GOALS ALIASES ---
 
+
 @router.get("/goals")
 async def get_goals_alias(
     status: Optional[str] = None,
@@ -844,7 +859,9 @@ async def create_goal_alias(
 
 
 @router.get("/goals/achievements")
-async def get_goals_achievements_alias(current_user: TokenPayload = Depends(get_current_user)):
+async def get_goals_achievements_alias(
+    current_user: TokenPayload = Depends(get_current_user),
+):
     """Get achievements (alias for frontend goals api)"""
     service = get_health_goals_service()
     achievements = await service.get_achievements(patient_id=current_user.sub)
@@ -852,7 +869,9 @@ async def get_goals_achievements_alias(current_user: TokenPayload = Depends(get_
 
 
 @router.get("/goals/{goal_id}")
-async def get_goal_alias(goal_id: str, current_user: TokenPayload = Depends(get_current_user)):
+async def get_goal_alias(
+    goal_id: str, current_user: TokenPayload = Depends(get_current_user)
+):
     """Get a single health goal (alias for frontend goals api)"""
     return await get_health_goal(goal_id, current_user)
 
@@ -876,6 +895,7 @@ async def delete_goal_alias(
 
 
 # --- FAMILY MEMBER ALIASES ---
+
 
 @router.get("/family")
 async def get_family_alias(current_user: TokenPayload = Depends(get_current_user)):
@@ -921,6 +941,7 @@ async def remove_family_member_alias(
 
 # --- DOCUMENT ALIASES ---
 
+
 @router.post("/documents/upload")
 async def upload_document_alias(
     file: UploadFile = File(...),
@@ -956,12 +977,15 @@ async def share_document_alias(
 
 # --- HEALTH RECORDS HISTORY ---
 
+
 @router.get("/records/vitals")
 async def get_records_vitals(current_user: TokenPayload = Depends(get_current_user)):
     """Get vitals history (Patient Portal API match)"""
     import logging
+
     logger = logging.getLogger(__name__)
     from app.services.supabase import supabase
+
     try:
         res = (
             supabase.table("vitals_log")
@@ -977,11 +1001,15 @@ async def get_records_vitals(current_user: TokenPayload = Depends(get_current_us
 
 
 @router.get("/records/lab-results")
-async def get_records_lab_results(current_user: TokenPayload = Depends(get_current_user)):
+async def get_records_lab_results(
+    current_user: TokenPayload = Depends(get_current_user),
+):
     """Get lab results history (Patient Portal API match, maps scans to blood/lab assessments)"""
     import logging
+
     logger = logging.getLogger(__name__)
     from app.services.supabase import supabase
+
     try:
         res = (
             supabase.table("scans")
@@ -991,7 +1019,7 @@ async def get_records_lab_results(current_user: TokenPayload = Depends(get_curre
             .execute()
         )
         records = []
-        for scan in (res.data or []):
+        for scan in res.data or []:
             hgb = scan.get("hemoglobin_estimate")
             pred = scan.get("prediction") or "Completed"
 
@@ -1010,24 +1038,30 @@ async def get_records_lab_results(current_user: TokenPayload = Depends(get_curre
             elif "anemia" in pred.lower():
                 abnormal_flag = "L"
 
-            records.append({
-                "id": scan.get("id"),
-                "test_name": "Hemoglobin Scan Assessment",
-                "test_category": "Blood Screening",
-                "result_value": hgb,
-                "result_text": pred,
-                "units": "g/dL",
-                "reference_range": "12.0 - 16.0 g/dL",
-                "status": "final",
-                "abnormal_flag": abnormal_flag,
-                "critical_value": critical_value,
-                "reported_date": scan.get("reviewed_at") or scan.get("created_at"),
-                "created_at": scan.get("created_at"),
-                "ordered_by": "Netra AI Referral" if not scan.get("doctor_id") else "Primary Doctor",
-                "performed_by_lab": "Netra AI Computer Vision Platform",
-                "collected_date": scan.get("created_at"),
-                "notes": scan.get("recommendations")
-            })
+            records.append(
+                {
+                    "id": scan.get("id"),
+                    "test_name": "Hemoglobin Scan Assessment",
+                    "test_category": "Blood Screening",
+                    "result_value": hgb,
+                    "result_text": pred,
+                    "units": "g/dL",
+                    "reference_range": "12.0 - 16.0 g/dL",
+                    "status": "final",
+                    "abnormal_flag": abnormal_flag,
+                    "critical_value": critical_value,
+                    "reported_date": scan.get("reviewed_at") or scan.get("created_at"),
+                    "created_at": scan.get("created_at"),
+                    "ordered_by": (
+                        "Netra AI Referral"
+                        if not scan.get("doctor_id")
+                        else "Primary Doctor"
+                    ),
+                    "performed_by_lab": "Netra AI Computer Vision Platform",
+                    "collected_date": scan.get("created_at"),
+                    "notes": scan.get("recommendations"),
+                }
+            )
         return records
     except Exception as e:
         logger.error(f"Error fetching records lab-results: {e}")
@@ -1035,11 +1069,15 @@ async def get_records_lab_results(current_user: TokenPayload = Depends(get_curre
 
 
 @router.get("/records/prescriptions")
-async def get_records_prescriptions(current_user: TokenPayload = Depends(get_current_user)):
+async def get_records_prescriptions(
+    current_user: TokenPayload = Depends(get_current_user),
+):
     """Get prescriptions history (Patient Portal API match)"""
     import logging
+
     logger = logging.getLogger(__name__)
     from app.services.supabase import supabase
+
     try:
         res = (
             supabase.table("prescriptions")
@@ -1064,19 +1102,28 @@ async def get_records_timeline(
     """Get timeline history (Patient Portal API match)"""
     from app.routes.timeline import get_timeline
     from app.models.schemas import TokenPayload
+
     payload = TokenPayload(sub=current_user.sub, role="patient")
-    res = await get_timeline(current_user=payload, start_date=start_date, end_date=end_date, event_type=event_type)
+    res = await get_timeline(
+        current_user=payload,
+        start_date=start_date,
+        end_date=end_date,
+        event_type=event_type,
+    )
     return res
 
 
 # --- SETTINGS PROFILE & PREFERENCES ---
 
+
 @router.get("/settings/profile")
 async def get_settings_profile(current_user: TokenPayload = Depends(get_current_user)):
     """Get patient profile settings"""
     import logging
+
     logger = logging.getLogger(__name__)
     from app.services.supabase import supabase
+
     try:
         res = (
             supabase.table("profiles_patient")
@@ -1106,12 +1153,20 @@ async def update_settings_profile(
 ):
     """Update patient profile settings"""
     import logging
+
     logger = logging.getLogger(__name__)
     from app.services.supabase import supabase
+
     # Filter keys to only allow valid columns
     allowed_keys = {
-        "full_name", "phone", "date_of_birth", "gender", "address",
-        "emergency_contact_name", "emergency_contact_phone", "blood_group"
+        "full_name",
+        "phone",
+        "date_of_birth",
+        "gender",
+        "address",
+        "emergency_contact_name",
+        "emergency_contact_phone",
+        "blood_group",
     }
     filtered_data = {k: v for k, v in data.items() if k in allowed_keys}
     try:
@@ -1138,17 +1193,31 @@ async def update_settings_profile(
 
 
 @router.get("/settings/preferences")
-async def get_settings_preferences(current_user: TokenPayload = Depends(get_current_user)):
+async def get_settings_preferences(
+    current_user: TokenPayload = Depends(get_current_user),
+):
     """Get patient settings preferences"""
     import logging
+
     logger = logging.getLogger(__name__)
     from app.services.supabase import supabase
+
     user_id = current_user.sub
     try:
-        pref_res = supabase.table("user_preferences").select("*").eq("user_id", user_id).execute()
+        pref_res = (
+            supabase.table("user_preferences")
+            .select("*")
+            .eq("user_id", user_id)
+            .execute()
+        )
         pref_data = pref_res.data[0] if pref_res.data else {}
 
-        notif_res = supabase.table("notification_preferences").select("*").eq("user_id", user_id).execute()
+        notif_res = (
+            supabase.table("notification_preferences")
+            .select("*")
+            .eq("user_id", user_id)
+            .execute()
+        )
         notif_data = notif_res.data[0] if notif_res.data else {}
 
         return {
@@ -1158,8 +1227,8 @@ async def get_settings_preferences(current_user: TokenPayload = Depends(get_curr
             "notifications": {
                 "email": notif_data.get("email", True),
                 "sms": notif_data.get("sms", False),
-                "push": notif_data.get("push", True)
-            }
+                "push": notif_data.get("push", True),
+            },
         }
     except Exception as e:
         logger.error(f"Error getting preferences: {e}")
@@ -1167,7 +1236,7 @@ async def get_settings_preferences(current_user: TokenPayload = Depends(get_curr
             "language": "en",
             "timezone": "UTC",
             "theme": "light",
-            "notifications": {"email": True, "sms": False, "push": True}
+            "notifications": {"email": True, "sms": False, "push": True},
         }
 
 
@@ -1177,8 +1246,10 @@ async def update_settings_preferences(
 ):
     """Update patient settings preferences"""
     import logging
+
     logger = logging.getLogger(__name__)
     from app.services.supabase import supabase
+
     user_id = current_user.sub
     try:
         pref_updates = {}
@@ -1200,7 +1271,7 @@ async def update_settings_preferences(
                 "user_id": user_id,
                 "email": notif_updates.get("email", True),
                 "sms": notif_updates.get("sms", False),
-                "push": notif_updates.get("push", True)
+                "push": notif_updates.get("push", True),
             }
             supabase.table("notification_preferences").upsert(
                 notif_data, on_conflict="user_id"
@@ -1214,27 +1285,37 @@ async def update_settings_preferences(
 
 # --- APPOINTMENT ENDPOINTS ---
 
+
 @router.get("/appointments")
-async def get_appointments_alias(current_user: TokenPayload = Depends(get_current_user)):
+async def get_appointments_alias(
+    current_user: TokenPayload = Depends(get_current_user),
+):
     """Get all appointments (frontend client api match)"""
     from app.routes.patient import get_appointments
     from app.models.schemas import TokenPayload, UserRole
+
     user_payload = TokenPayload(sub=current_user.sub, role=UserRole.PATIENT)
     return await get_appointments(current_user=user_payload)
 
 
 @router.get("/appointments/upcoming")
-async def get_upcoming_appointments(current_user: TokenPayload = Depends(get_current_user)):
+async def get_upcoming_appointments(
+    current_user: TokenPayload = Depends(get_current_user),
+):
     """Get upcoming appointments for patient portal dashboard"""
     import logging
+
     logger = logging.getLogger(__name__)
     from app.services.supabase import supabase
     from datetime import datetime
+
     try:
         now_iso = datetime.now().isoformat()
         res = (
             supabase.table("appointments")
-            .select("id, patient_id, doctor_id, scheduled_at, status, type, reason, notes, created_at, updated_at")
+            .select(
+                "id, patient_id, doctor_id, scheduled_at, status, type, reason, notes, created_at, updated_at"
+            )
             .eq("patient_id", current_user.sub)
             .neq("status", "cancelled")
             .gte("scheduled_at", now_iso)
@@ -1243,7 +1324,9 @@ async def get_upcoming_appointments(current_user: TokenPayload = Depends(get_cur
         )
         appointments = res.data or []
 
-        doc_ids = list(set(str(a["doctor_id"]) for a in appointments if a.get("doctor_id")))
+        doc_ids = list(
+            set(str(a["doctor_id"]) for a in appointments if a.get("doctor_id"))
+        )
         doctor_map = {}
         if doc_ids:
             try:
@@ -1253,7 +1336,7 @@ async def get_upcoming_appointments(current_user: TokenPayload = Depends(get_cur
                     .in_("id", doc_ids)
                     .execute()
                 )
-                for doc in (doc_res.data or []):
+                for doc in doc_res.data or []:
                     doctor_map[str(doc["id"])] = {
                         "name": doc.get("full_name", "Doctor"),
                         "specialty": doc.get("specialty", "Specialist"),
@@ -1266,7 +1349,7 @@ async def get_upcoming_appointments(current_user: TokenPayload = Depends(get_cur
             doc_id = appt.get("doctor_id")
             appt["profiles_doctor"] = doctor_map.get(
                 str(doc_id) if doc_id else "",
-                {"name": "Doctor", "specialty": "Specialist"}
+                {"name": "Doctor", "specialty": "Specialist"},
             )
 
         return appointments
@@ -1276,11 +1359,15 @@ async def get_upcoming_appointments(current_user: TokenPayload = Depends(get_cur
 
 
 @router.get("/appointments/{appointment_id}")
-async def get_appointment_detail(appointment_id: str, current_user: TokenPayload = Depends(get_current_user)):
+async def get_appointment_detail(
+    appointment_id: str, current_user: TokenPayload = Depends(get_current_user)
+):
     """Get details of a specific appointment"""
     import logging
+
     logger = logging.getLogger(__name__)
     from app.services.supabase import supabase
+
     try:
         res = (
             supabase.table("appointments")

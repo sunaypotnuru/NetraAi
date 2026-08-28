@@ -98,9 +98,14 @@ class SendGridProvider:
                         "status_code": getattr(response, "status_code", 0),
                     }
                 else:
-                    logger.warning("SendGrid returned status %s — trying SMTP fallback", getattr(response, "status_code", 0))
+                    logger.warning(
+                        "SendGrid returned status %s — trying SMTP fallback",
+                        getattr(response, "status_code", 0),
+                    )
             except Exception as e:
-                logger.warning("SendGrid API error: %s — trying SMTP fallback if available", e)
+                logger.warning(
+                    "SendGrid API error: %s — trying SMTP fallback if available", e
+                )
 
         # 2. Try SMTP fallback if host and user provided
         if self.smtp_host and self.smtp_user and self.smtp_password:
@@ -131,12 +136,16 @@ class SendGridProvider:
                 logger.error("SMTP error: %s", smtp_err)
 
         # 3. Simulation / Log Mode
-        logger.info("📧 [Simulated Email Dispatch] → %s | Subject: %s (Status: Logged)", to_email, subject)
+        logger.info(
+            "📧 [Simulated Email Dispatch] → %s | Subject: %s (Status: Logged)",
+            to_email,
+            subject,
+        )
         return {
             "success": True,
             "mock": True,
             "provider": "simulation_logger",
             "to": to_email,
             "subject": subject,
-            "note": "Email logged successfully. Configure active SendGrid API key or SMTP settings in .env for live delivery."
+            "note": "Email logged successfully. Configure active SendGrid API key or SMTP settings in .env for live delivery.",
         }

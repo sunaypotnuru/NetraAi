@@ -97,7 +97,9 @@ async def get_doctor_availability(doctor_id: str, date: Optional[str] = None):
             try:
                 target_date = datetime.fromisoformat(date.replace("Z", "+00:00"))
             except ValueError:
-                raise HTTPException(status_code=400, detail="Invalid date format. Expected ISO 8601.")
+                raise HTTPException(
+                    status_code=400, detail="Invalid date format. Expected ISO 8601."
+                )
         else:
             target_date = datetime.now()
 
@@ -126,7 +128,7 @@ async def get_dashboard(current_user: TokenPayload = Depends(get_current_doctor)
     try:
         # Get profile - safely using existing columns
         profile_fields = "id, full_name, specialty, email, avatar_url, license_number, is_verified, rating, bio, experience_years, consultation_fee, created_at, updated_at"
-        
+
         # Get profile
         profile_res = (
             supabase.table("profiles_doctor")
@@ -172,7 +174,9 @@ async def get_dashboard(current_user: TokenPayload = Depends(get_current_doctor)
             }
             try:
                 # Use upsert to prevent race condition errors
-                supabase.table("profiles_doctor").upsert(new_profile, on_conflict="id").execute()
+                supabase.table("profiles_doctor").upsert(
+                    new_profile, on_conflict="id"
+                ).execute()
             except Exception as insert_err:
                 logger.warning(f"Could not upsert doctor profile: {insert_err}")
                 # Try to fetch again in case another request created it
@@ -190,7 +194,6 @@ async def get_dashboard(current_user: TokenPayload = Depends(get_current_doctor)
                 profile = new_profile
         else:
             profile = profile_res.data[0]
-
 
         # Get today's appointments
         today = datetime.now().date().isoformat()
@@ -226,12 +229,12 @@ async def get_dashboard(current_user: TokenPayload = Depends(get_current_doctor)
                 for apt in appointments:
                     apt["profiles_patient"] = patients_map.get(apt["patient_id"])
             except Exception as pat_err:
-                logger.error(f"Error fetching patient profiles for dashboard: {pat_err}")
+                logger.error(
+                    f"Error fetching patient profiles for dashboard: {pat_err}"
+                )
 
         # Get pending scans assigned to this doctor's patients
-        pat_ids = (
-            [appt["patient_id"] for appt in appointments] if appointments else []
-        )
+        pat_ids = [appt["patient_id"] for appt in appointments] if appointments else []
         scans_data: List[Dict[str, Any]] = []
         if pat_ids:
             try:
@@ -255,7 +258,9 @@ async def get_dashboard(current_user: TokenPayload = Depends(get_current_doctor)
                         .execute()
                     )
                     patients_map = (
-                        {p["id"]: p for p in patients_res.data} if patients_res.data else {}
+                        {p["id"]: p for p in patients_res.data}
+                        if patients_res.data
+                        else {}
                     )
 
                     # Attach patient data to scans
@@ -284,10 +289,7 @@ async def get_dashboard(current_user: TokenPayload = Depends(get_current_doctor)
         }
     except Exception as e:
         logger.error(f"Critical error in doctor dashboard: {str(e)}", exc_info=True)
-        raise HTTPException(
-            status_code=500, 
-            detail=f"Dashboard load failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Dashboard load failed: {str(e)}")
 
 
 @router.get("/alerts")
@@ -366,12 +368,7 @@ async def get_patient_details(
             status_code=403, detail="Not authorized to view this patient's details."
         )
 
-    patient_res = (
-        supabase.table("profiles_patient")
-        .select("*")
-        .eq("id", id)
-        .execute()
-    )
+    patient_res = supabase.table("profiles_patient").select("*").eq("id", id).execute()
     if not patient_res.data:
         raise HTTPException(status_code=404, detail="Patient not found.")
 
@@ -411,7 +408,7 @@ async def get_patient_details(
         "height": "N/A",
         "bmi": "N/A",
         "oxygen_saturation": "N/A",
-        "blood_glucose": "N/A"
+        "blood_glucose": "N/A",
     }
 
     if vitals_res.data:
@@ -437,13 +434,13 @@ async def get_patient_details(
         date_str = logged_at[:7]
         if date_str not in trends_map:
             trends_map[date_str] = {"date": date_str}
-        
+
         ttype = vital.get("tracker_type")
         try:
             val_float = float(vital.get("value", 0))
         except ValueError:
             val_float = 0.0
-            
+
         if ttype == "blood_pressure":
             val_str = str(vital.get("value", ""))
             if "/" in val_str:
@@ -464,12 +461,14 @@ async def get_patient_details(
     recent_appointments = []
     for apt in (all_appts_res.data or [])[:5]:
         scheduled_at = apt.get("scheduled_at", "")
-        recent_appointments.append({
-            "date": scheduled_at[:10] if scheduled_at else "Unknown",
-            "type": apt.get("consultation_type") or "Consultation",
-            "diagnosis": apt.get("notes") or "General Checkup",
-            "status": apt.get("status") or "completed"
-        })
+        recent_appointments.append(
+            {
+                "date": scheduled_at[:10] if scheduled_at else "Unknown",
+                "type": apt.get("consultation_type") or "Consultation",
+                "diagnosis": apt.get("notes") or "General Checkup",
+                "status": apt.get("status") or "completed",
+            }
+        )
 
     # Return structured nested response matching frontend
     return {
@@ -478,15 +477,17 @@ async def get_patient_details(
             "medical_history": {
                 "allergies": [],
                 "chronic_conditions": [],
-                "current_medications": [m.get("name") for m in meds_res.data] if meds_res.data else []
+                "current_medications": (
+                    [m.get("name") for m in meds_res.data] if meds_res.data else []
+                ),
             },
             "recent_vitals": latest_vitals,
             "vital_trends": vital_trends,
             "recent_appointments": recent_appointments,
             "stats": {
                 "appointments_count": len(all_appts_res.data or []),
-                "adherence_score": 85
-            }
+                "adherence_score": 85,
+            },
         }
     }
 
@@ -632,9 +633,13 @@ async def update_appointment_status(
 
     if update.status == "completed":
         try:
-            asyncio.create_task(record_achievement_progress(current_user.sub, "MENTOR", 1))
+            asyncio.create_task(
+                record_achievement_progress(current_user.sub, "MENTOR", 1)
+            )
         except Exception as achievement_error:
-            logger.warning(f"Achievement recording failed for MENTOR: {achievement_error}")
+            logger.warning(
+                f"Achievement recording failed for MENTOR: {achievement_error}"
+            )
 
     return res.data[0]
 
@@ -661,8 +666,8 @@ async def upload_prescription_pdf(
         except Exception as storage_err:
             logger.error(f"Storage upload failed: {storage_err}")
             raise HTTPException(
-                status_code=500, 
-                detail="Storage upload failed. Ensure 'prescriptions' bucket exists and has correct permissions."
+                status_code=500,
+                detail="Storage upload failed. Ensure 'prescriptions' bucket exists and has correct permissions.",
             )
 
         # Get the public URL
@@ -776,7 +781,7 @@ async def create_prescription(
         if patient_res.data:
             patient_name = patient_res.data.get("full_name") or "Patient"
             patient_email = patient_res.data.get("email")
-            
+
             if patient_email:
                 # Retrieve doctor name for the email signature
                 doctor_res = (
@@ -787,11 +792,11 @@ async def create_prescription(
                     .execute()
                 )
                 doctor_name = (
-                    doctor_res.data.get("full_name") 
-                    if doctor_res.data 
+                    doctor_res.data.get("full_name")
+                    if doctor_res.data
                     else "Your Physician"
                 )
-                
+
                 # Build HTML table for medications list
                 med_lines = []
                 for idx, med in enumerate(rx.medications, 1):
@@ -819,7 +824,7 @@ async def create_prescription(
                     f"</tbody>"
                     f"</table>"
                 )
-                
+
                 email_subject = "Your New Prescription - Netra AI"
                 email_body = (
                     f"Dear {patient_name},<br><br>"
@@ -828,21 +833,26 @@ async def create_prescription(
                     f"<strong>Prescribed Medications:</strong><br>"
                     f"{medications_table}<br>"
                 )
-                
+
                 if rx.additional_notes:
                     email_body += f"<br><strong>Doctor's Notes:</strong> {rx.additional_notes}<br>"
-                    
+
                 email_body += (
                     "<br>These medications have also been automatically added to your medication reminders list in the Netra AI portal.<br><br>"
                     "Take care of your health!<br><br>"
                     "Sincerely,<br>"
                     "The Netra AI Platform Support Team"
                 )
-                
+
                 # Import and dispatch the SendGrid email in a background task
                 from app.utils.reminders import _send_email
-                asyncio.create_task(_send_email(patient_email, email_subject, email_body))
-                logger.info(f"Triggered prescription email dispatch task for patient: {patient_email}")
+
+                asyncio.create_task(
+                    _send_email(patient_email, email_subject, email_body)
+                )
+                logger.info(
+                    f"Triggered prescription email dispatch task for patient: {patient_email}"
+                )
     except Exception as email_err:
         logger.error(f"Failed to trigger prescription email auto-dispatch: {email_err}")
 

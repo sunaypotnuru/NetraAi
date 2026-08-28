@@ -26,12 +26,12 @@ CSRF_TOKEN_LENGTH = 32
 class CSRFProtectionMiddleware(BaseHTTPMiddleware):
     """
     CSRF Protection using Double Submit Cookie pattern.
-    
+
     How it works:
     1. Server generates a random CSRF token and sets it as a cookie
     2. Client reads the cookie and includes it in a custom header for state-changing requests
     3. Server validates that the cookie value matches the header value
-    
+
     This protects against CSRF because:
     - Attackers can't read cookies from other domains (Same-Origin Policy)
     - Attackers can't set custom headers in cross-origin requests
@@ -72,12 +72,12 @@ class CSRFProtectionMiddleware(BaseHTTPMiddleware):
         # Get environment settings
         environment = os.getenv("ENVIRONMENT", "production")
         is_production = environment == "production"
-        
+
         # Cookie settings
         secure = is_production  # Only send over HTTPS in production
         samesite = "strict"  # Strict same-site policy
         max_age = 86400  # 24 hours
-        
+
         response.set_cookie(
             key=CSRF_COOKIE_NAME,
             value=token,
@@ -90,7 +90,7 @@ class CSRFProtectionMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
         """Process request and validate CSRF token for state-changing operations."""
-        
+
         # Skip CSRF check for exempt paths
         if self._is_exempt(request.url.path):
             response = await call_next(request)
@@ -99,13 +99,13 @@ class CSRFProtectionMiddleware(BaseHTTPMiddleware):
         # Skip CSRF check for safe methods (GET, HEAD, OPTIONS)
         if request.method not in self.protected_methods:
             response = await call_next(request)
-            
+
             # Generate and set CSRF token if not present
             csrf_token = self._get_csrf_token_from_cookie(request)
             if not csrf_token:
                 csrf_token = self._generate_csrf_token()
                 self._set_csrf_cookie(response, csrf_token)
-            
+
             return response
 
         # For state-changing methods, validate CSRF token
@@ -123,8 +123,8 @@ class CSRFProtectionMiddleware(BaseHTTPMiddleware):
                 status_code=403,
                 content={
                     "detail": "CSRF token missing. Include X-CSRF-Token header.",
-                    "error": "csrf_token_missing"
-                }
+                    "error": "csrf_token_missing",
+                },
             )
 
         # Validate tokens match (constant-time comparison)
@@ -137,15 +137,15 @@ class CSRFProtectionMiddleware(BaseHTTPMiddleware):
                 status_code=403,
                 content={
                     "detail": "CSRF token validation failed.",
-                    "error": "csrf_token_invalid"
-                }
+                    "error": "csrf_token_invalid",
+                },
             )
 
         # CSRF validation passed, process request
         response = await call_next(request)
-        
+
         # Refresh CSRF token on successful request
         new_token = self._generate_csrf_token()
         self._set_csrf_cookie(response, new_token)
-        
+
         return response

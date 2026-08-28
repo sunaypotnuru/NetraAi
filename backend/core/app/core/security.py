@@ -11,7 +11,9 @@ from app.core.config import settings  # type: ignore
 from app.models.schemas import TokenPayload, UserRole  # type: ignore
 
 logger = logging.getLogger(__name__)
-security = HTTPBearer(auto_error=True)  # Automatically reject requests without valid Bearer token
+security = HTTPBearer(
+    auto_error=True
+)  # Automatically reject requests without valid Bearer token
 
 # Module-level cached JWT secret to avoid brute-force on every request
 _processed_jwt_secret = None
@@ -60,7 +62,6 @@ async def get_current_user_ws(token: str) -> Dict[str, Any]:
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials",
         )
-
 
 
 def verify_supabase_jwt(token: str) -> Dict[str, Any]:
@@ -196,7 +197,9 @@ def get_current_user(
     """
     logger.debug("Authenticating request for path: %s", request.url.path)
 
-    auth_header = request.headers.get("authorization") or request.headers.get("Authorization")
+    auth_header = request.headers.get("authorization") or request.headers.get(
+        "Authorization"
+    )
     logger.debug("Authorization header present: %s", bool(auth_header))
     logger.debug("HTTPBearer credentials present: %s", credentials is not None)
     # Check environment first - NEVER allow bypass in production.
@@ -211,7 +214,7 @@ def get_current_user(
         logger.critical("BYPASS_AUTH attempted in production - rejecting request!")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Security configuration error"
+            detail="Security configuration error",
         )
 
     # Log bypass status for debugging
@@ -323,7 +326,9 @@ def get_current_user(
     user_metadata = payload.get("user_metadata", {})
     role_str = user_metadata.get("role", "patient")
 
-    logger.info(f"JWT decoded successfully: email={payload.get('email')}, role={role_str}, sub={payload.get('sub')}")
+    logger.info(
+        f"JWT decoded successfully: email={payload.get('email')}, role={role_str}, sub={payload.get('sub')}"
+    )
 
     # Validate role
     try:
@@ -368,13 +373,14 @@ def get_current_doctor(
     # A doctor (or admin) can access doctor routes
     if current_user.role not in [UserRole.DOCTOR, UserRole.ADMIN]:
         raise HTTPException(status_code=403, detail="Not enough permissions")
-        
+
     if current_user.role == UserRole.ADMIN:
         return current_user
-        
+
     if current_user.role == UserRole.DOCTOR:
         try:
             from app.services.supabase import supabase
+
             res = (
                 supabase.table("profiles_doctor")
                 .select("is_verified, verification_status")
@@ -384,23 +390,25 @@ def get_current_doctor(
             )
             if not res or not res.data:
                 raise HTTPException(status_code=403, detail="Doctor profile not found.")
-            
+
             is_verified = res.data.get("is_verified", False)
             verification_status = res.data.get("verification_status", "pending")
             if not is_verified or verification_status != "approved":
                 raise HTTPException(
                     status_code=403,
-                    detail=f"Doctor profile is not verified. Current status: {verification_status}. Access to doctor dashboard is restricted until admin approval."
+                    detail=f"Doctor profile is not verified. Current status: {verification_status}. Access to doctor dashboard is restricted until admin approval.",
                 )
         except HTTPException:
             raise
         except Exception as e:
-            logger.error(f"Error checking verification status for doctor {current_user.email}: {e}")
+            logger.error(
+                f"Error checking verification status for doctor {current_user.email}: {e}"
+            )
             raise HTTPException(
                 status_code=500,
-                detail="Internal server error checking doctor verification status."
+                detail="Internal server error checking doctor verification status.",
             )
-            
+
     return current_user
 
 
@@ -409,17 +417,17 @@ def get_current_admin(
 ) -> TokenPayload:
     """
     Verify that the current user has admin privileges.
-    
+
     Admin access is granted if:
     1. User has role=admin in JWT token (user_metadata.role)
     2. User is a doctor with is_admin=true in profiles_doctor table
-    
+
     Args:
         current_user: The authenticated user from get_current_user()
-        
+
     Returns:
         TokenPayload with admin role
-        
+
     Raises:
         HTTPException 403: If user doesn't have admin privileges
     """
@@ -427,12 +435,15 @@ def get_current_admin(
     if current_user.role == UserRole.ADMIN:
         logger.info(f"Admin access granted for {current_user.email} (JWT role: admin)")
         return current_user
-    
+
     # Check if user is a doctor with admin privileges in database
     if current_user.role == UserRole.DOCTOR:
         try:
             from app.services.supabase import supabase
-            logger.info(f"Checking database for admin flag: user_id={current_user.sub}, email={current_user.email}")
+
+            logger.info(
+                f"Checking database for admin flag: user_id={current_user.sub}, email={current_user.email}"
+            )
             # Check if this doctor has is_admin flag set
             doctor_res = (
                 supabase.table("profiles_doctor")
@@ -441,25 +452,33 @@ def get_current_admin(
                 .maybe_single()
                 .execute()
             )
-            
-            logger.info(f"Database query result: {doctor_res.data if doctor_res else 'None'}")
-            
+
+            logger.info(
+                f"Database query result: {doctor_res.data if doctor_res else 'None'}"
+            )
+
             if doctor_res and doctor_res.data and doctor_res.data.get("is_admin"):
-                logger.info(f"Admin access granted for doctor {current_user.email} via is_admin flag")
+                logger.info(
+                    f"Admin access granted for doctor {current_user.email} via is_admin flag"
+                )
                 # Upgrade the user's role for this request
                 current_user.role = UserRole.ADMIN
                 return current_user
             else:
-                logger.warning(f"Doctor {current_user.email} exists but is_admin=false or not found")
+                logger.warning(
+                    f"Doctor {current_user.email} exists but is_admin=false or not found"
+                )
         except Exception as e:
-            logger.error(f"Failed to check admin privileges for doctor {current_user.email}: {e}")
-    
+            logger.error(
+                f"Failed to check admin privileges for doctor {current_user.email}: {e}"
+            )
+
     # If we get here, user doesn't have admin access
     logger.warning(
         f"Admin access denied for user {current_user.email} "
         f"(role: {current_user.role.value}, required: admin)"
     )
     raise HTTPException(
-        status_code=403, 
-        detail=f"Admin access required. Current role: {current_user.role.value}. Contact administrator to grant admin privileges."
+        status_code=403,
+        detail=f"Admin access required. Current role: {current_user.role.value}. Contact administrator to grant admin privileges.",
     )

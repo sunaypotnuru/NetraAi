@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends
-from typing import Optional
+from fastapi import APIRouter, Depends, Request
+from pydantic import BaseModel
+from typing import Optional, Any
 import logging
 
 from app.core.security import get_current_admin
@@ -110,10 +111,6 @@ async def log_audit(
 
 # ─── Public endpoint for frontend production error reporting ───────────────────
 
-from fastapi import Request
-from pydantic import BaseModel
-from typing import Any
-
 
 class ClientErrorPayload(BaseModel):
     level: str = "error"
@@ -133,22 +130,25 @@ async def log_client_error(payload: ClientErrorPayload, request: Request):
     """
     try:
         ip = request.client.host if request.client else "unknown"
-        supabase.table("audit_logs").insert({
-            "action": f"client_{payload.level}",
-            "resource_type": "frontend",
-            "details": {
-                "message": payload.message,
-                "detail": payload.detail,
-                "url": payload.url,
-                "timestamp": payload.timestamp,
-            },
-            "ip_address": ip,
-            "user_agent": payload.userAgent,
-            "status": "logged",
-        }).execute()
-        logger.warning(f"[ClientError] {payload.level}: {payload.message} | url={payload.url}")
+        supabase.table("audit_logs").insert(
+            {
+                "action": f"client_{payload.level}",
+                "resource_type": "frontend",
+                "details": {
+                    "message": payload.message,
+                    "detail": payload.detail,
+                    "url": payload.url,
+                    "timestamp": payload.timestamp,
+                },
+                "ip_address": ip,
+                "user_agent": payload.userAgent,
+                "status": "logged",
+            }
+        ).execute()
+        logger.warning(
+            f"[ClientError] {payload.level}: {payload.message} | url={payload.url}"
+        )
     except Exception as exc:
         logger.error(f"Failed to persist client error report: {exc}")
     # Always 200 — never let error reporting break the app
     return {"status": "received"}
-

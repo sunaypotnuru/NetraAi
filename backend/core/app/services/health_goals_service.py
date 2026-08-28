@@ -366,7 +366,9 @@ class HealthGoalsService:
                 Col.GoalAchievements.EARNED_AT: datetime.now().isoformat(),
             }
             response = (
-                self.supabase.table(Tables.GOAL_ACHIEVEMENTS).insert(achievement).execute()
+                self.supabase.table(Tables.GOAL_ACHIEVEMENTS)
+                .insert(achievement)
+                .execute()
             )
             return response.data[0] if response.data else {}
         except Exception:
@@ -393,8 +395,11 @@ class HealthGoalsService:
             return response.data if response.data else []
         except Exception as e:
             import logging
+
             logger = logging.getLogger(__name__)
-            logger.warning(f"Failed to fetch goal achievements (table may be missing): {e}")
+            logger.warning(
+                f"Failed to fetch goal achievements (table may be missing): {e}"
+            )
             return []
 
     # ─── Statistics ─────────────────────────────────────────────────────────

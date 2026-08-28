@@ -12,7 +12,7 @@ from fastapi import status
 class NetraAIError(Exception):
     """
     Base exception for all NetraAI application errors.
-    
+
     Attributes:
         message: Human-readable error message
         details: Additional context about the error
@@ -60,42 +60,56 @@ class NetraAIError(Exception):
 class AuthenticationError(NetraAIError):
     """
     Raised when authentication fails.
-    
+
     Examples:
         - Invalid credentials
         - Expired tokens
         - Missing authentication headers
     """
 
-    def __init__(self, message: str = "Authentication failed", details: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self,
+        message: str = "Authentication failed",
+        details: Optional[Dict[str, Any]] = None,
+    ):
         super().__init__(message, details, status.HTTP_401_UNAUTHORIZED)
 
 
 class AuthorizationError(NetraAIError):
     """
     Raised when user lacks required permissions.
-    
+
     Examples:
         - Accessing admin-only endpoints
         - Modifying resources owned by other users
         - Role-based access violations
     """
 
-    def __init__(self, message: str = "Permission denied", details: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self,
+        message: str = "Permission denied",
+        details: Optional[Dict[str, Any]] = None,
+    ):
         super().__init__(message, details, status.HTTP_403_FORBIDDEN)
 
 
 class TokenExpiredError(AuthenticationError):
     """Raised when JWT or session token has expired."""
 
-    def __init__(self, message: str = "Token has expired", details: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self,
+        message: str = "Token has expired",
+        details: Optional[Dict[str, Any]] = None,
+    ):
         super().__init__(message, details)
 
 
 class InvalidTokenError(AuthenticationError):
     """Raised when token signature or format is invalid."""
 
-    def __init__(self, message: str = "Invalid token", details: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self, message: str = "Invalid token", details: Optional[Dict[str, Any]] = None
+    ):
         super().__init__(message, details)
 
 
@@ -105,7 +119,7 @@ class InvalidTokenError(AuthenticationError):
 class ValidationError(NetraAIError):
     """
     Raised when input validation fails.
-    
+
     Examples:
         - Invalid email format
         - Missing required fields
@@ -113,14 +127,23 @@ class ValidationError(NetraAIError):
         - Business rule violations
     """
 
-    def __init__(self, message: str = "Validation failed", details: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self,
+        message: str = "Validation failed",
+        details: Optional[Dict[str, Any]] = None,
+    ):
         super().__init__(message, details, status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 
 class InvalidInputError(ValidationError):
     """Raised when user input is malformed or invalid."""
 
-    def __init__(self, message: str, field: Optional[str] = None, details: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self,
+        message: str,
+        field: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+    ):
         if field:
             details = details or {}
             details["field"] = field
@@ -148,7 +171,7 @@ class ResourceError(NetraAIError):
 class ResourceNotFoundError(ResourceError):
     """
     Raised when requested resource doesn't exist.
-    
+
     Examples:
         - User ID not found
         - Appointment not found
@@ -170,7 +193,7 @@ class ResourceNotFoundError(ResourceError):
 class ResourceAlreadyExistsError(ResourceError):
     """
     Raised when attempting to create duplicate resource.
-    
+
     Examples:
         - Email already registered
         - Appointment slot already booked
@@ -184,7 +207,7 @@ class ResourceAlreadyExistsError(ResourceError):
 class ResourceConflictError(ResourceError):
     """
     Raised when resource operation conflicts with current state.
-    
+
     Examples:
         - Canceling completed appointment
         - Deleting resource with active dependencies
@@ -207,7 +230,7 @@ class ServiceError(NetraAIError):
 class ServiceUnavailableError(ServiceError):
     """
     Raised when external service is unavailable.
-    
+
     Examples:
         - Database connection failure
         - External API timeout
@@ -230,7 +253,7 @@ class ServiceUnavailableError(ServiceError):
 class DatabaseError(ServiceError):
     """
     Raised when database operations fail.
-    
+
     Examples:
         - Connection timeout
         - Query execution failure
@@ -238,14 +261,18 @@ class DatabaseError(ServiceError):
         - Constraint violations
     """
 
-    def __init__(self, message: str = "Database operation failed", details: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self,
+        message: str = "Database operation failed",
+        details: Optional[Dict[str, Any]] = None,
+    ):
         super().__init__(message, details, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ExternalAPIError(ServiceError):
     """
     Raised when external API call fails.
-    
+
     Examples:
         - Supabase API error
         - Payment gateway failure
@@ -270,7 +297,7 @@ class ExternalAPIError(ServiceError):
 class ConfigurationError(NetraAIError):
     """
     Raised when application configuration is invalid.
-    
+
     Examples:
         - Missing required environment variables
         - Invalid configuration values
@@ -313,7 +340,7 @@ class ModelNotFoundError(ModelError):
 class ModelInferenceError(ModelError):
     """
     Raised when model inference/prediction fails.
-    
+
     Examples:
         - Invalid input format
         - Model timeout
@@ -335,14 +362,18 @@ class ModelInferenceError(ModelError):
 class ImageProcessingError(ModelError):
     """
     Raised when image preprocessing or analysis fails.
-    
+
     Examples:
         - Invalid image format
         - Corrupted image data
         - ROI extraction failure
     """
 
-    def __init__(self, message: str = "Image processing failed", details: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self,
+        message: str = "Image processing failed",
+        details: Optional[Dict[str, Any]] = None,
+    ):
         super().__init__(message, details, status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 
@@ -352,7 +383,7 @@ class ImageProcessingError(ModelError):
 class BusinessLogicError(NetraAIError):
     """
     Base class for business rule violations.
-    
+
     Examples:
         - Appointment booking conflicts
         - Invalid state transitions
@@ -372,7 +403,11 @@ class AppointmentError(BusinessLogicError):
 class PaymentError(BusinessLogicError):
     """Raised when payment operations fail."""
 
-    def __init__(self, message: str = "Payment processing failed", details: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self,
+        message: str = "Payment processing failed",
+        details: Optional[Dict[str, Any]] = None,
+    ):
         super().__init__(message, details)
 
 
@@ -382,7 +417,7 @@ class PaymentError(BusinessLogicError):
 class RateLimitExceededError(NetraAIError):
     """
     Raised when user exceeds rate limit.
-    
+
     Examples:
         - Too many requests per minute
         - API quota exceeded

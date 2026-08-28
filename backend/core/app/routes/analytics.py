@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
 
+
 def parse_date_range(
     start_date: Optional[str] = None, end_date: Optional[str] = None, days: int = 30
 ) -> tuple[datetime, datetime]:
@@ -49,27 +50,54 @@ class SimpleAnalyticsRestService:
         completed_count = 0
 
         try:
-            patient_count = supabase.table("profiles_patient").select("id", count="exact").execute().count or 0
+            patient_count = (
+                supabase.table("profiles_patient")
+                .select("id", count="exact")
+                .execute()
+                .count
+                or 0
+            )
         except Exception as e:
             logger.warning(f"Failed to fetch patient count: {e}")
 
         try:
-            doctor_count = supabase.table("profiles_doctor").select("id", count="exact").execute().count or 0
+            doctor_count = (
+                supabase.table("profiles_doctor")
+                .select("id", count="exact")
+                .execute()
+                .count
+                or 0
+            )
         except Exception as e:
             logger.warning(f"Failed to fetch doctor count: {e}")
 
         try:
-            appt_count = supabase.table("appointments").select("id", count="exact").execute().count or 0
+            appt_count = (
+                supabase.table("appointments")
+                .select("id", count="exact")
+                .execute()
+                .count
+                or 0
+            )
         except Exception as e:
             logger.warning(f"Failed to fetch appointment count: {e}")
 
         try:
-            scan_count = supabase.table("scans").select("id", count="exact").execute().count or 0
+            scan_count = (
+                supabase.table("scans").select("id", count="exact").execute().count or 0
+            )
         except Exception as e:
             logger.warning(f"Failed to fetch scan count: {e}")
 
         try:
-            completed_count = supabase.table("appointments").select("id", count="exact").eq("status", "completed").execute().count or 0
+            completed_count = (
+                supabase.table("appointments")
+                .select("id", count="exact")
+                .eq("status", "completed")
+                .execute()
+                .count
+                or 0
+            )
         except Exception as e:
             logger.warning(f"Failed to fetch completed appointment count: {e}")
 
@@ -100,7 +128,15 @@ class SimpleAnalyticsRestService:
                 day_str = day.strftime("%Y-%m-%d")
                 next_day_str = (day + timedelta(days=1)).strftime("%Y-%m-%d")
 
-                cnt = supabase.table("appointments").select("id", count="exact").gte("created_at", day_str).lt("created_at", next_day_str).execute().count or 0
+                cnt = (
+                    supabase.table("appointments")
+                    .select("id", count="exact")
+                    .gte("created_at", day_str)
+                    .lt("created_at", next_day_str)
+                    .execute()
+                    .count
+                    or 0
+                )
                 daily_trends.append({"date": day_str, "appointments": cnt})
         except Exception as e:
             logger.error(f"Failed to fetch appointment trends: {e}")
@@ -115,17 +151,25 @@ class SimpleAnalyticsRestService:
                 day_str = day.strftime("%Y-%m-%d")
                 next_day_str = (day + timedelta(days=1)).strftime("%Y-%m-%d")
 
-                cnt = supabase.table("scans").select("id", count="exact").gte("created_at", day_str).lt("created_at", next_day_str).execute().count or 0
-                daily_trends.append({"date": day_str, "consultations": cnt, "avg_confidence": 0.92})
+                cnt = (
+                    supabase.table("scans")
+                    .select("id", count="exact")
+                    .gte("created_at", day_str)
+                    .lt("created_at", next_day_str)
+                    .execute()
+                    .count
+                    or 0
+                )
+                daily_trends.append(
+                    {"date": day_str, "consultations": cnt, "avg_confidence": 0.92}
+                )
         except Exception as e:
             logger.error(f"Failed to fetch AI usage trends: {e}")
         return {"daily_trends": list(reversed(daily_trends))}
 
 
 @router.get("/metrics")
-async def get_metrics(
-    current_admin: TokenPayload = Depends(get_current_admin)
-):
+async def get_metrics(current_admin: TokenPayload = Depends(get_current_admin)):
     """Get core platform metrics (KPIs)"""
     try:
         service = SimpleAnalyticsRestService()
@@ -162,7 +206,10 @@ async def get_scan_trends(
         start, end = parse_date_range(days=days)
         service = SimpleAnalyticsRestService()
         result = service.get_ai_usage_trends(start, end)
-        trends = [{"date": d["date"], "total": d["consultations"]} for d in result.get("daily_trends", [])]
+        trends = [
+            {"date": d["date"], "total": d["consultations"]}
+            for d in result.get("daily_trends", [])
+        ]
         return {"data": trends}
     except Exception as e:
         logger.error(f"Error getting scan trends: {e}")
@@ -176,20 +223,27 @@ async def get_doctor_performance(
     """Get top performing doctors based on completed appointments using REST."""
     try:
         # Fetch top doctors using REST directly
-        doc_res = supabase.table("profiles_doctor").select("id, full_name, specialty, rating").limit(10).execute()
+        doc_res = (
+            supabase.table("profiles_doctor")
+            .select("id, full_name, specialty, rating")
+            .limit(10)
+            .execute()
+        )
         doctors = doc_res.data or []
 
         data = []
         for d in doctors:
             # Just approximation for dashboard UI to not overwhelm Supabase API
-            data.append({
-                "id": d.get("id"),
-                "name": d.get("full_name") or "Doctor",
-                "specialty": d.get("specialty") or "General Medicine",
-                "rating": d.get("rating") or 4.8,
-                "completed_appointments": 12,
-                "total_appointments": 15
-            })
+            data.append(
+                {
+                    "id": d.get("id"),
+                    "name": d.get("full_name") or "Doctor",
+                    "specialty": d.get("specialty") or "General Medicine",
+                    "rating": d.get("rating") or 4.8,
+                    "completed_appointments": 12,
+                    "total_appointments": 15,
+                }
+            )
 
         return {"data": data}
     except Exception as e:
@@ -198,9 +252,7 @@ async def get_doctor_performance(
 
 
 @router.get("/overview")
-async def get_overview(
-    current_admin: TokenPayload = Depends(get_current_admin)
-):
+async def get_overview(current_admin: TokenPayload = Depends(get_current_admin)):
     """Get comprehensive overview including all categories."""
     try:
         service = SimpleAnalyticsRestService()
@@ -237,7 +289,9 @@ async def export_analytics(
         return StreamingResponse(
             iter([csv_content]),
             media_type="text/csv",
-            headers={"Content-Disposition": f"attachment; filename=netra_analytics_{datetime.now().strftime('%Y%m%d')}.csv"}
+            headers={
+                "Content-Disposition": f"attachment; filename=netra_analytics_{datetime.now().strftime('%Y%m%d')}.csv"
+            },
         )
     except Exception as e:
         logger.error(f"Export failed: {e}")
@@ -345,26 +399,29 @@ async def get_epidemic_timeline(
 ):
     """Get active epidemic cases and severity timeline trends."""
     start, end = parse_date_range(start_date, end_date, days=30)
-    
+
     timeline_data = []
     current = start
     base_cases = 12
     base_severity = 5.2
-    
+
     idx = 0
     while current <= end:
         date_str = current.strftime("%b %d")
         import math
+
         wave = math.sin(idx / 3.0) * 8
         cases = max(2, int(base_cases + (idx * 0.8) + wave))
         severity = max(1.0, min(10.0, base_severity + math.cos(idx / 2.0) * 1.5))
-        
-        timeline_data.append({
-            "date": date_str,
-            "cases": cases,
-            "avg_severity": round(severity, 1),
-        })
+
+        timeline_data.append(
+            {
+                "date": date_str,
+                "cases": cases,
+                "avg_severity": round(severity, 1),
+            }
+        )
         current += timedelta(days=1)
         idx += 1
-        
+
     return timeline_data

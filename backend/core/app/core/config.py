@@ -8,11 +8,11 @@ _ENV_FILE = os.path.join(_BASE_DIR, "..", "..", "..", "..", ".env")
 if not os.path.exists(_ENV_FILE):
     _ENV_FILE = os.path.join(_BASE_DIR, "..", "..", "..", ".env")
 from dotenv import load_dotenv  # noqa: E402
+
 if not os.path.exists(_ENV_FILE):
     _ENV_FILE = ".env"
 
 load_dotenv(_ENV_FILE)
-
 
 
 class Settings(BaseSettings):
@@ -21,7 +21,6 @@ class Settings(BaseSettings):
     SUPABASE_SERVICE_KEY: str = ""
     SUPABASE_SERVICE_ROLE_KEY: str = ""
     DATABASE_URL: Optional[str] = None
-
 
     # LiveKit (Video Calls)
     LIVEKIT_API_KEY: Optional[str] = None

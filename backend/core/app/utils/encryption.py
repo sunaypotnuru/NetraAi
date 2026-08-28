@@ -17,24 +17,26 @@ logger = logging.getLogger(__name__)
 class EncryptionService:
     """
     HIPAA-compliant encryption service for sensitive data at rest
-    
+
     Features:
     - AES-128-CBC encryption with HMAC authentication
     - Key derivation from application secret
     - Safe handling of encryption failures
     - Automatic base64 encoding for database storage
     """
-    
+
     def __init__(self, secret_key: Optional[str] = None):
         """
         Initialize encryption service
-        
+
         Args:
             secret_key: Master key for encryption (from JWT_SECRET or env)
         """
-        self._secret_key = secret_key or os.getenv("JWT_SECRET", "fallback-dev-key-CHANGE-IN-PROD")
+        self._secret_key = secret_key or os.getenv(
+            "JWT_SECRET", "fallback-dev-key-CHANGE-IN-PROD"
+        )
         self._fernet = self._initialize_fernet()
-    
+
     def _initialize_fernet(self) -> Fernet:
         """
         Initialize Fernet cipher with derived key from secret
@@ -45,7 +47,7 @@ class EncryptionService:
             kdf = PBKDF2(
                 algorithm=hashes.SHA256(),
                 length=32,
-                salt=b'netra-ai-hipaa-salt-v1',  # Static salt for deterministic key derivation
+                salt=b"netra-ai-hipaa-salt-v1",  # Static salt for deterministic key derivation
                 iterations=100000,  # NIST recommended minimum
             )
             key = base64.urlsafe_b64encode(kdf.derive(self._secret_key.encode()))
@@ -54,55 +56,55 @@ class EncryptionService:
             logger.error(f"Failed to initialize encryption: {e}")
             # Fallback to a development key (should never happen in prod)
             return Fernet(Fernet.generate_key())
-    
+
     def encrypt(self, plaintext: str) -> Optional[str]:
         """
         Encrypt plaintext string to base64-encoded ciphertext
-        
+
         Args:
             plaintext: String to encrypt
-            
+
         Returns:
             Base64-encoded encrypted string, or None on failure
         """
         if not plaintext:
             return plaintext
-        
+
         try:
-            encrypted_bytes = self._fernet.encrypt(plaintext.encode('utf-8'))
-            return encrypted_bytes.decode('utf-8')
+            encrypted_bytes = self._fernet.encrypt(plaintext.encode("utf-8"))
+            return encrypted_bytes.decode("utf-8")
         except Exception as e:
             logger.error(f"Encryption failed: {e}")
             return None
-    
+
     def decrypt(self, ciphertext: str) -> Optional[str]:
         """
         Decrypt base64-encoded ciphertext to plaintext string
-        
+
         Args:
             ciphertext: Encrypted string (base64-encoded)
-            
+
         Returns:
             Decrypted plaintext string, or None on failure
         """
         if not ciphertext:
             return ciphertext
-        
+
         try:
-            decrypted_bytes = self._fernet.decrypt(ciphertext.encode('utf-8'))
-            return decrypted_bytes.decode('utf-8')
+            decrypted_bytes = self._fernet.decrypt(ciphertext.encode("utf-8"))
+            return decrypted_bytes.decode("utf-8")
         except Exception as e:
             logger.error(f"Decryption failed: {e}")
             return None
-    
+
     def encrypt_dict_fields(self, data: dict, fields: list[str]) -> dict:
         """
         Encrypt specific fields in a dictionary
-        
+
         Args:
             data: Dictionary containing data
             fields: List of field names to encrypt
-            
+
         Returns:
             Dictionary with encrypted fields
         """
@@ -113,15 +115,15 @@ class EncryptionService:
                 if encrypted_value:
                     encrypted_data[field] = encrypted_value
         return encrypted_data
-    
+
     def decrypt_dict_fields(self, data: dict, fields: list[str]) -> dict:
         """
         Decrypt specific fields in a dictionary
-        
+
         Args:
             data: Dictionary containing encrypted data
             fields: List of field names to decrypt
-            
+
         Returns:
             Dictionary with decrypted fields
         """
@@ -152,10 +154,10 @@ def get_encryption_service() -> EncryptionService:
 def encrypt_sensitive_data(plaintext: str) -> Optional[str]:
     """
     Convenience function to encrypt sensitive data
-    
+
     Args:
         plaintext: String to encrypt
-        
+
     Returns:
         Encrypted string or None
     """
@@ -165,10 +167,10 @@ def encrypt_sensitive_data(plaintext: str) -> Optional[str]:
 def decrypt_sensitive_data(ciphertext: str) -> Optional[str]:
     """
     Convenience function to decrypt sensitive data
-    
+
     Args:
         ciphertext: Encrypted string
-        
+
     Returns:
         Decrypted string or None
     """

@@ -64,6 +64,7 @@ from app.routes.emergency_contacts import router as emergency_contacts_router
 from app.middleware.activity import ActivityLoggingMiddleware  # type: ignore
 from app.middleware.input_validation import SecurityInputValidationMiddleware  # type: ignore
 from app.middleware.csrf_protection import CSRFProtectionMiddleware  # type: ignore
+
 # SessionTimeoutMiddleware temporarily disabled - was causing 401 errors
 # # from app.middleware.session_timeout import SessionTimeoutMiddleware  # type: ignore  # noqa: F401
 from app.middleware.user_rate_limit import UserRateLimitMiddleware  # type: ignore
@@ -146,33 +147,35 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup and shutdown lifecycle for the app."""
-    
+
     # ═══════════════════════════════════════════════════════════════
     # CRITICAL CONFIGURATION VALIDATION (Fail Fast)
     # ═══════════════════════════════════════════════════════════════
     logger.info("Validating critical configuration...")
-    
+
     # Validate JWT Secret
     if not settings.SUPABASE_JWT_SECRET:
         logger.critical("❌ SUPABASE_JWT_SECRET is not configured!")
         logger.critical("Set SUPABASE_JWT_SECRET environment variable")
-        raise RuntimeError("SUPABASE_JWT_SECRET environment variable is required for authentication")
-    
+        raise RuntimeError(
+            "SUPABASE_JWT_SECRET environment variable is required for authentication"
+        )
+
     # Validate Supabase URL
     if not settings.SUPABASE_URL:
         logger.critical("❌ SUPABASE_URL is not configured!")
         raise RuntimeError("SUPABASE_URL environment variable is required")
-    
+
     # Validate Supabase Service Key
     if not settings.SUPABASE_SERVICE_KEY:
         logger.critical("❌ SUPABASE_SERVICE_KEY is not configured!")
         raise RuntimeError("SUPABASE_SERVICE_KEY environment variable is required")
-    
+
     # Log environment and auth status for debugging
     environment = os.getenv("ENVIRONMENT", "development").lower()
     logger.info(f"🌍 Environment: {environment}")
     logger.info(f"🔐 BYPASS_AUTH: {settings.BYPASS_AUTH}")
-    
+
     # Never allow the local/demo auth bypass in production.
     if settings.BYPASS_AUTH and environment == "production":
         logger.critical("BYPASS_AUTH cannot be enabled in production")
@@ -181,7 +184,7 @@ async def lifespan(app: FastAPI):
     if settings.BYPASS_AUTH:
         logger.warning("⚠️ BYPASS_AUTH is enabled - authentication is bypassed!")
         logger.warning("⚠️ This should only be used for development/testing")
-    
+
     logger.info("✅ Configuration validation passed")
 
     # ═══════════════════════════════════════════════════════
@@ -190,8 +193,12 @@ async def lifespan(app: FastAPI):
     groq_key = os.getenv("GROQ_API_KEY", "")
     gemini_key = os.getenv("GEMINI_API_KEY", "")
     if not groq_key and not gemini_key:
-        logger.critical("❌ No AI provider configured! Set GROQ_API_KEY or GEMINI_API_KEY")
-        raise RuntimeError("At least one AI provider key required (GROQ_API_KEY or GEMINI_API_KEY)")
+        logger.critical(
+            "❌ No AI provider configured! Set GROQ_API_KEY or GEMINI_API_KEY"
+        )
+        raise RuntimeError(
+            "At least one AI provider key required (GROQ_API_KEY or GEMINI_API_KEY)"
+        )
     if not groq_key:
         logger.warning("⚠️  GROQ_API_KEY missing - using Gemini fallback only")
     if not gemini_key:
@@ -204,7 +211,9 @@ async def lifespan(app: FastAPI):
     if enable_payments:
         razorpay_secret = os.getenv("RAZORPAY_KEY_SECRET", "")
         if not razorpay_secret:
-            logger.critical("❌ ENABLE_PAYMENTS=true but RAZORPAY_KEY_SECRET is missing")
+            logger.critical(
+                "❌ ENABLE_PAYMENTS=true but RAZORPAY_KEY_SECRET is missing"
+            )
             raise RuntimeError("RAZORPAY_KEY_SECRET required when ENABLE_PAYMENTS=true")
 
     # ═══════════════════════════════════════════════════════
@@ -221,15 +230,18 @@ async def lifespan(app: FastAPI):
     if not os.getenv("LIVEKIT_API_SECRET"):
         logger.warning("⚠️  LIVEKIT_API_SECRET missing - video consultations disabled")
     if not os.getenv("REDIS_URL"):
-        logger.warning("⚠️  REDIS_URL missing - caching disabled, expect slower performance")
+        logger.warning(
+            "⚠️  REDIS_URL missing - caching disabled, expect slower performance"
+        )
 
     logger.info("✅ All configuration validation passed")
 
     # Initialize JWT secret cache for fast verification
     from app.core.security import _initialize_jwt_secret
+
     _initialize_jwt_secret()
     logger.info("✅ JWT secret initialized and cached")
-    
+
     # ═══════════════════════════════════════════════════════════════
     # STARTUP TASKS
     # ═══════════════════════════════════════════════════════════════
@@ -379,8 +391,10 @@ app = FastAPI(
 
 # Register custom exception handlers for standardized error responses
 from app.core.exception_handlers import register_exception_handlers  # type: ignore
+
 register_exception_handlers(app)
 logger.info("✅ Custom exception handlers registered")
+
 
 # CORS for React/Vite frontend with strict security
 def get_allowed_origins():
@@ -433,7 +447,7 @@ if trusted_hosts:
 # Security middleware (order matters!)
 # Request flow: top to bottom
 # Response flow: bottom to top
-# 
+#
 # Correct order:
 # 1. Rate limiting (block bad actors early)
 # 2. Input validation (validate before processing)
@@ -443,13 +457,13 @@ if trusted_hosts:
 
 from app.middleware.auth_state import AuthStateMiddleware  # type: ignore  # noqa: E402
 
-app.add_middleware(AdvancedRateLimitingMiddleware)        # 1st - Block bad actors early
-app.add_middleware(UserRateLimitMiddleware)               # 2nd - Per-user rate limits
-app.add_middleware(SecurityInputValidationMiddleware)     # 3rd - Validate input
-app.add_middleware(CSRFProtectionMiddleware)              # 4th - CSRF protection
-app.add_middleware(AuthStateMiddleware)                   # 5th - Extract user context
+app.add_middleware(AdvancedRateLimitingMiddleware)  # 1st - Block bad actors early
+app.add_middleware(UserRateLimitMiddleware)  # 2nd - Per-user rate limits
+app.add_middleware(SecurityInputValidationMiddleware)  # 3rd - Validate input
+app.add_middleware(CSRFProtectionMiddleware)  # 4th - CSRF protection
+app.add_middleware(AuthStateMiddleware)  # 5th - Extract user context
 # app.add_middleware(SessionTimeoutMiddleware)            # 6th - TEMPORARILY DISABLED (was causing 401)
-app.add_middleware(SecurityHeadersMiddleware)             # 7th - Add headers to response (last)
+app.add_middleware(SecurityHeadersMiddleware)  # 7th - Add headers to response (last)
 
 
 # Activity logging middleware
@@ -591,7 +605,9 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """Custom handler for Request Validation Errors (422 Unprocessable Entity)."""
-    logger.warning(f"Validation error on {request.method} {request.url.path}: {exc.errors()}")
+    logger.warning(
+        f"Validation error on {request.method} {request.url.path}: {exc.errors()}"
+    )
     return JSONResponse(
         status_code=422,
         content={
@@ -606,7 +622,10 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 @app.exception_handler(Exception)
 async def unhandled_exception_handler(request: Request, exc: Exception):
     """Global catch-all for 500 Unhandled Exceptions to prevent sensitive leakages."""
-    logger.error(f"Unhandled exception on {request.method} {request.url.path}: {exc}", exc_info=True)
+    logger.error(
+        f"Unhandled exception on {request.method} {request.url.path}: {exc}",
+        exc_info=True,
+    )
     return JSONResponse(
         status_code=500,
         content={
@@ -615,4 +634,3 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
             "detail": "An internal server error occurred.",
         },
     )
-

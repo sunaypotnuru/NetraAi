@@ -119,7 +119,9 @@ async def get_doctor_portal_revenue(
     """Get revenue data for the specified period"""
     service = get_doctor_analytics_service()
     # Using existing analytics method or detailed summary
-    revenue = service.get_revenue_analytics(doctor_id=str(current_user.sub), period=period)
+    revenue = service.get_revenue_analytics(
+        doctor_id=str(current_user.sub), period=period
+    )
     return revenue
 
 
@@ -163,8 +165,8 @@ async def get_statistics(current_user: TokenPayload = Depends(get_current_doctor
 
 @router.post("/clinical-notes")
 async def create_clinical_note(
-    note_data: ClinicalNoteCreate, 
-    current_user: TokenPayload = Depends(get_current_doctor)
+    note_data: ClinicalNoteCreate,
+    current_user: TokenPayload = Depends(get_current_doctor),
 ):
     """Create a new clinical note"""
     service = get_clinical_notes_service()
@@ -202,8 +204,7 @@ async def get_clinical_notes(
 
 @router.get("/clinical-notes/{note_id}")
 async def get_clinical_note(
-    note_id: str, 
-    current_user: TokenPayload = Depends(get_current_doctor)
+    note_id: str, current_user: TokenPayload = Depends(get_current_doctor)
 ):
     """Get a single clinical note"""
     service = get_clinical_notes_service()
@@ -234,12 +235,13 @@ async def update_clinical_note(
 
 @router.delete("/clinical-notes/{note_id}")
 async def delete_clinical_note(
-    note_id: str, 
-    current_user: TokenPayload = Depends(get_current_doctor)
+    note_id: str, current_user: TokenPayload = Depends(get_current_doctor)
 ):
     """Delete a clinical note"""
     service = get_clinical_notes_service()
-    success = await service.delete_note(note_id=note_id, doctor_id=str(current_user.sub))
+    success = await service.delete_note(
+        note_id=note_id, doctor_id=str(current_user.sub)
+    )
 
     if not success:
         raise HTTPException(status_code=404, detail="Clinical note not found")
@@ -269,8 +271,8 @@ async def search_clinical_notes(
 
 @router.post("/note-templates")
 async def create_note_template(
-    template_data: NoteTemplateCreate, 
-    current_user: TokenPayload = Depends(get_current_doctor)
+    template_data: NoteTemplateCreate,
+    current_user: TokenPayload = Depends(get_current_doctor),
 ):
     """Create a note template"""
     service = get_clinical_notes_service()
@@ -283,8 +285,8 @@ async def create_note_template(
 
 @router.get("/note-templates")
 async def get_note_templates(
-    note_type: Optional[str] = None, 
-    current_user: TokenPayload = Depends(get_current_doctor)
+    note_type: Optional[str] = None,
+    current_user: TokenPayload = Depends(get_current_doctor),
 ):
     """Get note templates"""
     service = get_clinical_notes_service()
@@ -297,14 +299,16 @@ async def get_note_templates(
 
 @router.put("/note-templates/{template_id}")
 async def update_note_template(
-    template_id: str, 
-    update_data: dict, 
-    current_user: TokenPayload = Depends(get_current_doctor)
+    template_id: str,
+    update_data: dict,
+    current_user: TokenPayload = Depends(get_current_doctor),
 ):
     """Update a note template"""
     service = get_clinical_notes_service()
     template = await service.update_template(
-        template_id=template_id, doctor_id=str(current_user.sub), update_data=update_data
+        template_id=template_id,
+        doctor_id=str(current_user.sub),
+        update_data=update_data,
     )
 
     return template
@@ -312,8 +316,7 @@ async def update_note_template(
 
 @router.delete("/note-templates/{template_id}")
 async def delete_note_template(
-    template_id: str, 
-    current_user: TokenPayload = Depends(get_current_doctor)
+    template_id: str, current_user: TokenPayload = Depends(get_current_doctor)
 ):
     """Delete a note template"""
     service = get_clinical_notes_service()
@@ -369,8 +372,7 @@ async def get_prescription_templates(
 
 @router.get("/prescription-templates/{template_id}")
 async def get_prescription_template(
-    template_id: str, 
-    current_user: TokenPayload = Depends(get_current_doctor)
+    template_id: str, current_user: TokenPayload = Depends(get_current_doctor)
 ):
     """Get a single prescription template"""
     service = get_prescription_template_service()
@@ -403,8 +405,7 @@ async def update_prescription_template(
 
 @router.delete("/prescription-templates/{template_id}")
 async def delete_prescription_template(
-    template_id: str, 
-    current_user: TokenPayload = Depends(get_current_doctor)
+    template_id: str, current_user: TokenPayload = Depends(get_current_doctor)
 ):
     """Delete a prescription template"""
     service = get_prescription_template_service()
@@ -420,8 +421,7 @@ async def delete_prescription_template(
 
 @router.post("/prescription-templates/{template_id}/toggle-favorite")
 async def toggle_template_favorite(
-    template_id: str, 
-    current_user: TokenPayload = Depends(get_current_doctor)
+    template_id: str, current_user: TokenPayload = Depends(get_current_doctor)
 ):
     """Toggle favorite status of a template"""
     service = get_prescription_template_service()
@@ -473,9 +473,7 @@ async def get_analytics(
     demographics = await service.get_patient_demographics(doctor_id=doctor_id)
     trends = await service.get_appointment_trends(doctor_id=doctor_id)
     diagnoses = await service.get_common_diagnoses(doctor_id=doctor_id)
-    prescriptions = await service.get_prescription_patterns(
-        doctor_id=doctor_id
-    )
+    prescriptions = await service.get_prescription_patterns(doctor_id=doctor_id)
 
     return {
         "earnings": earnings,
@@ -488,10 +486,14 @@ async def get_analytics(
 
 
 @router.get("/analytics/demographics")
-async def get_patient_demographics(current_user: TokenPayload = Depends(get_current_doctor)):
+async def get_patient_demographics(
+    current_user: TokenPayload = Depends(get_current_doctor),
+):
     """Get patient demographics"""
     service = get_doctor_analytics_service()
-    demographics = await service.get_patient_demographics(doctor_id=str(current_user.sub))
+    demographics = await service.get_patient_demographics(
+        doctor_id=str(current_user.sub)
+    )
 
     return demographics
 

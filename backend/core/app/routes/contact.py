@@ -42,8 +42,9 @@ async def submit_contact_message(request: ContactMessageRequest):
         # Send confirmation email to user via SendGrid provider
         try:
             from app.services.email_provider import SendGridProvider
+
             email_provider = SendGridProvider()
-            
+
             subject = "Thank you for contacting Netra AI"
             html_body = f"""
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">

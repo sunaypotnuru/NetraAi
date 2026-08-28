@@ -340,7 +340,11 @@ async def advanced_search(
         except Exception as e:
             logger.debug(f"Search history logging skipped (table may not exist): {e}")
 
-        return {"status": "success", "data": results, "filters_applied": filters.model_dump()}
+        return {
+            "status": "success",
+            "data": results,
+            "filters_applied": filters.model_dump(),
+        }
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -1,5 +1,6 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Tuple, Optional
+import logging
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, EmailStr
@@ -8,6 +9,7 @@ from app.services.supabase import supabase
 from app.services.login_history_service import get_login_history_service
 from app.core.security import get_current_user
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/auth/security", tags=["auth-security"])
 
 # In-memory protection layer for brute-force mitigation.

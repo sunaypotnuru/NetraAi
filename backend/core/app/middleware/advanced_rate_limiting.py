@@ -54,7 +54,11 @@ class AdvancedRateLimitingMiddleware(BaseHTTPMiddleware):
         import sys
 
         # Skip rate limiting for health checks, static assets, or in testing mode
-        if self._should_skip_rate_limiting(request) or os.getenv("ALLOW_MOCK_RESPONSES") == "true" or "pytest" in sys.modules:
+        if (
+            self._should_skip_rate_limiting(request)
+            or os.getenv("ALLOW_MOCK_RESPONSES") == "true"
+            or "pytest" in sys.modules
+        ):
             return await call_next(request)
 
         client_ip = self._get_client_ip(request)

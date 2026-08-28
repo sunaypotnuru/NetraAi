@@ -122,7 +122,7 @@ class AppointmentService:
                     existing_start = existing_start.replace(tzinfo=None)
                 else:
                     existing_start = existing_start.astimezone(scheduled_at.tzinfo)
-                
+
                 existing_duration = appt.get("duration_minutes", self.default_duration)
                 existing_end = existing_start + timedelta(
                     minutes=existing_duration + self.buffer_time
@@ -198,7 +198,7 @@ class AppointmentService:
                     appt_start = appt_start.replace(tzinfo=None)
                 else:
                     appt_start = appt_start.astimezone(date.tzinfo)
-                
+
                 appt_duration = appt.get("duration_minutes", self.default_duration)
                 appt_end = appt_start + timedelta(
                     minutes=appt_duration + self.buffer_time

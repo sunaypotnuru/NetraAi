@@ -168,7 +168,9 @@ class DoctorAnalyticsService:
         ratings = ratings_response.data if ratings_response.data else []
 
         average_rating = (
-            sum(r.get(Col.Ratings.RATING) or 0 for r in ratings) / len(ratings) if ratings else 0
+            sum(r.get(Col.Ratings.RATING) or 0 for r in ratings) / len(ratings)
+            if ratings
+            else 0
         )
 
         # Get total clinical notes
@@ -203,7 +205,7 @@ class DoctorAnalyticsService:
     def get_dashboard_stats(self, doctor_id: str) -> Dict[str, Any]:
         """Get summary stats for doctor dashboard"""
         today = datetime.now().date().isoformat()
-        
+
         # 1. Today's appointments count
         appts_res = (
             self.supabase.table(Tables.APPOINTMENTS)
@@ -213,7 +215,7 @@ class DoctorAnalyticsService:
             .execute()
         )
         appts_count = appts_res.count or 0
-        
+
         # 2. Revenue today (paid appointments)
         revenue_res = (
             self.supabase.table(Tables.APPOINTMENTS)
@@ -223,8 +225,11 @@ class DoctorAnalyticsService:
             .gte(Col.Appointments.SCHEDULED_AT, today)
             .execute()
         )
-        revenue_today = sum(float(a.get(Col.Appointments.CONSULTATION_FEE, 0) or 0) for a in (revenue_res.data or []))
-        
+        revenue_today = sum(
+            float(a.get(Col.Appointments.CONSULTATION_FEE, 0) or 0)
+            for a in (revenue_res.data or [])
+        )
+
         # 3. Pending patients (scans to review)
         # We look for scans where reviewed_at is null (not yet reviewed)
         scans_res = (
@@ -234,11 +239,11 @@ class DoctorAnalyticsService:
             .execute()
         )
         pending_patients = scans_res.count or 0
-        
+
         return {
             "appointments_today": appts_count,
             "revenue_today": revenue_today,
-            "pending_patients": pending_patients
+            "pending_patients": pending_patients,
         }
 
     def get_doctor_availability(self, doctor_id: str) -> Dict[str, Any]:

@@ -8,7 +8,9 @@ logger = logging.getLogger(__name__)
 
 # Fallback for local development if DATABASE_URL is not set
 # This ensures the app doesn't crash, but analytics will return 0/empty
-SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL or "postgresql://postgres:postgres@localhost:5432/postgres"
+SQLALCHEMY_DATABASE_URL = (
+    settings.DATABASE_URL or "postgresql://postgres:postgres@localhost:5432/postgres"
+)
 
 try:
     engine = create_engine(
@@ -26,15 +28,18 @@ except Exception as e:
     # Create a dummy sessionmaker that will fail on use but allow import
     SessionLocal = None
 
+
 def get_db() -> Generator[Session, None, None]:
     """
     Dependency to get a SQLAlchemy database session.
     Used in analytics routes for complex aggregations.
     """
     if SessionLocal is None:
-        logger.error("SessionLocal is not initialized. Database connection might be missing.")
+        logger.error(
+            "SessionLocal is not initialized. Database connection might be missing."
+        )
         raise Exception("Database connection not initialized")
-        
+
     db = SessionLocal()
     try:
         yield db

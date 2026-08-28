@@ -735,9 +735,7 @@ async def notifications_endpoint(
     try:
         await websocket.accept()
         # Send initial connected status
-        await websocket.send_json(
-            {"type": "connection", "status": "connected"}
-        )
+        await websocket.send_json({"type": "connection", "status": "connected"})
 
         while True:
             data = await websocket.receive_text()
@@ -746,10 +744,7 @@ async def notifications_endpoint(
                 # Handle ping/heartbeat from frontend's WebSocketService
                 if message.get("type") == "ping":
                     await websocket.send_json(
-                        {
-                            "type": "pong",
-                            "timestamp": message.get("timestamp")
-                        }
+                        {"type": "pong", "timestamp": message.get("timestamp")}
                     )
             except json.JSONDecodeError:
                 pass
@@ -775,10 +770,7 @@ async def presence_endpoint(
                 message = json.loads(data)
                 if message.get("type") == "ping":
                     await websocket.send_json(
-                        {
-                            "type": "pong",
-                            "timestamp": message.get("timestamp")
-                        }
+                        {"type": "pong", "timestamp": message.get("timestamp")}
                     )
             except json.JSONDecodeError:
                 pass

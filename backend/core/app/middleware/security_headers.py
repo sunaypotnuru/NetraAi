@@ -105,7 +105,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         # Additional security headers (skip for API docs)
         if request.url.path not in ["/docs", "/redoc", "/openapi.json"]:
             response.headers["X-Permitted-Cross-Domain-Policies"] = "none"
-            
+
             # Cross-Origin Policies for defense-in-depth
             # COEP: Requires explicit CORS opt-in for cross-origin resources
             response.headers["Cross-Origin-Embedder-Policy"] = "require-corp"
