@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import api from '@/lib/api';
 import { useAuth } from '@/app/contexts/AuthContext';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@/lib/i18n';
 
 interface EmergencyContact {
   id: string;
