@@ -325,8 +325,6 @@ class SessionService:
                 .update(
                     {
                         "is_active": False,
-                        "terminated_at": now.isoformat(),
-                        "termination_reason": reason,
                     }
                 )
                 .eq("session_token", session_token)
@@ -369,8 +367,6 @@ class SessionService:
                 .update(
                     {
                         "is_active": False,
-                        "terminated_at": now.isoformat(),
-                        "termination_reason": reason,
                     }
                 )
                 .eq("user_id", user_id)
@@ -414,8 +410,6 @@ class SessionService:
                 .update(
                     {
                         "is_active": False,
-                        "terminated_at": now.isoformat(),
-                        "termination_reason": "timeout",
                     }
                 )
                 .eq("is_active", True)
