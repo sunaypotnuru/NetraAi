@@ -429,7 +429,16 @@ class SessionService:
             return count
 
         except Exception as e:
-            logger.error(f"Error cleaning up expired sessions: {e}")
+            msg = str(e).lower()
+            if (
+                "name or service not known" in msg
+                or "errno -2" in msg
+                or isinstance(e, (OSError, ConnectionError, TimeoutError))
+            ):
+                # Transient DNS/network error — expected on cold-start, do not alert Sentry
+                logger.warning(f"Session cleanup skipped — network not ready: {e}")
+            else:
+                logger.error(f"Error cleaning up expired sessions: {e}")
             return 0
 
 

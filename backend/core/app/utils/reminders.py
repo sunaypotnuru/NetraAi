@@ -94,17 +94,34 @@ def _get_sendgrid() -> Any:
 # Core helper: fetch templates by trigger event
 # ============================================================
 async def fetch_templates(trigger_event: str) -> List[Dict[str, Any]]:
-    """Fetch active follow-up templates for a given trigger event."""
+    """Fetch active follow-up templates for a given trigger event.
+
+    Returns an empty list on network/DNS errors so the scheduler job
+    never crashes and never reports transient failures to Sentry.
+    """
     if not supabase:
         return []
-    res = (
-        supabase.table("follow_up_templates")
-        .select("*")
-        .eq("trigger_event", trigger_event)
-        .eq("is_active", True)
-        .execute()
-    )
-    return list(res.data) if res.data else []
+    try:
+        res = (
+            supabase.table("follow_up_templates")
+            .select("*")
+            .eq("trigger_event", trigger_event)
+            .eq("is_active", True)
+            .execute()
+        )
+        return list(res.data) if res.data else []
+    except Exception as e:
+        msg = str(e).lower()
+        if (
+            "name or service not known" in msg
+            or "errno -2" in msg
+            or isinstance(e, (OSError, ConnectionError, TimeoutError))
+        ):
+            # Transient network issue — log quietly, never raise to Sentry
+            logger.warning("fetch_templates skipped — network not ready: %s", e)
+            return []
+        logger.warning("fetch_templates error for '%s': %s", trigger_event, e)
+        return []
 
 
 # ============================================================
@@ -306,9 +323,33 @@ async def send_reminder_or_followup(
 # Scheduled job: process upcoming & completed appointments
 # ============================================================
 async def process_appointments() -> None:
-    """Timer loop run every 15 minutes by APScheduler."""
+    """Timer loop run every 15 minutes by APScheduler.
+
+    All exceptions are caught internally so APScheduler never sees an
+    unhandled exception — which would be reported to Sentry.
+    DNS/network errors (Errno -2) are expected on cold-start and logged
+    at WARNING level only.
+    """
     if not supabase:
         return
+    try:
+        await _process_appointments_inner()
+    except Exception as e:
+        msg = str(e).lower()
+        if (
+            "name or service not known" in msg
+            or "errno -2" in msg
+            or isinstance(e, (OSError, ConnectionError, TimeoutError))
+        ):
+            logger.warning(
+                "process_appointments skipped — network not ready: %s", e
+            )
+        else:
+            logger.error("process_appointments unexpected error: %s", e)
+
+
+async def _process_appointments_inner() -> None:
+    """Inner logic — separated so process_appointments can safely catch all errors."""
     logger.info("⏰ Running scheduled appointment check...")
     now = datetime.utcnow()
 
