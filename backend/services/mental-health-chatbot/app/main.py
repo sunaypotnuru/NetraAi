@@ -40,7 +40,7 @@ logger.info(f"CORS configured for origins: {allowed_origins}")
 
 # Groq configuration (Cloud-based, fast, and production-ready)
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.1-70b-versatile")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "qwen/qwen3.8-27b")
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 
