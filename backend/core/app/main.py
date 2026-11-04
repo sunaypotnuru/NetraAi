@@ -102,9 +102,7 @@ def scrub_phi_from_events(event, hint):
     log_msg = event.get("message") or ""
     if not log_msg and "logentry" in event:
         log_msg = (
-            event["logentry"].get("message")
-            or event["logentry"].get("formatted")
-            or ""
+            event["logentry"].get("message") or event["logentry"].get("formatted") or ""
         )
     if log_msg:
         log_msg_lower = log_msg.lower()

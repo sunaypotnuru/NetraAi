@@ -32,7 +32,7 @@ REQUIRED_BUCKETS = {
 }
 
 _NETWORK_ERRORS = (
-    OSError,          # covers [Errno -2] Name or service not known
+    OSError,  # covers [Errno -2] Name or service not known
     ConnectionError,
     TimeoutError,
 )
@@ -78,7 +78,9 @@ def initialize_storage_buckets() -> bool:
                     "Storage bucket check skipped — network not ready yet: %s", e
                 )
                 return False
-            logger.warning("Could not list buckets: %s. Will attempt to create anyway.", e)
+            logger.warning(
+                "Could not list buckets: %s. Will attempt to create anyway.", e
+            )
 
         # Create missing buckets
         for bucket_name, config in REQUIRED_BUCKETS.items():
@@ -90,19 +92,24 @@ def initialize_storage_buckets() -> bool:
                     logger.info("✅ Created storage bucket: %s", bucket_name)
                 except Exception as e:
                     err_str = str(e).lower()
-                    if "already exists" in err_str or "bucket already exists" in err_str:
+                    if (
+                        "already exists" in err_str
+                        or "bucket already exists" in err_str
+                    ):
                         logger.info("✅ Bucket already exists: %s", bucket_name)
                     elif _is_network_error(e):
                         # DNS not ready — skip quietly, do NOT call logger.error
                         # so Sentry never captures this.
                         logger.warning(
                             "Bucket '%s' setup skipped — network not ready: %s",
-                            bucket_name, e,
+                            bucket_name,
+                            e,
                         )
                     else:
                         logger.warning(
                             "Could not create bucket '%s' (non-critical): %s",
-                            bucket_name, e,
+                            bucket_name,
+                            e,
                         )
             else:
                 logger.info("✅ Bucket already exists: %s", bucket_name)
@@ -112,9 +119,7 @@ def initialize_storage_buckets() -> bool:
 
     except Exception as e:
         if _is_network_error(e):
-            logger.warning(
-                "Storage init skipped — network not ready on startup: %s", e
-            )
+            logger.warning("Storage init skipped — network not ready on startup: %s", e)
             return False
         # Genuine unexpected error — log as warning (not error) to avoid Sentry noise
         logger.warning("Storage bucket init encountered an issue: %s", e)

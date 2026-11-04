@@ -341,9 +341,7 @@ async def process_appointments() -> None:
             or "errno -2" in msg
             or isinstance(e, (OSError, ConnectionError, TimeoutError))
         ):
-            logger.warning(
-                "process_appointments skipped — network not ready: %s", e
-            )
+            logger.warning("process_appointments skipped — network not ready: %s", e)
         else:
             logger.error("process_appointments unexpected error: %s", e)
 
