@@ -77,9 +77,43 @@ from app.warmup import warmup_deepseek_sync  # type: ignore
 from app.utils.storage_init import initialize_storage_buckets
 
 
-# PHI scrubbing function for Sentry
+# PHI scrubbing & transient network error filtering for Sentry
 def scrub_phi_from_events(event, hint):
-    """Remove PHI (Protected Health Information) from Sentry events before sending."""
+    """
+    1. Filter out transient network / DNS cold-start errors so sleeping container
+       wakeups never trigger Sentry alerts.
+    2. Remove PHI (Protected Health Information) from Sentry events before sending.
+    """
+    # ─── Drop transient DNS / connection errors on cold-start / sleep-wake ─────
+    if hint and "exc_info" in hint and hint["exc_info"]:
+        _, exc_val, _ = hint["exc_info"]
+        if exc_val is not None:
+            msg = str(exc_val).lower()
+            if (
+                "name or service not known" in msg
+                or "errno -2" in msg
+                or "getaddrinfo failed" in msg
+                or "nodename nor servname provided" in msg
+                or isinstance(exc_val, (OSError, ConnectionError, TimeoutError))
+            ):
+                return None  # Discard event completely
+
+    # Check logentry / message for transient network strings
+    log_msg = event.get("message") or ""
+    if not log_msg and "logentry" in event:
+        log_msg = (
+            event["logentry"].get("message")
+            or event["logentry"].get("formatted")
+            or ""
+        )
+    if log_msg:
+        log_msg_lower = log_msg.lower()
+        if (
+            "name or service not known" in log_msg_lower
+            or "errno -2" in log_msg_lower
+            or "getaddrinfo failed" in log_msg_lower
+        ):
+            return None  # Discard event completely
     # List of sensitive fields to scrub
     sensitive_fields = [
         "email",

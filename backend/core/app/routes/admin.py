@@ -1302,6 +1302,8 @@ async def delete_review(
 async def get_team_members_public():
     """Publicly accessible endpoint to list all active team members."""
     try:
+        if not supabase:
+            return []
         res = (
             supabase.table("team_members")
             .select("*")
@@ -1309,8 +1311,16 @@ async def get_team_members_public():
             .order("created_at", desc=False)
             .execute()
         )
-        return res.data
+        return res.data or []
     except Exception as e:
+        msg = str(e).lower()
+        if (
+            "name or service not known" in msg
+            or "errno -2" in msg
+            or isinstance(e, (OSError, ConnectionError, TimeoutError))
+        ):
+            logger.warning("get_team_members_public skipped — network not ready: %s", e)
+            return []
         raise HTTPException(status_code=500, detail=str(e))
 
 
